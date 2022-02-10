@@ -1,16 +1,31 @@
-<#$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectToAzure.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/validatesubready.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/DefineResourceGroup.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/kickoffdeploymentofavsprivatecloud.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectAVSExrToVnet.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
+mkdir $env:TEMP\AVSDeploy
 
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectAVSExrToOnPremExr.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/addhcx.ps1
-Invoke-Expression $($ScriptFromGitHub.Content)
+<#$filename = ConnectToAzure.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
+
+$filename = validatesubready.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
+
+$filename = DefineResourceGroup.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
+
+$filename = kickoffdeploymentofavsprivatecloud.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
+
+$filename = ConnectAVSExrToVnet.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
 #>
+$filename = ConnectAVSExrToOnPremExr.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
+
+$filename = addhcx.ps1
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-Expression $env:TEMP\AVSDeploy\$filename
+
+
