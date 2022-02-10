@@ -1,5 +1,10 @@
-$deployvariablesvariables = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/avspcdeploy-variables.ps1
-Invoke-Expression $($deployvariablesvariables.Content)
+$variablefile = "avspcdeploy-variables.ps1"
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$variablefile -OutFile $env:TEMP\AVSDeploy\$variablefile
+Invoke-Expression $env:TEMP\AVSDeploy\$variablefile
+
+
+
+
 
 Select-AzSubscription -SubscriptionId $sub
 Write-Host -ForegroundColor Yellow "Building Global Reach connection from $pcname to the on-premises Express Route $NameOfOnPremExRCircuit..."
