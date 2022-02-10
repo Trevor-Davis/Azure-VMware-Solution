@@ -1,28 +1,10 @@
-$sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
-$RGNewOrExisting = "Existing"
-$rgfordeployment = "VirtualWorkloads-APAC-AzureCloud"
-$regionfordeployment = "southeastasia"
-$pcname = "AVS1-VirtualWorkloads-APAC-AzureCloud"
-$addressblock = "10.1.0.0/22"
-$skus = "AV36"
-$numberofhosts = "3"
-$internet = "Enabled"
-$ExrGatewayForAVS = "ExRGW-VirtualWorkloads-APAC-Hub"
-$ExRGWResourceGroup = "VirtualWorkloads-APAC-Hub"
-$ExrGWforAVSResourceGroup = "VirtualWorkloads-APAC-Hub"
-$ExrForAVSRegion = "southeastasia"
-$OnPremExRCircuitSub = "3988f2d0-8066-42fa-84f2-5d72f80901da"
-$NameOfOnPremExRCircuit = "tnt15-cust-p01-australiaeast-er"
-$RGofOnPremExRCircuit = "Prod_AVS_RG" 
-
-
 <#$variablefile = "avspcdeploy-variables.ps1"
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$variablefile -OutFile $env:TEMP\AVSDeploy\$variablefile
 . "$env:TEMP\AVSDeploy\$variablefile"
 #>
 Select-AzSubscription -SubscriptionId $sub
 Write-Host -ForegroundColor Yellow "Building Global Reach connection from $pcname to the on-premises Express Route $NameOfOnPremExRCircuit..."
-write-Host "hello3"
+write-Host "hello4"
 New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey "490b170e-1ae8-404d-bafc-333eaa0e6cde" -PeerExpressRouteResourceId "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
 
 $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
