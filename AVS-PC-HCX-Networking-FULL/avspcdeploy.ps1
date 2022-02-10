@@ -8,8 +8,9 @@ $ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-D
 Invoke-Expression $($ScriptFromGitHub.Content)
 $ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectAVSExrToVnet.ps1
 Invoke-Expression $($ScriptFromGitHub.Content)
-#>
+
 $ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectAVSExrToOnPremExr.ps1
 Invoke-Expression $($ScriptFromGitHub.Content)
 $ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/addhcx.ps1
 Invoke-Expression $($ScriptFromGitHub.Content)
+#>
