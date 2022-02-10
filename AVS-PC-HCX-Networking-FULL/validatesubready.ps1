@@ -1,5 +1,7 @@
-$deployvariablesvariables = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/avspcdeploy-variables.ps1
-Invoke-Expression $($deployvariablesvariables.Content)
+$sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
+$regionfordeployment = "southeastasia"
+
+
 
 
 Write-Host -ForegroundColor Yellow  "

@@ -1,5 +1,12 @@
-$variables = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/avspcdeploy-variables.ps1
-Invoke-Expression $($variables.Content)
+$sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
+$rgfordeployment = "VirtualWorkloads-APAC-AzureCloud"
+$regionfordeployment = "southeastasia"
+$pcname = "AVS1-VirtualWorkloads-APAC-AzureCloud"
+$addressblock = "10.1.0.0/22"
+$skus = "AV36"
+$numberofhosts = "3"
+$internet = "Enabled"
+
 
 Write-Host -ForegroundColor Green "
 Success: The Azure VMware Solution Private Cloud Deployment Has Begun

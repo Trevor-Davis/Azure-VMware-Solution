@@ -1,5 +1,10 @@
-$deployvariablesvariables = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/avspcdeploy-variables.ps1
-Invoke-Expression $($deployvariablesvariables.Content)
+$rgfordeployment = "VirtualWorkloads-APAC-AzureCloud"
+$pcname = "AVS1-VirtualWorkloads-APAC-AzureCloud"
+$ExrGatewayForAVS = "ExRGW-VirtualWorkloads-APAC-Hub"
+$ExRGWResourceGroup = "VirtualWorkloads-APAC-Hub"
+$ExrGWforAVSResourceGroup = "VirtualWorkloads-APAC-Hub"
+$ExrForAVSRegion = "southeastasia"
+
 
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment
 $peerid = $myprivatecloud.CircuitExpressRouteId
