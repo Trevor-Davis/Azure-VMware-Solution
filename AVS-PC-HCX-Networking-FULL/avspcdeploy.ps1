@@ -1,6 +1,6 @@
-$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectToAzure.ps1
+<#$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/ConnectToAzure.ps1
 Invoke-Expression $($ScriptFromGitHub.Content)
-<#$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/validatesubready.ps1
+$ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/validatesubready.ps1
 Invoke-Expression $($ScriptFromGitHub.Content)
 $ScriptFromGitHub = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/DefineResourceGroup.ps1
 Invoke-Expression $($ScriptFromGitHub.Content)
