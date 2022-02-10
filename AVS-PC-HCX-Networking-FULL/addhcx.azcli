@@ -1,0 +1,5 @@
+RESOURCE_GROUP="VirtualWorkloads-APAC-AzureCloud"
+PRIVATECLOUD_NAME="AVS1-VirtualWorkloads-APAC-AzureCloud"
+
+# Deploy HCX Advanced
+az vmware addon hcx create --resource-group $RESOURCE_GROUP --private-cloud $PRIVATECLOUD_NAME --offer "VMware MaaS Cloud Provider"
