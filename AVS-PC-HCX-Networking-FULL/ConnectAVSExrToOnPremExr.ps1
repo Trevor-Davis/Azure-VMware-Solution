@@ -1,4 +1,4 @@
-<#$variablefile = "avspcdeploy-variables.ps1"
+#$variablefile = "avspcdeploy-variables.ps1"
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$variablefile -OutFile $env:TEMP\AVSDeploy\$variablefile
 . "$env:TEMP\AVSDeploy\$variablefile"
 #>
