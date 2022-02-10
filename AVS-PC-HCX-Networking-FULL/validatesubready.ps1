@@ -1,4 +1,4 @@
-$deployvariablesvariables = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/AVS-PC-HCX-Networking-FULL/avspcdeploy-variables.ps1
+$deployvariablesvariables = Invoke-WebRequest https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/avspcdeploy-variables.ps1
 Invoke-Expression $($deployvariablesvariables.Content)
 
 
