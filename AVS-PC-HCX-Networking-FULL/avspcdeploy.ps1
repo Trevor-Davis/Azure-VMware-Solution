@@ -75,10 +75,10 @@ $RGofOnPremExRCircuit = "Prod_AVS_RG"
 
 
 
-<#$filename = ConnectToAzure.ps1
+$filename = ConnectToAzure.ps1
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
-Invoke-Expression $env:TEMP\AVSDeploy\$filename
-
+. "$env:TEMP\AVSDeploy\$filename"
+<#
 $filename = validatesubready.ps1
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-PC-HCX-Networking-FULL/$filename -OutFile $env:TEMP\AVSDeploy\$filename
 Invoke-Expression $env:TEMP\AVSDeploy\$filename
