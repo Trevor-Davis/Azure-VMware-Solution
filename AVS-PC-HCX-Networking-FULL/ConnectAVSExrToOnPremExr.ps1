@@ -3,7 +3,7 @@ Invoke-Expression $($deployvariablesvariables.Content)
 
 Select-AzSubscription -SubscriptionId $sub
 Write-Host -ForegroundColor Yellow "Building Global Reach connection from $pcname to the on-premises Express Route $NameOfOnPremExRCircuit..."
-write-Host "hello"
+write-Host "hello2"
 New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey "490b170e-1ae8-404d-bafc-333eaa0e6cde" -PeerExpressRouteResourceId "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
 
 $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
