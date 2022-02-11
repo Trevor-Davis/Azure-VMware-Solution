@@ -25,7 +25,7 @@ AVS ExpressRoute Auth Key Generation Failed"
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
 
-$exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExRGWResourceGroup -Name $ExrGatewayForAVS
+$exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
 New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExrForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
  
 Write-host -ForegroundColor Green "
