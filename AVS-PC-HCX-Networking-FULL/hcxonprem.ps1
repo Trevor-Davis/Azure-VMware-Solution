@@ -1,159 +1,3 @@
-# Written By: Trevor Davis
-# www.virtualworkloads.com
-# @vTrevorDavis
-
-
-<###stop###
-#######################################################################################
-# Confirm Requirements Are Met
-#######################################################################################
-
-
-$msg1 = "This script will DEPLOY and CONFIGURE the HCX Connector" 
-$msg2 = "ON-PREMISES which will then connect to the AVS private cloud"
-$msg3 = "HCX Manager."
-$msg4 = ""
-$msg5 = "FOR THIS SCRIPT TO FUNCTION THE FOLLOWING IS REQUIRED ON"
-$msg6 = "THE LOCAL WINDOWS MACHINE:"
-$msg7 = "- Powershell 7.x"
-$msg8 = "- VMware PowerCLI"
-$msg9 = "- HCX Powershell Module"
-$msg10 = "- HCX Connector OVA file"
-
-$msg1yposition = "20"
-$msg3yposition = "40"
-$msg4yposition = "60"
-$msg5yposition = "80"
-$msg6yposition = "100"
-$msg7yposition = "120"
-$msg8yposition = "140"
-$msg9yposition = "160"
-$msg10yposition = "180"
-
-
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
-$form = New-Object System.Windows.Forms.Form
-$form.Text = 'AVS HCX On-Prem Deploy and Config'
-$form.Size = New-Object System.Drawing.Size(400,350)
-$form.StartPosition = 'CenterScreen'
-
-$okButton = New-Object System.Windows.Forms.Button
-$okButton.Location = New-Object System.Drawing.Point(125,250)
-$okButton.Size = New-Object System.Drawing.Size(75,23)
-$okButton.Text = 'Continue'
-$okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-$form.AcceptButton = $okButton
-$form.Controls.Add($okButton)
-
-$cancelButton = New-Object System.Windows.Forms.Button
-$cancelButton.Location = New-Object System.Drawing.Point(200,250)
-$cancelButton.Size = New-Object System.Drawing.Size(75,23)
-$cancelButton.Text = 'Cancel'
-$cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-$form.CancelButton = $cancelButton
-$form.Controls.Add($cancelButton)
-
-$label1 = New-Object System.Windows.Forms.Label
-$label1.Location = New-Object System.Drawing.Point(10,$msg1yposition)
-$label1.Size = New-Object System.Drawing.Size(400,20)
-$label1.Text = $msg1
-$form.Controls.Add($label1)
-
-$label2 = New-Object System.Windows.Forms.Label
-$label2.Location = New-Object System.Drawing.Point(10,$msg2yposition)
-$label2.Size = New-Object System.Drawing.Size(400,20)
-$label2.Text = $msg2
-$form.Controls.Add($label2)
-
-$label3 = New-Object System.Windows.Forms.Label
-$label3.Location = New-Object System.Drawing.Point(10,$msg3yposition)
-$label3.Size = New-Object System.Drawing.Size(400,20)
-$label3.Text = $msg3
-$form.Controls.Add($label3)
-
-$label4 = New-Object System.Windows.Forms.Label
-$label4.Location = New-Object System.Drawing.Point(10,$msg4yposition)
-$label4.Size = New-Object System.Drawing.Size(400,20)
-$label4.Text = $msg4
-$form.Controls.Add($label4)
-
-$label5 = New-Object System.Windows.Forms.Label
-$label5.Location = New-Object System.Drawing.Point(10,$msg5yposition)
-$label5.Size = New-Object System.Drawing.Size(400,20)
-$label5.Text = $msg5
-$form.Controls.Add($label5)
-
-$label6 = New-Object System.Windows.Forms.Label
-$label6.Location = New-Object System.Drawing.Point(10,$msg6yposition)
-$label6.Size = New-Object System.Drawing.Size(400,20)
-$label6.Text = $msg6
-$form.Controls.Add($label6)
-
-$label7 = New-Object System.Windows.Forms.Label
-$label7.Location = New-Object System.Drawing.Point(10,$msg7yposition)
-$label7.Size = New-Object System.Drawing.Size(400,20)
-$label7.Text = $msg7
-$form.Controls.Add($label7)
-
-$label8 = New-Object System.Windows.Forms.Label
-$label8.Location = New-Object System.Drawing.Point(10,$msg8yposition)
-$label8.Size = New-Object System.Drawing.Size(400,20)
-$label8.Text = $msg8
-$form.Controls.Add($label8)
-
-$label9 = New-Object System.Windows.Forms.Label
-$label9.Location = New-Object System.Drawing.Point(10,$msg9yposition)
-$label9.Size = New-Object System.Drawing.Size(400,20)
-$label9.Text = $msg9
-$form.Controls.Add($label9)
-
-$label10 = New-Object System.Windows.Forms.Label
-$label10.Location = New-Object System.Drawing.Point(10,$msg10yposition)
-$label10.Size = New-Object System.Drawing.Size(400,20)
-$label10.Text = $msg10
-$form.Controls.Add($label10)
-
-$form.Topmost = $true
-
-$result = $form.ShowDialog()
-
-if ($result -eq [System.Windows.Forms.DialogResult]::Cancel)
-
-{
-
-Exit
-
-}
-###stop###>
-
-#######################################################################################
-# Outline Requirements 
-#######################################################################################
-
-Write-Host -ForegroundColor Green "
-This script will do the following:"
-
-Write-Host -ForegroundColor White "
-- Deploy HCX Connector to the on-premises VMware cluster which has the VMs that will be migrating to AVS.
-"
-
-Write-Host -ForegroundColor Green "
-To support this deployment the following is required on your local system:
-"
-
-Write-Host -ForegroundColor White "- Pre-Populated Configuraton File"
-Write-Host -ForegroundColor Yellow "  https://github.com/Trevor-Davis/scripts/blob/main/Nested_Cluster_Deploy/nestedlabvariables.xlsx"
-Write-Host -ForegroundColor White "- Microsoft Excel"
-Write-Host -ForegroundColor White "- HCX Connector OVA file (Can be downloaded from the HCX Manager in AVS)"
-
-Write-Host -ForegroundColor Yellow "Would you like to begin? (Y/N): " -NoNewline
-$begin = Read-Host 
-
-if ("n" -eq $begin) {
-  Exit-PSSession}
-
 #######################################################################################
 # Check for Installs
 #######################################################################################
@@ -175,75 +19,6 @@ if ($vmwarepowerclicheck.Name -ne "VMware.VimAutomation.Hcx") {
   Exit-PSSession
   }
 
-#######################################################################################
-# Browse for User Input File 
-#######################################################################################
-Clear-Host
-Write-Host -ForegroundColor Yellow "You will now be asked to locate the file" -NoNewline
-Write-Host -ForegroundColor Red " hcx.xlsx " -NoNewline
-Write-Host -ForegroundColor Yellow "on your local system.  Press any key to continue ..."
-$readhost = Read-Host 
-
-   Add-Type -AssemblyName System.Windows.Forms
-   $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
-   [void]$FileBrowser.ShowDialog()
-   
-   $file = $FileBrowser.FileName
-
-# $file = "C:\Users\avs-admin\Downloads\nested\nestedlabvariables.xlsx"
-
-$sheetName = "hcx"
-   $objExcel = New-Object -ComObject Excel.Application
-   $workbook = $objExcel.Workbooks.Open($file)
-   $sheet = $workbook.Worksheets.Item($sheetName)
-   $objExcel.Visible=$false
-
-   #Declare the  positions
-   $rowOnPremVIServerIP,$colOnPremVIServerIP = 8,4
-$rowOnPremVIServerUsername,$colOnPremVIServerUsername = 9,4
-$rowOnPremVIServerPassword,$colOnPremVIServerPassword = 10,4
-$rowPSCIP,$colPSCIP = 11,4
-$rowOnPremCluster,$colOnPremCluster = 12,4
-$rowVMNetwork,$colVMNetwork = 13,4
-$rowDatastore,$colDatastore = 14,4
-$rowHCXVMIP,$colHCXVMIP = 15,4
-$rowHCXVMNetmask ,$colHCXVMNetmask  = 16,4
-$rowHCXVMGateway,$colHCXVMGateway = 17,4
-$rowHCXVMDNS,$colHCXVMDNS = 18,4
-$rowHCXVMDomain,$colHCXVMDomain = 19,4
-$rowAVSVMNTP,$colAVSVMNTP = 20,4
-$rowHCXOnPremPassword,$colHCXOnPremPassword = 21,4
-$rowHCXOnPremLocation,$colHCXOnPremLocation = 22,4
-$rowhcxactivationkey,$colhcxactivationkey = 23,4
-
-
-$rowHCXCloudIP,$colHCXCloudIP = 26,4
-$rowHCXCloudPassword,$colHCXCloudPassword = 27,4
-
-
-$rowvmotionportgroup,$colvmotionportgroup = 30,4
-$rowvmotionprofilegateway,$colvmotionprofilegateway = 31,4
-$rowvmotionnetworkmask,$colvmotionnetworkmask = 32,4
-$rowvmotionippool,$colvmotionippool = 33,4
-$rowmanagementportgroup,$colmanagementportgroup = 34,4
-$rowmgmtprofilegateway,$colmgmtprofilegateway = 35,4
-$rowmgmtnetworkmask,$colmgmtnetworkmask = 36,4
-$rowmgmtippool,$colmgmtippool = 37,4
-$rowhcxVDS,$colhcxVDS = 38,4
-$rowHCXOnPremUserID,$colHCXOnPremUserID = 39,4
-$rowHCXManagerVMName,$colHCXManagerVMName = 40,4
-$rowHCXOnPremRoleMapping,$colHCXOnPremRoleMapping = 41,4
-$rowmgmtnetworkprofilename,$colmgmtnetworkprofilename = 42,4
-$rowvmotionnetworkprofilename,$colvmotionnetworkprofilename = 43,4
-$rowhcxactivationurl,$colhcxactivationurl = 44,4
-$rowHCXCloudUserID,$colHCXCloudUserID = 45,4
-$rowhcxComputeProfileName,$colhcxComputeProfileName = 46,4
-$rowhcxServiceMeshName,$colhcxServiceMeshName = 47,4
-$rowhcxRemoteComputeProfileName,$colhcxRemoteComputeProfileName = 48,4
-
-
-    
-   #read in variables
    $OnPremVIServerIP = $sheet.Cells.Item($rowOnPremVIServerIP,$colOnPremVIServerIP).text
    $OnPremVIServerUsername = $sheet.Cells.Item($rowOnPremVIServerUsername,$colOnPremVIServerUsername).text
    $OnPremVIServerPassword = $sheet.Cells.Item($rowOnPremVIServerPassword,$colOnPremVIServerPassword).text
@@ -260,12 +35,8 @@ $rowhcxRemoteComputeProfileName,$colhcxRemoteComputeProfileName = 48,4
    $HCXOnPremPassword = $sheet.Cells.Item($rowHCXOnPremPassword,$colHCXOnPremPassword).text
    $HCXOnPremLocation = $sheet.Cells.Item($rowHCXOnPremLocation,$colHCXOnPremLocation).text
    $hcxactivationkey = $sheet.Cells.Item($rowhcxactivationkey,$colhcxactivationkey).text
-   
-   
    $HCXCloudIP = $sheet.Cells.Item($rowHCXCloudIP,$colHCXCloudIP).text
    $HCXCloudPassword = $sheet.Cells.Item($rowHCXCloudPassword,$colHCXCloudPassword).text
-   
-   
    $vmotionportgroup = $sheet.Cells.Item($rowvmotionportgroup,$colvmotionportgroup).text
    $vmotionprofilegateway = $sheet.Cells.Item($rowvmotionprofilegateway,$colvmotionprofilegateway).text
    $vmotionnetworkmask = $sheet.Cells.Item($rowvmotionnetworkmask,$colvmotionnetworkmask).text
@@ -286,60 +57,22 @@ $rowhcxRemoteComputeProfileName,$colhcxRemoteComputeProfileName = 48,4
    $hcxServiceMeshName = $sheet.Cells.Item($rowhcxServiceMeshName,$colhcxServiceMeshName).text
    $hcxRemoteComputeProfileName = $sheet.Cells.Item($rowhcxRemoteComputeProfileName,$colhcxRemoteComputeProfileName).text
    
-   
+write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
+$hcxfilename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
+Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$filename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
+write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
 
-   #close excel file
-   $objExcel.quit()
-
-
-########################################
-# Deploy HCX Connector
-########################################
-Write-Host "
-"
-Write-Host -NoNewLine -ForegroundColor White "
-   You will now be asked to locate the"
-   Write-Host -NoNewLine -ForegroundColor Green " HCX OVA file on your system.  This should have been downloaded from the Azure VMware Solution HCX Manager."
-   Write-Host -NoNewline -ForegroundColor White "  Press any key to continue ..."
-
-  
-
-   Add-Type -AssemblyName System.Windows.Forms
-   $FileBrowser = New-Object System.Windows.Forms.OpenFileDialog
-   [void]$FileBrowser.ShowDialog()
-   $HCXApplianceOVA = $FileBrowser.FileName
-
-   $filename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
-Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/powerapp-generated-scripts/$filename -OutFile $env:TEMP\$filename
-Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/powerapp-generated-scripts/$filename 
-clear-host
-Start-Sleep -Seconds 10
-write-host "hello"
-
-$hello = $env:TEMP
-#$HCXApplianceOVA = "C:\users\avs-admin\Downloads\VMware-HCX-Connector-4.3.0.0-19068550.ova"
+$HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
 
 # Connect to vCenter
-
-
-
 Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore
 Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $false
-Write-Host -ForegroundColor Green "Connecting to On-Premises vCenter Server..."
 Connect-VIServer $OnPremVIServerIP -WarningAction SilentlyContinue -User $OnPremVIServerUsername -Password $OnPremVIServerPassword
-
-
 
 # Load OVF/OVA configuration into a variable
 $ovfconfig = Get-OvfConfiguration $HCXApplianceOVA
-
-
 $VMHost = Get-Cluster $OnPremCluster | Get-VMHost
 $VMHost = $VMHost.Name.Get(0)
-
-# | Sort-Object MemoryGB | Sort-Object -first 1
-#$VMHost | Get-datastore | Sort FreeSpaceGB -Descending | Select -first 1
-
 
 # Fill out the OVF/OVA configuration parameters
 
@@ -375,9 +108,9 @@ $ovfconfig.Common.mgr_cli_passwd.Value = $HCXOnPremPassword
 $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremPassword
 
 # Deploy the OVF/OVA with the config parameters
-Write-Host -ForegroundColor Green "Deploying HCX Connector OVA ..."
+Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
 $vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
-
+Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
 
 <###
 
@@ -393,7 +126,7 @@ $HCXVMIP = "192.168.89.152"
 #########################
 
 # Power On the HCX Connector VM after deployment
-Write-Host -ForegroundColor Green "Powering on HCX Connector ..."
+Write-Host -ForegroundColor Yellow "Powering on HCX Connector ..."
 $vm | Start-VM -Confirm:$false | Out-Null
 # Waiting for HCX Connector to initialize
 while(1) {
@@ -404,12 +137,12 @@ while(1) {
             $requests = Invoke-WebRequest -Uri "https://$($HCXVMIP):9443" -Method GET -TimeoutSec 5
         }
         if($requests.StatusCode -eq 200) {
-            Write-Host -ForegroundColor Green "HCX Connector is now ready to be configured!"
+            Write-Host -ForegroundColor Green "Success: HCX Connector is now ready to be configured!"
             break
         }
     }
     catch {
-        Write-Host -ForegroundColor Yellow "HCX Connector is not ready yet, sleeping for 60 seconds ..."
+        Write-Host -ForegroundColor Yellow "HCX Connector Being Configured ... Still Not Ready ... Will Check Again In 1 Minute ..."
         Start-Sleep 60
     }
 }
@@ -688,10 +421,12 @@ $command | ConvertTo-Json
 #Exit
 ##########
 
-Write-Host -ForegroundColor Blue "HCX Is Now Deployed In Your On Premises Cluster, Log into your On-Premises vCenter and You Should See a HCX Plug-In, If You Do Not, Log Out of vCenter and Log Back In."
+Write-Host -ForegroundColor Green "
+HCX Is Now Deployed In Your On Premises Cluster, 
+Log into your On-Premises vCenter and You Should See a HCX Plug-In,
+If You Do Not, Log Out of vCenter and Log Back In.
+"
 Write-Host -ForegroundColor White "Press Any Key To Continue"
-$readhost = Read-Host 
-
 
 
 Start-Process "https://$OnPremVIServerIP"
