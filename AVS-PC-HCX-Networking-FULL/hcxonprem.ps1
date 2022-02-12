@@ -52,54 +52,141 @@ Select the number which corresponds to the Cluster where you would like to deplo
 Generally pick the one which has the VMs you are going to be migrating, but could be any cluster managed by this vCenter"
 $OnPremCluster = $clusters["$OnPremCluster"].Name
 
-#Get The VDS List
 
-write-host -foregroundcolor blue "=================================
-"
+#Pick L2 Extension DVS
 
-   $item = Get-VDSwitch 
-      $Count = 0
-      
-       foreach ($item in $items) {
-          $list = $item.Name
-          Write-Host "$Count - $list"
-          $Count++
-       }
-       
-write-host -foregroundcolor blue "
+write-host -foregroundcolor Yellow "
 =================================  "
        
 $Selection = Read-Host "
-Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector.
+Are you extending L2 VDS portgroups to AVS? (Y/N)"
+if ($Selection =eq "y") {
+  write-host -foregroundcolor blue "=================================
+  "
+  
+     $item = Get-VDSwitch 
+        $Count = 0
+        
+         foreach ($item in $items) {
+            $list = $item.Name
+            Write-Host "$Count - $list"
+            $Count++
+         }
+         
+  write-host -foregroundcolor blue "
+  =================================  "
+         
+  $Selection = Read-Host "
+  Select the switch from this list which contgains the portgroups which will be extended to AVS."
+  $hcxVDS = $items["$Selection"].Name
+  
+  
+}
 
-Generally pick the one which has the VMs you are going to be migrating, but could be any cluster managed by this vCenter"
-$hcxVDS = $items["$Selection"].Name
+
+#Pick the network segments
+
+write-host -foregroundcolor blue "=================================
+  "
+  
+     $item = Get-VirtualNetwork
+        $Count = 0
+        
+         foreach ($item in $items) {
+            $list = $item.Name
+            Write-Host "$Count - $list"
+            $Count++
+         }
+         
+  write-host -foregroundcolor blue "
+  =================================  "
+         
+$Selection = Read-Host "
+Select the number of the portgroup which cooresponds to your VMOTION network"
+$vmotionportgroup = $items["$Selection"].Name
+
+$Selection = Read-Host "
+Select the number of the portgroup which cooresponds to your MANAGEMENT network"
+$managementportgroup = $items["$Selection"].Name
+
+$Selection = Read-Host "
+Select the portgroup where the HCX Connector should be deployed.
+This is typically the same portgroup which is used for other management type of workloads, but could be any portgroup you like."
+$VMNetwork = $items["$Selection"].Name
+
+#Pick the Datastore to use
+
+write-host -foregroundcolor blue "=================================
+  "
+  
+     $item = Get-Datastore
+        $Count = 0
+        
+         foreach ($item in $items) {
+            $list = $item.Name
+            Write-Host "$Count - $list"
+            $Count++
+         }
+         
+  write-host -foregroundcolor blue "
+  =================================  "
+         
+$Selection = Read-Host "
+Select the datastore where the HCX Connector and other HCX appliances should be deployed (not a significant amount of space required)."
+$Datastore = $items["$Selection"].Name
 
 
-   $VMNetwork = "workload-app"
-   $Datastore = "LabDatastore"
-   $HCXVMIP = "10.17.0.9"
-   $HCXVMNetmask  = "27"
-   $HCXVMGateway = "10.17.0.1"
-   $HCXVMDNS = "1.1.1.1"
-   $HCXVMDomain = "azure.ms"
-   $AVSVMNTP = "pool.ntp.org"
-   $HCXOnPremPassword = "Microsoft.123!"
-   $HCXOnPremLocation = "Buffalo"
-   $hcxactivationkey = "431371541AB14BE795C7968AB2F409E0"
+#Define the HCX Connector Deployment Details
+write-Host -foregroundcolor Yellow "You will now be asked to input the parameters for the HCX Connector OVA Deployment.  Remember the portgroup where it will be deployed is $VMNetwork"
+$Selection = Read-Host -ForegroundColor "Press Any Key To Continue"
+
+$Selection = Read-Host "
+IP Address for the HCX Connector:"
+$HCXVMIP = $Selection
+
+$Selection = Read-Host "
+Netmask (in /xx format) for the HCX Connector:"
+$HCXVMNetmask = $Selection
+
+$Selection = Read-Host "
+Gateway for the HCX Connector:"
+$HCXVMGateway = $Selection
+
+$Selection = Read-Host "
+Domain for the HCX Connector (example: mycompany.com):"
+$HCXVMDomain = $Selection
+
+$Selection = Read-Host "
+NTP Server for the HCX Connector (example: pool.ntp.com):"
+$AVSVMNTP = $Selection
+
+$Selection = Read-Host "
+Provide a admin password of your choice for the HCX Connector:"
+$HCXOnPremPassword = $Selection
+
+$Selection = Read-Host "
+What is the nearest major city to where the HCX Connector is being deployed (example: New York, London, Miami, Melbourne, etc..):"
+$HCXOnPremLocation = "$Selection"
+
+
+   
    $HCXCloudIP = "10.2.0.9"
    $HCXCloudPassword = "8xeR0e&b4-I9"
-   $vmotionportgroup = "vmotion"
    $vmotionprofilegateway = "10.17.0.65"
    $vmotionnetworkmask = "27"
    $vmotionippool = "10.17.0.74-10.17.0.77"
-   $managementportgroup = "management"
    $mgmtprofilegateway = "10.17.0.1"
    $mgmtnetworkmask = "27"
    $mgmtippool = "10.17.0.10-10.17.0.16"
+   $HCXOnPremRoleMapping = "vsphere.local"
+   $hcxactivationkey = "431371541AB14BE795C7968AB2F409E0"
+
+
+
+
+
    $HCXOnPremUserID = "admin"
    $HCXManagerVMName = "AVS-HCX-Connector"
-   $HCXOnPremRoleMapping = "vsphere.local"
    $mgmtnetworkprofilename = "Management"
    $vmotionnetworkprofilename = "vMotion"
    $hcxactivationurl = "https://connect.hcx.vmware.com"
