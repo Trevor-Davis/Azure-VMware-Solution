@@ -106,8 +106,35 @@ Select the number of the portgroup which cooresponds to your VMOTION network"
 $vmotionportgroup = $items["$Selection"].Name
 
 $Selection = Read-Host "
+What is the Gateway for the vMotion Network on porgroup $vmotionportgroup ? : "
+$vmotionprofilegateway = $Selection
+
+Write-Host "
+What is the Netmask for the vMotion Network (in this format /xx) on porgroup $vmotionportgroup ?" 
+$Selection = Read-Host "/"
+$vmotionnetworkmask = $Selection
+
+$Selection = Read-Host "
+Provide three FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x):" 
+$vmotionippool = $Selection
+
+$Selection = Read-Host "
 Select the number of the portgroup which cooresponds to your MANAGEMENT network"
 $managementportgroup = $items["$Selection"].Name
+
+$Selection = Read-Host "
+What is the Gateway for the Management Network on portgroup $managementportgroup ? : "
+$mgmtprofilegateway = $Selection
+
+Write-Host "
+What is the Netmask for the Management Network (in this format /xx) on porgroup $managementportgroup ?" 
+$Selection = Read-Host "/"
+$mgmtnetworkmask = $Selection
+
+$Selection = Read-Host "
+Provide three FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x):" 
+$mgmtippool = $Selection
+
 
 $Selection = Read-Host "
 Select the portgroup where the HCX Connector should be deployed.
@@ -172,12 +199,7 @@ $HCXOnPremLocation = "$Selection"
    
    $HCXCloudIP = "10.2.0.9"
    $HCXCloudPassword = "8xeR0e&b4-I9"
-   $vmotionprofilegateway = "10.17.0.65"
-   $vmotionnetworkmask = "27"
-   $vmotionippool = "10.17.0.74-10.17.0.77"
-   $mgmtprofilegateway = "10.17.0.1"
-   $mgmtnetworkmask = "27"
-   $mgmtippool = "10.17.0.10-10.17.0.16"
+
    $HCXOnPremRoleMapping = "vsphere.local"
    $hcxactivationkey = "431371541AB14BE795C7968AB2F409E0"
 
