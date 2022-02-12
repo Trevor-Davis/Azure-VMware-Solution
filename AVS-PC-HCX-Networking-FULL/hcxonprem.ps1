@@ -75,13 +75,6 @@ Select the number which corresponds to the Cluster where you would like to deplo
 Generally pick the one which has the VMs you are going to be migrating, but could be any cluster managed by this vCenter"
 $hcxVDS = $items["$Selection"].Name
 
-$hcxVDS = "DistributedSwitch"
-
-
-
-
-
-
 
    $VMNetwork = "workload-app"
    $Datastore = "LabDatastore"
