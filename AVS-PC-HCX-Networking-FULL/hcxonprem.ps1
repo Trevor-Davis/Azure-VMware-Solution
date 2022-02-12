@@ -19,11 +19,70 @@ if ($vmwarepowerclicheck.Name -ne "VMware.VimAutomation.Hcx") {
   Exit-PSSession
   }
 
+###########################
+# Get the variables
+###########################
+
    $OnPremVIServerIP = "10.17.0.2"
    $OnPremVIServerUsername = "administrator@vsphere.local"
    $OnPremVIServerPassword = "0hDG3VqFyTd!"
    $PSCIP = $OnPremVIServerIP
-   $OnPremCluster = "Cluster-1"
+
+#Get Cluster Name
+write-host -ForegroundColor Red "You will be prompted to log into you on-premises vCenter Server $OnPremVIServerIP..."
+Connect-VIServer -Server 192.168.0.2
+write-host -foregroundcolor blue "=================================
+"
+
+   $clusters = Get-Cluster 
+      $Count = 0
+      
+       foreach ($cluster in $clusters) {
+          $clusterlist = $cluster.Name
+          Write-Host "$Count - $clusterlist"
+          $Count++
+       }
+       
+write-host -foregroundcolor blue "
+=================================  "
+       
+$OnPremCluster = Read-Host "
+Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector.
+
+Generally pick the one which has the VMs you are going to be migrating, but could be any cluster managed by this vCenter"
+$OnPremCluster = $clusters["$OnPremCluster"].Name
+
+#Get The VDS List
+
+write-host -foregroundcolor blue "=================================
+"
+
+   $item = Get-VDSwitch 
+      $Count = 0
+      
+       foreach ($item in $items) {
+          $list = $item.Name
+          Write-Host "$Count - $list"
+          $Count++
+       }
+       
+write-host -foregroundcolor blue "
+=================================  "
+       
+$Selection = Read-Host "
+Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector.
+
+Generally pick the one which has the VMs you are going to be migrating, but could be any cluster managed by this vCenter"
+$hcxVDS = $items["$Selection"].Name
+
+$hcxVDS = "DistributedSwitch"
+
+
+
+
+
+
+
    $VMNetwork = "workload-app"
    $Datastore = "LabDatastore"
    $HCXVMIP = "10.17.0.9"
@@ -45,7 +104,6 @@ if ($vmwarepowerclicheck.Name -ne "VMware.VimAutomation.Hcx") {
    $mgmtprofilegateway = "10.17.0.1"
    $mgmtnetworkmask = "27"
    $mgmtippool = "10.17.0.10-10.17.0.16"
-   $hcxVDS = "DistributedSwitch"
    $HCXOnPremUserID = "admin"
    $HCXManagerVMName = "AVS-HCX-Connector"
    $HCXOnPremRoleMapping = "vsphere.local"
