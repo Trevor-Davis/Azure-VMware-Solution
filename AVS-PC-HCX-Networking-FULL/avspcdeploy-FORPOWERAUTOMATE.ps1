@@ -36,7 +36,7 @@ $RGofOnPremExRCircuit = "REPLACE-RGFORONPREMEXR"
 $internet = "Enabled"
 $numberofhosts = "3"
 
-<#
+
 #############################################################################################################
 remove-item $env:TEMP\AVSDeploy\*.*
 mkdir $env:TEMP\AVSDeploy
@@ -102,7 +102,7 @@ if ("n" -eq $azurecliyesorno) {
 
   }
     
-#>
+
 #connecttoazure.ps1
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub ... there should be a web browser pop-up ... go there to login"
@@ -145,7 +145,7 @@ https://docs.microsoft.com/en-us/azure/azure-vmware/enable-azure-vmware-solution
 Exit
 
 }
-<#
+
 #DefineResourceGroup.ps1
 if ( "Existing" -eq $RGNewOrExisting )
 {
@@ -241,7 +241,7 @@ New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
-#>
+
 #ConnectAVSExrToOnPremExr.ps1
 
 
