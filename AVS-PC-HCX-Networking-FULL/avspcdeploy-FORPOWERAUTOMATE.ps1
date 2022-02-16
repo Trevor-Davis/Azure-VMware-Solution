@@ -2,7 +2,6 @@ $internaltest="yes" #put yes if this is an internal test
 $InternalAuthKey = "14eddea1-2f61-49d1-8a03-6bf2a9ae7779"
 $InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
 
-$deployhcxyesorno = "No"
 
 
 ##avspcdeploy-variables.ps1
@@ -311,12 +310,14 @@ if ("yes" -eq $internaltest) {
   }
   
   #addhcx.ps1
-  if ($deployhcxyesorno -eq "Yes") {
+  $deployhcxyesorno = "No"
+
+if ($deployhcxyesorno -eq "Yes") {
 
 write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 45 minutes ... "
 az vmware addon hcx create --resource-group "" --private-cloud "AVS2-VirtualWorkloads-APAC-AzureCloud" --offer "VMware MaaS Cloud Provider"
 write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
-}
+
 
 ######################################################
 
@@ -346,7 +347,7 @@ if ($vmwarepowerclicheck.Name -ne "VMware.VimAutomation.Hcx") {
 ###########################
 
    $OnPremVIServerIP = "10.17.0.2"
-   $PSCSameAsvCenterYesOrNo = Yes
+   $PSCSameAsvCenterYesOrNo = "Yes"
 if ($PSCSameAsvCenterYesOrNo -eq "Yes" ) {
      $PSCIP = $OnPremVIServerIP
    }
@@ -911,3 +912,4 @@ Write-Host -ForegroundColor White "Press Any Key To Continue"
 
 
 Start-Process "https://$OnPremVIServerIP"
+}
