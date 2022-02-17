@@ -5,49 +5,52 @@ $InternalPeerURI = ""
 #######################################################################################
 # Read In Variables
 #######################################################################################
-$sub = "@{outputs('Create_SharePoint_Entry')?['body/subfordeployment']}"
-$regionfordeployment = "@{outputs('Create_SharePoint_Entry')?['body/regionfordeployment']}"
-$pcname = "@{outputs('Create_SharePoint_Entry')?['body/vNetNameForAVS']}"
-$skus = "@{outputs('Create_SharePoint_Entry')?['body/SKUType']}"
-$addressblock = "@{outputs('Create_SharePoint_Entry')?['body/AVSAddressBlock']}"
-$ExrGatewayForAVS = "@{outputs('Create_SharePoint_Entry')?['body/existingvnetgwname']}" ##existingvnetgwname
-$deployhcxyesorno = "@{outputs('Create_SharePoint_Entry')?['body/DeployHCX']}"
-$ExrGWforAVSResourceGroup = "@{outputs('Create_SharePoint_Entry')?['body/RGofOnPremExRCircuit']}"
-$NameOfOnPremExRCircuit = "@{outputs('Create_SharePoint_Entry')?['body/NameOfOnPremExRCircuit']}" 
-$ExrForAVSRegion = "@{outputs('Create_SharePoint_Entry')?['body/ExRForAVSRegion']}" 
-$RGofOnPremExRCircuit = "@{outputs('Create_SharePoint_Entry')?['body/RGofOnPremExRCircuit']}"  
+$sub = "Sub for AVS Private Cloud" #subfordeployment
+$regionfordeployment = "Region for deployment of AVS" #regionfordeployment
+$pcname = "Name of AVS Private Cloud" #NameOfAVSPC
+$skus = "AVS Private Cloud SKU (AV36 or AV36T for Trial Nodes)" #SKUType
+$addressblock = "The /22 Network Block for AVS" #AVSAddressBlock
+$ExrGatewayForAVS = "The ExR GW Name The AVS Private Cloud Will Connect" #existingvnetgwname
+$deployhcxyesorno = "Yes Or No" #DeployHCX
+$ExrGWforAVSResourceGroup = "The Resource Group of the ExR GW Which AVS Will Connect" #RGofOnPremExRCircuit
+$NameOfOnPremExRCircuit = "The name of the on-prem ExR Circuit" #NameOfOnPremExRCircuit
+$ExrForAVSRegion = "The region where AVS is Deployed" #ExRForAVSRegion
+$RGofOnPremExRCircuit = "The RG where the the On-Prem ExR is deployed" #RGofOnPremExRCircuit
 $internet = "Enabled"
 $numberofhosts = "3"
 
-$RGNewOrExisting = "@{outputs('Create_SharePoint_Entry')?['body/RGForAVSNewOrExisting']}" #RGforAVSNewOrExisting
+$RGNewOrExisting = "New Or Existing ... Use an existing RG for AVS or create a new one" #RGforAVSNewOrExisting
 if("New" -eq $RGNewOrExisting)
 {
-$rgfordeployment = "@{outputs('Create_SharePoint_Entry')?['body/rgfordeployment_x002d_New']}"
+$rgfordeployment = "Name of the new resource group" #rgfordeployment
 }
 else {
-$rgfordeployment = "@{outputs('Create_SharePoint_Entry')?['body/rgfordeployment']}" #rgfordeployment
+$rgfordeployment = "Name of the existing RG" #rgfordeployment
 }
 
 
-$SameSubAVSAndExRGW = "@{outputs('Create_SharePoint_Entry')?['body/SameSubAVSAndExRGW']}"
+$SameSubAVSAndExRGW = "Yes or No ... Does AVS and the ExR GW connecting in the same subscriptoin?" #SameSubAVSAndExRGW
 if ("Yes" -eq $SameSubAVSAndExRGW) {
 $OnPremExRCircuitSub = $sub
 }
 else {
-    $OnPremExRCircuitSub = "@{outputs('Create_SharePoint_Entry')?['body/OnPremExRCircuitSub']}"
+    $OnPremExRCircuitSub = "The sub where the ExR is deployed" #OnPremExRCircuitSub
+    
 }
 
   
-$OnPremVIServerIP = "@{outputs('Create_SharePoint_Entry')?['body/OnPremVIServerIP']}"
-$PSCSameAsvCenterYesOrNo = "@{outputs('Create_SharePoint_Entry')?['body/PSCIPSameAsVcenterYesOrNo']}"
+$OnPremVIServerIP = "the On Prem vCenter server IP " #OnPremVIServerIP
+$PSCSameAsvCenterYesOrNo = "Is the PSC the same IP as the vCenter Server? ... Yes or No" #PSCIPSameAsVcenterYesOrNo
+
 if ($PSCSameAsvCenterYesOrNo -eq "Yes" ) {
   $PSCIP = $OnPremVIServerIP
 }
 else {
-  $PSCIP = "@{outputs('Create_SharePoint_Entry')?['body/PSCIP']}"
+  $PSCIP = "The PSCIP" #PSCIP
+  
 }
 
-$HCXOnPremRoleMapping = "@{outputs('Create_SharePoint_Entry')?['body/HCXOnPremRoleMapping']}"
+$HCXOnPremRoleMapping = "What is the SSO domain for vCenter, i.e., vsphere.local, mycompany.local" #HCXOnPremRoleMapping
 
 #######################################################################################
 # Create Temp Storage Location
