@@ -1,37 +1,32 @@
-#######################################################################################
-# Check for Installs
-#######################################################################################
-if ($PSVersionTable.PSVersion.Major -lt 7){
-  Write-Host -ForegroundColor Red "Please upgrade Powershell to 7.x"
-  Exit-PSSession
+#addhcx.ps1
+  if ($deployhcxyesorno -eq "Yes") {
+
+az login
+az account set --subscription $sub
+write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 45 minutes ... "
+#remove
+#az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
+write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
 }
 
-$vmwarepowerclicheck = Find-Module -Name VMware.PowerCLI
-if ($vmwarepowerclicheck.Name -ne "VMware.PowerCLI") {
-  Write-Host -ForegroundColor Red "Please install the VMware.PowerCLI Module"
-  Exit-PSSession
-  
-}
-
-$vmwarepowerclicheck = Find-Module -Name VMware.VimAutomation.Hcx
-if ($vmwarepowerclicheck.Name -ne "VMware.VimAutomation.Hcx") {
-  Write-Host -ForegroundColor Red "Please install the VMware.VimAutomation.Hcx Module"
-  Exit-PSSession
-  }
 
 ###########################
 # Get the variables
 ###########################
 
    $OnPremVIServerIP = "10.17.0.2"
-   if (condition) {
-     condition
+   $PSCSameAsvCenterYesOrNo = "Yes"
+if ($PSCSameAsvCenterYesOrNo -eq "Yes" ) {
+     $PSCIP = $OnPremVIServerIP
    }
-   $PSCIP = $OnPremVIServerIP
+
+
+Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 
 #Get Cluster Name
 write-host -ForegroundColor Red "You will be prompted to log into you on-premises vCenter Server $OnPremVIServerIP..."
-Connect-VIServer -Server 192.168.0.2
+Connect-VIServer -Server 10.17.0.2 -username $OnPremVIServerUsername -password $OnPremVIServerPassword
+
 write-host -foregroundcolor blue "=================================
 "
 
@@ -61,11 +56,10 @@ write-host -foregroundcolor Yellow "
        
 $Selection = Read-Host "
 Are you extending L2 VDS portgroups to AVS? (Y/N)"
-if ($Selection =eq "y") {
+if ($Selection -eq "y") {
   write-host -foregroundcolor blue "=================================
   "
-  
-     $item = Get-VDSwitch 
+     $items =   Get-VDSwitch -Server $OnPremVIServerIP
         $Count = 0
         
          foreach ($item in $items) {
@@ -73,7 +67,6 @@ if ($Selection =eq "y") {
             Write-Host "$Count - $list"
             $Count++
          }
-         
   write-host -foregroundcolor blue "
   =================================  "
          
@@ -90,7 +83,7 @@ if ($Selection =eq "y") {
 write-host -foregroundcolor blue "=================================
   "
   
-     $item = Get-VirtualNetwork
+     $items = Get-VirtualNetwork
         $Count = 0
         
          foreach ($item in $items) {
@@ -110,32 +103,47 @@ $Selection = Read-Host "
 What is the Gateway for the vMotion Network on porgroup $vmotionportgroup ? : "
 $vmotionprofilegateway = $Selection
 
+#remove
+$vmotionprofilegateway = "10.17.0.65"
+
+
 Write-Host "
 What is the Netmask for the vMotion Network (in this format /xx) on porgroup $vmotionportgroup ?" 
 $Selection = Read-Host "/"
 $vmotionnetworkmask = $Selection
+#remove
+$vmotionnetworkmask = "27"
 
 $Selection = Read-Host "
 Provide three FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x):" 
 $vmotionippool = $Selection
+#remove
+$vmotionippool = "10.17.0.74-10.17.0.77"
+
 
 $Selection = Read-Host "
 Select the number of the portgroup which cooresponds to your MANAGEMENT network"
 $managementportgroup = $items["$Selection"].Name
 
+
 $Selection = Read-Host "
 What is the Gateway for the Management Network on portgroup $managementportgroup ? : "
 $mgmtprofilegateway = $Selection
+#remove
+$mgmtprofilegateway = "10.17.0.1"
 
 Write-Host "
 What is the Netmask for the Management Network (in this format /xx) on porgroup $managementportgroup ?" 
 $Selection = Read-Host "/"
 $mgmtnetworkmask = $Selection
+#remove
+$mgmtnetworkmask = "27"
 
 $Selection = Read-Host "
 Provide three FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x):" 
 $mgmtippool = $Selection
-
+#remove
+$mgmtippool = "10.17.0.10-10.17.0.16"
 
 $Selection = Read-Host "
 Select the portgroup where the HCX Connector should be deployed.
@@ -147,7 +155,7 @@ $VMNetwork = $items["$Selection"].Name
 write-host -foregroundcolor blue "=================================
   "
   
-     $item = Get-Datastore
+     $items = Get-Datastore
         $Count = 0
         
          foreach ($item in $items) {
@@ -171,42 +179,57 @@ $Selection = Read-Host -ForegroundColor "Press Any Key To Continue"
 $Selection = Read-Host "
 IP Address for the HCX Connector:"
 $HCXVMIP = $Selection
+#remove
+$HCXVMIP = "10.17.1.140"
 
 $Selection = Read-Host "
 Netmask (in /xx format) for the HCX Connector:"
 $HCXVMNetmask = $Selection
+#remove
+$HCXVMNetmask = "25"
 
 $Selection = Read-Host "
 Gateway for the HCX Connector:"
 $HCXVMGateway = $Selection
+#remove
+$HCXVMGateway = "10.17.1.129"
+
+$Selection = Read-Host "
+DNS Server for the HCX Connector:"
+$HCXVMDNS = $Selection
+#remove
+$HCXVMDNS = "1.1.1.1"
 
 $Selection = Read-Host "
 Domain for the HCX Connector (example: mycompany.com):"
 $HCXVMDomain = $Selection
+#remove
+$HCXVMDomain = "lab.avs.ms"
 
 $Selection = Read-Host "
-NTP Server for the HCX Connector (example: pool.ntp.com):"
+NTP Server for the HCX Connector (example: pool.ntp.org):"
 $AVSVMNTP = $Selection
+#remove
+$AVSVMNTP = "pool.ntp.org"
 
 $Selection = Read-Host "
 Provide a admin password of your choice for the HCX Connector:"
 $HCXOnPremPassword = $Selection
+#remove
+$HCXOnPremPassword = "Microsoft.123!"
 
 $Selection = Read-Host "
 What is the nearest major city to where the HCX Connector is being deployed (example: New York, London, Miami, Melbourne, etc..):"
 $HCXOnPremLocation = "$Selection"
-
+#remove
+$HCXOnPremLocation = "Buffalo"
 
    
-   $HCXCloudIP = "10.2.0.9"
-   $HCXCloudPassword = "8xeR0e&b4-I9"
+   $HCXCloudIP = "10.1.0.9"
+   $HCXCloudPassword = "4f9k$@H1xEr9"
 
    $HCXOnPremRoleMapping = "vsphere.local"
-   $hcxactivationkey = "431371541AB14BE795C7968AB2F409E0"
-
-
-
-
+   $hcxactivationkey = ""
 
    $HCXOnPremUserID = "admin"
    $HCXManagerVMName = "AVS-HCX-Connector"
@@ -218,9 +241,16 @@ $HCXOnPremLocation = "$Selection"
    $hcxServiceMeshName = "AVS-ServiceMesh"
    $hcxRemoteComputeProfileName = "TNT43-HCX-COMPUTE-PROFILE"
    
+
+#remove
+#remove-item $env:TEMP\AVSDeploy\*.*
+mkdir $env:TEMP\AVSDeploy
+Clear-Host
+
 write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
 $hcxfilename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
-Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$filename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
+#remove
+#Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
 write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
 
 $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
@@ -270,7 +300,8 @@ $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremPassword
 
 # Deploy the OVF/OVA with the config parameters
 Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
-$vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
+#remove
+#$vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
 Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
 
 <###
@@ -288,7 +319,7 @@ $HCXVMIP = "192.168.89.152"
 
 # Power On the HCX Connector VM after deployment
 Write-Host -ForegroundColor Yellow "Powering on HCX Connector ..."
-$vm | Start-VM -Confirm:$false | Out-Null
+$vm | Start-VM -VM $HCXManagerVMName -Confirm:$false
 # Waiting for HCX Connector to initialize
 while(1) {
     try {
@@ -525,12 +556,12 @@ $command = New-HCXSitePairing -Url $HCXCloudIP -Username $HCXCloudUserID -Passwo
 $command | ConvertTo-Json
 
 ######################
-# Create vMotion Netowrk Profile
+# Create vMotion Network Profile
 ######################
 
 $vmotionnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name $vmotionportgroup 
 
-$command = New-HCXNetworkProfile -PrimaryDNS "$HCXVMDNS" -DNSSuffix "$HCXOnPremRoleMapping" -Name "$vmotionnetworkprofilename" -GatewayAddress "$vmotionprofilegateway" -IPPool "$vmotionippool" -Network $vmotionnetworkbacking -PrefixLength "$vmotionnetworkmask"
+$command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $vmotionnetworkprofilename -GatewayAddress $vmotionprofilegateway -IPPool $vmotionippool -Network $vmotionnetworkbacking -PrefixLength $vmotionnetworkmask
 $command | ConvertTo-Json
 
 
@@ -539,11 +570,9 @@ $command | ConvertTo-Json
 ######################
 
 
-
-
 $mgmtnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name $managementportgroup 
 
-$command = New-HCXNetworkProfile -PrimaryDNS "$HCXVMDNS" -DNSSuffix "$HCXOnPremRoleMapping" -Name "$mgmtnetworkprofilename" -GatewayAddress "$mgmtprofilegateway" -IPPool "$mgmtippool" -Network $mgmtnetworkbacking -PrefixLength "$mgmtnetworkmask"
+$command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $mgmtnetworkprofilename -GatewayAddress $mgmtprofilegateway -IPPool $mgmtippool -Network $mgmtnetworkbacking -PrefixLength $mgmtnetworkmask
 $command | ConvertTo-Json
 
 
@@ -573,10 +602,13 @@ $command | ConvertTo-Json
 
 $hcxDestinationSite = Get-HCXSite -Destination 
 $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName
-$hcxRemoteComputeProfile = Get-HCXComputeProfile -Site $hcxDestinationSite -Name $hcxRemoteComputeProfileName
-
-$command = New-HCXServiceMesh -Name $hcxServiceMeshName -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension 
+$hcxRemoteComputeProfileName = Get-HCXComputeProfile -Site $hcxDestinationSite
+$hcxRemoteComputeProfile = Get-HCXComputeProfile -Site $hcxDestinationSite -Name $hcxRemoteComputeProfileName.Name
+$hcxSourceUplinkNetworkProfile = Get-HCXNetworkProfile -Name $managementNetworkProfile
+$command = New-HCXServiceMesh -Name $hcxServiceMeshName -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension 
 $command | ConvertTo-Json
+
+
 
 ###############
 #Exit
@@ -587,7 +619,7 @@ HCX Is Now Deployed In Your On Premises Cluster,
 Log into your On-Premises vCenter and You Should See a HCX Plug-In,
 If You Do Not, Log Out of vCenter and Log Back In.
 "
-Write-Host -ForegroundColor White "Press Any Key To Continue"
+Read-Host -ForegroundColor White "Press Any Key To Continue"
 
 
 Start-Process "https://$OnPremVIServerIP"
