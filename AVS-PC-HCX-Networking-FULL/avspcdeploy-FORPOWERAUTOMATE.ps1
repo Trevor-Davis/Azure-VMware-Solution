@@ -1,19 +1,18 @@
-$internaltest="no" #put yes if this is an internal test
-$InternalAuthKey = ""
-$InternalPeerURI = ""
+$internaltest="Yes" #put yes if this is an internal test
+$InternalAuthKey = "14eddea1-2f61-49d1-8a03-6bf2a9ae7779"
+$InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
 
 #######################################################################################
 # Read In Variables
 #######################################################################################
 $sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
 $regionfordeployment = "southeastasia"
-$RGNewOrExisting = "New" #RGforAVSNewOrExisting
-$pcname = "AVS1-VirtualWorkloads-APAC-AzureCloud"
+$pcname = "AVS2-VirtualWorkloads-APAC-AzureCloud"
 $skus = "AV36"
 $addressblock = "10.1.0.0/22"
 $ExrGatewayForAVS = "ExRGW-VirtualWorkloads-APAC-Hub" ##existingvnetgwname
 #note ... need new input in the form
-$deployhcxyesorno = "No"
+$deployhcxyesorno = "Yes"
 $ExrGWforAVSResourceGroup = "REPLACE-RGFORONPREMEXR"
 $NameOfOnPremExRCircuit = "MyOnPremExR" 
 $ExrForAVSRegion = "eastasia" 
@@ -21,13 +20,13 @@ $RGofOnPremExRCircuit = "REPLACE-RGFORONPREMEXR"
 $internet = "Enabled"
 $numberofhosts = "3"
 
-
+$RGNewOrExisting = "Existing" #RGforAVSNewOrExisting
 if("New" -eq $RGNewOrExisting)
 {
 $rgfordeployment = "AVS1-VirtualWorkloads-APAC-AzureCloud-RG"
 }
 else {
-$rgfordeployment = "" #rgfordeployment
+$rgfordeployment = "AVS1-VirtualWorkloads-APAC-AzureCloud-RG" #rgfordeployment
 }
 
 
@@ -62,7 +61,7 @@ Clear-Host
 #######################################################################################
 #PowerShell 7
 
-if ($PSVersionTable.PSVersion.Major -lt 8){
+if ($PSVersionTable.PSVersion.Major -lt 7){
   $PSVersion = $PSVersionTable.PSVersion.Major
   Write-Host -NoNewline -ForegroundColor Yellow "Your Powershell Version Is $PSVersion ... Would You Like To Upgrade To Powershell Version 7 Now? (Y/N): "
   $PSVersionUpgrade = Read-Host 
@@ -79,29 +78,7 @@ if ($PSVersionTable.PSVersion.Major -lt 8){
 }
 Write-Host  "
 Powershell Version 7 Is a Requirement For This Script" -ForegroundColor Red
-Exit-PSSession
-}
-
-#PowerShell 7
-
-if ($PSVersionTable.PSVersion.Major -lt 8){
-  $PSVersion = $PSVersionTable.PSVersion.Major
-  Write-Host -NoNewline -ForegroundColor Yellow "Your Powershell Version Is $PSVersion ... Would You Like To Upgrade To Powershell Version 7 Now? (Y/N): "
-  $PSVersionUpgrade = Read-Host 
-  
-  if ($PSVersionUpgrade -eq "y"){
-  
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-  $PowerShellDownloadURL = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/PowerShell-7.2.1-win-x64.msi"
-  $PowerShellDownloadFileName = "PowerShell-7.2.1-win-x64.msi"
-  Invoke-WebRequest -Uri $PowerShellDownloadURL -OutFile $env:TEMP\AVSDeploy\$PowerShellDownloadFileName 
-  Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
-  Write-Host -ForegroundColor Green "
-  Success: PowerShell Upgraded"
-}
-Write-Host  "
-Powershell Version 7 Is a Requirement For This Script" -ForegroundColor Red
-Exit-PSSession
+Exit
 }
 
 #Az and Az.VMware Powershell Modules
@@ -124,7 +101,7 @@ if ($vmwareazcheck.Name -ne "Az") {
 
 }
 Write-Host  "Az and Az.VMware Powershell Modules Are Requirements For This Script" -ForegroundColor Red
-Exit-PSSession
+Exit
 }
 
 
@@ -149,7 +126,7 @@ if ($vmwarepowerclicheck.Name -ne "VMware.PowerCLI") {
 
 }
 Write-Host  "VMware PowerCLI Modules Are Requirements For This Script" -ForegroundColor Red
-Exit-PSSession
+Exit
 }
 
 
@@ -170,7 +147,7 @@ if ($vmwarepowerclihcxcheck.Name -ne "VMware.VimAutomation.Hcx") {
 
 }
 Write-Host  "VMware HCX PowerCLI Module Is Required For This Script" -ForegroundColor Red
-Exit-PSSession
+Exit
 }
   
 #Azure CLI
@@ -194,7 +171,7 @@ if ("False" -eq $installed) {
     }
 
     Write-Host  "Azure CLI Program Is Required For This Script" -ForegroundColor Red
-    Exit-PSSession
+    Exit
 
   }
     
@@ -263,7 +240,7 @@ Success: AVS Private Cloud Resource Group $rgfordeployment Created"
 #######################################################################################
 # Kickoff Private Cloud Deployment
 #######################################################################################
-
+<#
 Write-Host -ForegroundColor Green "
 Success: The Azure VMware Solution Private Cloud Deployment Has Begun
 "
@@ -310,7 +287,7 @@ if("Failed" -eq $currentprovisioningstate)
   Exit
 
 }
-
+#>
 
 #######################################################################################
 # Connect AVS To vNet
@@ -413,7 +390,7 @@ if ("yes" -eq $internaltest) {
 #######################################################################################
 
 if ($deployhcxyesorno -eq "No") {
-  Exit-PSSession
+  Exit
 }
 
 else
@@ -708,7 +685,8 @@ $hcxactivationkey = $Selection
   
   write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
   $hcxfilename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
-  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
+  #remove
+  #Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
   write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
   
@@ -757,8 +735,7 @@ $hcxactivationkey = $Selection
   
   # Deploy the OVF/OVA with the config parameters
   Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
-  #remove
-  #$vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
+  $vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
   Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
   
   <###
