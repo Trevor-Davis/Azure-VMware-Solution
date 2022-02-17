@@ -1,53 +1,53 @@
-$internaltest="Yes" #put yes if this is an internal test
-$InternalAuthKey = "14eddea1-2f61-49d1-8a03-6bf2a9ae7779"
-$InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
+$internaltest="No" #put yes if this is an internal test
+$InternalAuthKey = ""
+$InternalPeerURI = ""
 
 #######################################################################################
 # Read In Variables
 #######################################################################################
-$sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
-$regionfordeployment = "southeastasia"
-$pcname = "AVS2-VirtualWorkloads-APAC-AzureCloud"
-$skus = "AV36"
-$addressblock = "10.1.0.0/22"
-$ExrGatewayForAVS = "ExRGW-VirtualWorkloads-APAC-Hub" ##existingvnetgwname
-#note ... need new input in the form
-$deployhcxyesorno = "Yes"
-$ExrGWforAVSResourceGroup = "REPLACE-RGFORONPREMEXR"
-$NameOfOnPremExRCircuit = "MyOnPremExR" 
-$ExrForAVSRegion = "eastasia" 
-$RGofOnPremExRCircuit = "REPLACE-RGFORONPREMEXR"  
+$sub = "@{outputs('Create_SharePoint_Entry')?['body/subfordeployment']}"
+$regionfordeployment = "@{outputs('Create_SharePoint_Entry')?['body/regionfordeployment']}"
+$pcname = "@{outputs('Create_SharePoint_Entry')?['body/vNetNameForAVS']}"
+$skus = "@{outputs('Create_SharePoint_Entry')?['body/SKUType']}"
+$addressblock = "@{outputs('Create_SharePoint_Entry')?['body/AVSAddressBlock']}"
+$ExrGatewayForAVS = "@{outputs('Create_SharePoint_Entry')?['body/existingvnetgwname']}" ##existingvnetgwname
+$deployhcxyesorno = "@{outputs('Create_SharePoint_Entry')?['body/DeployHCX']}"
+$ExrGWforAVSResourceGroup = "@{outputs('Create_SharePoint_Entry')?['body/RGofOnPremExRCircuit']}"
+$NameOfOnPremExRCircuit = "@{outputs('Create_SharePoint_Entry')?['body/NameOfOnPremExRCircuit']}" 
+$ExrForAVSRegion = "@{outputs('Create_SharePoint_Entry')?['body/ExRForAVSRegion']}" 
+$RGofOnPremExRCircuit = "@{outputs('Create_SharePoint_Entry')?['body/RGofOnPremExRCircuit']}"  
 $internet = "Enabled"
 $numberofhosts = "3"
 
-$RGNewOrExisting = "Existing" #RGforAVSNewOrExisting
+$RGNewOrExisting = "@{outputs('Create_SharePoint_Entry')?['body/RGForAVSNewOrExisting']}" #RGforAVSNewOrExisting
 if("New" -eq $RGNewOrExisting)
 {
-$rgfordeployment = "AVS1-VirtualWorkloads-APAC-AzureCloud-RG"
+$rgfordeployment = "@{outputs('Create_SharePoint_Entry')?['body/rgfordeployment_x002d_New']}"
 }
 else {
-$rgfordeployment = "AVS1-VirtualWorkloads-APAC-AzureCloud-RG" #rgfordeployment
+$rgfordeployment = "@{outputs('Create_SharePoint_Entry')?['body/rgfordeployment']}" #rgfordeployment
 }
 
 
-$SameSubAVSAndExRGW = "No"
+$SameSubAVSAndExRGW = "@{outputs('Create_SharePoint_Entry')?['body/SameSubAVSAndExRGW']}"
 if ("Yes" -eq $SameSubAVSAndExRGW) {
 $OnPremExRCircuitSub = $sub
 }
 else {
-    $OnPremExRCircuitSub = "REPLACE-EXPRESSROUTESUB"
+    $OnPremExRCircuitSub = "@{outputs('Create_SharePoint_Entry')?['body/OnPremExRCircuitSub']}"
 }
 
   
-$OnPremVIServerIP = "10.17.0.2"
-$PSCSameAsvCenterYesOrNo = "Yes"
+$OnPremVIServerIP = "@{outputs('Create_SharePoint_Entry')?['body/OnPremVIServerIP']}"
+$PSCSameAsvCenterYesOrNo = "@{outputs('Create_SharePoint_Entry')?['body/PSCIPSameAsVcenterYesOrNo']}"
 if ($PSCSameAsvCenterYesOrNo -eq "Yes" ) {
   $PSCIP = $OnPremVIServerIP
 }
+else {
+  $PSCIP = "@{outputs('Create_SharePoint_Entry')?['body/PSCIP']}"
+}
 
-
-$HCXOnPremRoleMapping = "vsphere.local"
-
+$HCXOnPremRoleMapping = "@{outputs('Create_SharePoint_Entry')?['body/HCXOnPremRoleMapping']}"
 
 #######################################################################################
 # Create Temp Storage Location
@@ -61,6 +61,12 @@ Clear-Host
 #######################################################################################
 #PowerShell 7
 
+Write-Host -ForegroundColor White "Checking The Local System To Verify The Following Items Are Installed, If They Aren't Already Installed You Will Have The Option To Install Them:
+- PowerShell 7.x
+- AZ and the AZ.VMware Powershell Modules
+- VMware PowerCLI Modules
+- Azure CLI
+"
 if ($PSVersionTable.PSVersion.Major -lt 7){
   $PSVersion = $PSVersionTable.PSVersion.Major
   Write-Host -NoNewline -ForegroundColor Yellow "Your Powershell Version Is $PSVersion ... Would You Like To Upgrade To Powershell Version 7 Now? (Y/N): "
@@ -103,8 +109,6 @@ if ($vmwareazcheck.Name -ne "Az") {
 Write-Host  "Az and Az.VMware Powershell Modules Are Requirements For This Script" -ForegroundColor Red
 Exit
 }
-
-
 
 
 #VMware PowerCLI Modules
@@ -206,7 +210,6 @@ Success: Resource Provider Enabled
 
 }
 
-
 Else
 
 {
@@ -225,7 +228,7 @@ Exit
 
 if ( "Existing" -eq $RGNewOrExisting )
 {
-    write-host -foregroundcolor Green = "
+    write-host -foregroundcolor Green "
 AVS Private Cloud Resource Group is $rgfordeployment"
 }
 
@@ -240,7 +243,7 @@ Success: AVS Private Cloud Resource Group $rgfordeployment Created"
 #######################################################################################
 # Kickoff Private Cloud Deployment
 #######################################################################################
-<#
+
 Write-Host -ForegroundColor Green "
 Success: The Azure VMware Solution Private Cloud Deployment Has Begun
 "
@@ -293,7 +296,7 @@ if("Failed" -eq $currentprovisioningstate)
 # Connect AVS To vNet
 #######################################################################################
 
-$myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment
+$myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
@@ -432,20 +435,18 @@ write-host -ForegroundColor Yellow -nonewline "
 Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector (SUGGESTION: pick the one which has the VMs you are going to be migrating): "
 $Selection = Read-Host
 $OnPremCluster = $clusters["$Selection"].Name
+Clear-Host
   
   
 #######################################################################################
 # Pick L2 Extension DVS
 #######################################################################################  
-  
-write-host -foregroundcolor blue "================================="
+write-host -ForegroundColor Yellow -nonewline "
+Are you extending L2 VDS portgroups to AVS? (Y/N): "
+$Selection = Read-Host
 
-         
-  $Selection = Read-Host "
-  Are you extending L2 VDS portgroups to AVS? (Y/N)"
-  if ($Selection -eq "y") {
-write-host -foregroundcolor blue "=================================
-    "
+if ($Selection -eq "y") {
+write-host -foregroundcolor blue "================================="
        $items =   Get-VDSwitch -Server $OnPremVIServerIP
           $Count = 0
           
@@ -460,7 +461,7 @@ write-host -ForegroundColor Yellow -nonewline "
 Select the switch from this list which contgains the portgroups which will be extended to AVS: "
 $Selection = Read-Host
 $hcxVDS = $items["$Selection"].Name
-
+Clear-Host
   }
   
   
@@ -499,6 +500,7 @@ write-host -ForegroundColor Yellow -nonewline "
 Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
 $Selection = Read-Host
 $vmotionippool = $Selection
+Clear-Host
 
 #######################################################################################
 # Define the Management Portgroup and Config for the Network Profile
@@ -535,7 +537,7 @@ write-host -ForegroundColor Yellow -nonewline "
 Provide three contiguous FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
 $Selection = Read-Host
 $mgmtippool = $Selection
-
+Clear-Host
 
 #######################################################################################
 # Define the Portgroup To Deploy the HCX Connector
@@ -558,7 +560,7 @@ Select the number of the Portgroup Where You Would Like To Deploy the HCX Connec
 write-host -foregroundcolor yellow "This is typically the same portgroup which is used for other management type of workloads, but could be any portgroup you like.: "
 $Selection = Read-Host
 $VMNetwork = $items["$Selection"].Name
-           
+Clear-Host           
  
 
 #######################################################################################
@@ -581,6 +583,7 @@ write-host -ForegroundColor Yellow -nonewline "
 Select the datastore where the HCX Connector and other HCX appliances should be deployed (not a significant amount of space required): "
 $Selection = Read-Host
 $Datastore = $items["$Selection"].Name
+Clear-Host           
 
 
 
@@ -735,7 +738,8 @@ $hcxactivationkey = $Selection
   
   # Deploy the OVF/OVA with the config parameters
   Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
-  $vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
+  #$vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
+  Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
   Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
   
   <###
@@ -753,7 +757,8 @@ $hcxactivationkey = $Selection
   
   # Power On the HCX Connector VM after deployment
   Write-Host -ForegroundColor Yellow "Powering on HCX Connector ..."
-  $vm | Start-VM -VM $HCXManagerVMName -Confirm:$false
+  Start-VM -VM $HCXManagerVMName -Confirm:$false
+#  $vm | Start-VM -VM $HCXManagerVMName -Confirm:$false
   # Waiting for HCX Connector to initialize
   while(1) {
       try {
@@ -1058,3 +1063,4 @@ $hcxactivationkey = $Selection
   $Selection = Read-Host
   Start-Process "https://$OnPremVIServerIP"
     }
+    
