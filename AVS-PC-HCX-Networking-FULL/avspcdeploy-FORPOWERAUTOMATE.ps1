@@ -1048,13 +1048,13 @@ $hcxactivationkey = $Selection
   #Exit
   ##########
   
-  Write-Host -ForegroundColor Green "
+  write-host -ForegroundColor Yellow -nonewline "
   HCX Is Now Deployed In Your On Premises Cluster, 
   Log into your On-Premises vCenter and You Should See a HCX Plug-In,
   If You Do Not, Log Out of vCenter and Log Back In.
+
+  Press Any Key To Continue
   "
-  Read-Host -ForegroundColor White "Press Any Key To Continue"
-  
-  
+  $Selection = Read-Host
   Start-Process "https://$OnPremVIServerIP"
     }
