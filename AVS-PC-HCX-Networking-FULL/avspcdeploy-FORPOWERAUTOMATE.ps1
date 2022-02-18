@@ -14,7 +14,8 @@ $ExrGatewayForAVS = "The ExR GW Name The AVS Private Cloud Will Connect" #existi
 $deployhcxyesorno = "Yes Or No" #DeployHCX
 $ExrGWforAVSResourceGroup = "The Resource Group of the ExR GW Which AVS Will Connect" #RGofOnPremExRCircuit
 $NameOfOnPremExRCircuit = "The name of the on-prem ExR Circuit" #NameOfOnPremExRCircuit
-$ExrForAVSRegion = "The region where AVS is Deployed" #ExRForAVSRegion
+$ExRGWForAVSRegion = "The ExR GW Region for AVS" #ExRGWForAVSRegion
+
 $RGofOnPremExRCircuit = "The RG where the the On-Prem ExR is deployed" #RGofOnPremExRCircuit
 $internet = "Enabled"
 $numberofhosts = "3"
