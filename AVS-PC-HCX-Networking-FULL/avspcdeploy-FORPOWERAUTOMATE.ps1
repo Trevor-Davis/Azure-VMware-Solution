@@ -33,10 +33,11 @@ $rgfordeployment = "Name of the existing RG" #rgfordeployment
 $SameSubAVSAndExRGW = "Yes or No ... Does AVS and the ExR GW connecting in the same subscriptoin?" #SameSubAVSAndExRGW
 if ("Yes" -eq $SameSubAVSAndExRGW) {
 $OnPremExRCircuitSub = $sub
+$vnetgwsub = $sub
 }
 else {
-    $OnPremExRCircuitSub = "The sub where the ExR is deployed" #OnPremExRCircuitSub
-    
+    $OnPremExRCircuitSub = "The sub where the ExR is deployed" #OnPremExRCircuitSub #OnPremExRCircuitSub ..... does not matter when doing internal testing
+    $vnetgwsub = "the sub where the ExR GW exists" #vnetgwsub
 }
 
   
@@ -256,7 +257,7 @@ Deployment Status Will Begin To Show Shortly
 "
 New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
 
-Write-Host -foregroundcolor Magenta "
+Write-Host -foregroundcolor Blue "
 The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours.
 "
 Write-Host -foregroundcolor Yellow "
@@ -294,7 +295,7 @@ if("Failed" -eq $currentprovisioningstate)
   Exit
 
 }
-#>
+
 
 #######################################################################################
 # Connect AVS To vNet
@@ -319,8 +320,11 @@ AVS ExpressRoute Auth Key Generation Failed"
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
 
+
+Set-AzContext -SubscriptionId $vnetgwsub
 $exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
-New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExrForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
+
+New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
  
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
