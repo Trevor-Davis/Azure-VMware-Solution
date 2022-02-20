@@ -1,6 +1,12 @@
 $internaltest="No" #put yes if this is an internal test
-$InternalAuthKey = ""
-$InternalPeerURI = ""
+
+if ("Yes" -eq $internaltest){
+$InternalAuthKey = "89193c55-f013-4b76-bf2f-05b92a1534ef"
+$InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
+$OnPremVIServerUsername = "administrator@vsphere.local"
+$OnPremVIServerPassword = '0hDG3VqFyTd!'
+}
+
 
 #######################################################################################
 # Read In Variables
@@ -307,21 +313,14 @@ Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
 $exrauthkey = New-AzVMWareAuthorization -Name "Connection-To-$ExrGatewayForAVS" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment 
-if ($exrauthkey.ProvisioningState -eq "Succeeded" ) {
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
-    }
-    if ($exrauthkey.ProvisioningState -ne "Succeeded" ) {
-        Write-Host -ForegroundColor Red "
-AVS ExpressRoute Auth Key Generation Failed"
-        Exit
-        }
 
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
 
 
-Set-AzContext -SubscriptionId $vnetgwsub
+Select-AzSubscription -SubscriptionId $vnetgwsub
 $exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
 
 New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
@@ -420,12 +419,26 @@ else
 #######################################################################################
 # Get On-Prem vCenter Creds
 #######################################################################################  
+if ("Yes" -eq $internaltest){
+
+Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
+
+}
+else {
+
+
+
 write-host -ForegroundColor Yellow -nonewline "What Is The Username for the ON-PREMISES vCenter Server ($OnPremVIServerIP) Where HCX Connector Will Be Deployed?: "
 $OnPremVIServerUsername = Read-Host 
 write-host -ForegroundColor Yellow -nonewline "What Is The Password for the ON-PREMISES vCenter Server ($OnPremVIServerIP) Where HCX Connector Will Be Deployed?: "
 $OnPremVIServerPassword = Read-Host -MaskInput
 Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
-  
+}
+
+#######################################################################################
+# Pick Cluster to Deploy HCX Connector
+#######################################################################################
+
 write-host -foregroundcolor blue "================================="
   
      $clusters = Get-Cluster 
@@ -476,6 +489,33 @@ Clear-Host
 #######################################################################################
 # Define the vMotion Portgroup and Config for the Network Profile
 #######################################################################################    
+if ("Yes" -eq $internaltest){
+    write-host -foregroundcolor blue "================================="
+    
+    $items = Get-VirtualNetwork
+       $Count = 0
+       
+        foreach ($item in $items) {
+           $list = $item.Name
+           Write-Host "$Count - $list"
+           $Count++
+        }
+        
+        write-host -foregroundcolor blue "================================="
+
+write-host -ForegroundColor Yellow -nonewline "
+Select the number of the vMotion Network Portgroup: "
+$Selection = Read-Host
+$vmotionportgroup = $items["$Selection"].Name
+
+
+$vmotionprofilegateway = "10.17.0.97"
+$vmotionnetworkmask = "27"
+$vmotionippool = "10.17.0.106-10.17.0.109"
+
+}
+
+else {
 write-host -foregroundcolor blue "================================="
     
        $items = Get-VirtualNetwork
@@ -509,10 +549,41 @@ Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in th
 $Selection = Read-Host
 $vmotionippool = $Selection
 Clear-Host
-
+}
 #######################################################################################
 # Define the Management Portgroup and Config for the Network Profile
 ####################################################################################### 
+if ("Yes" -eq $internaltest){
+
+
+    write-host -foregroundcolor blue "================================="
+    
+    $items = Get-VirtualNetwork
+       $Count = 0
+       
+        foreach ($item in $items) {
+           $list = $item.Name
+           Write-Host "$Count - $list"
+           $Count++
+        }
+        
+        write-host -foregroundcolor blue "================================="
+
+write-host -ForegroundColor Yellow -nonewline "
+Select the number of the Management Network Portgroup: "
+$Selection = Read-Host
+$managementportgroup = $items["$Selection"].Name
+
+$mgmtprofilegateway = "10.17.0.1"
+$mgmtnetworkmask = "27"
+$mgmtippool = "10.17.0.10-10.17.0.16"
+
+
+}
+else
+{
+
+
 write-host -foregroundcolor blue "================================="
     
        $items = Get-VirtualNetwork
@@ -546,7 +617,7 @@ Provide three contiguous FREE IP Addresses on the Management Network Segment (in
 $Selection = Read-Host
 $mgmtippool = $Selection
 Clear-Host
-
+        }
 #######################################################################################
 # Define the Portgroup To Deploy the HCX Connector
 ####################################################################################### 
@@ -598,8 +669,34 @@ Clear-Host
 #######################################################################################
   #Define the HCX Connector Deployment Details
 #######################################################################################
-  write-Host -foregroundcolor Yellow -nonewline "You will now be asked to input the parameters for the HCX Connector OVA Deployment.  Remember the portgroup where it will be deployed is $VMNetwork
-Press Any Key To Continue: "
+if ("Yes" -eq $internaltest){
+    $HCXVMIP = "10.17.1.147"
+    $HCXVMNetmask = "25"
+    $HCXVMGateway = "10.17.1.129"
+    $HCXVMDNS = "1.1.1.1"
+    $HCXVMDomain = "lab.avs.ms"
+    $AVSVMNTP = "pool.ntp.org"
+$HCXOnPremPassword = "Microsoft.123!"
+    $HCXOnPremLocation = "Buffalo"
+    
+  $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
+  $HCXCloudURL = $myprivatecloud.EndpointHcxCloudManager
+  $length = $HCXCloudURL.length 
+  $HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
+
+  $HCXCloudPassword = '$X3y)52fp%Ht6'
+   $hcxactivationkey = $Selection
+
+
+}
+else
+{
+
+
+  write-Host -foregroundcolor Yellow -nonewline "
+You will now be asked to input the parameters for the HCX Connector OVA Deployment.  
+Remember the portgroup where it will be deployed is $VMNetwork
+Press Enter Key To Continue: "
   $Selection = Read-Host 
   
   write-host -ForegroundColor Yellow -nonewline "IP Address for the HCX Connector: "
@@ -680,6 +777,7 @@ write-host -ForegroundColor Yellow -nonewline "Enter a HCX Activiation Key: "
 $Selection = Read-Host
 $hcxactivationkey = $Selection
 
+}
   
      $HCXOnPremUserID = "admin"
      $HCXManagerVMName = "AVS-HCX-Connector"
@@ -696,8 +794,8 @@ $hcxactivationkey = $Selection
   
   write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
   $hcxfilename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
-  #remove
-  #Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
+  
+  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
   write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
   
@@ -746,7 +844,6 @@ $hcxactivationkey = $Selection
   
   # Deploy the OVF/OVA with the config parameters
   Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
-  #$vm = Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
   Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
   Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
   
@@ -766,7 +863,6 @@ $hcxactivationkey = $Selection
   # Power On the HCX Connector VM after deployment
   Write-Host -ForegroundColor Yellow "Powering on HCX Connector ..."
   Start-VM -VM $HCXManagerVMName -Confirm:$false
-#  $vm | Start-VM -VM $HCXManagerVMName -Confirm:$false
   # Waiting for HCX Connector to initialize
   while(1) {
       try {
@@ -998,7 +1094,8 @@ $hcxactivationkey = $Selection
   # Connect To On Prem HCX Server
   ######################################
   Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword
-  
+    ##This username and password combination is used because it's the same as the on-prem vcenter
+
   $command = New-HCXSitePairing -Url $HCXCloudIP -Username $HCXCloudUserID -Password $HCXCloudPassword 
   $command | ConvertTo-Json
   
@@ -1027,8 +1124,6 @@ $hcxactivationkey = $Selection
   ######################
   # Create ComputeProfile
   ######################
-  #$managementNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename
-  #$vmotionNetworkProfile = Get-HCXNetworkProfile -Name $vmotionnetworkprofilename
   
   
   $managementNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename
