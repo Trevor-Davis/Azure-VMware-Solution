@@ -261,7 +261,7 @@ Success: The Azure VMware Solution Private Cloud Deployment Has Begun
 Write-Host -ForegroundColor White "
 Deployment Status Will Begin To Show Shortly
 "
-New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
+#New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
 
 Write-Host -foregroundcolor Blue "
 The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours.
@@ -270,7 +270,7 @@ Write-Host -foregroundcolor Yellow "
 The status of the deployment will update every 5 minutes.
 "
 
-Start-Sleep -Seconds 300
+#Start-Sleep -Seconds 300
 
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 $currentprovisioningstate = $provisioningstate.ProvisioningState
@@ -409,13 +409,13 @@ else
   az login
   az account set --subscription $sub
   write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 45 minutes ... "
-  az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
+ # az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
   write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
   
   
  
   Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
-  
+}  
 #######################################################################################
 # Get On-Prem vCenter Creds
 #######################################################################################  
@@ -684,7 +684,7 @@ $HCXOnPremPassword = "Microsoft.123!"
   $length = $HCXCloudURL.length 
   $HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
 
-  $HCXCloudPassword = '$X3y)52fp%Ht6'
+  $HCXCloudPassword = 'X3y)52fp%Ht6'
    $hcxactivationkey = $Selection
 
 
@@ -1046,6 +1046,13 @@ $hcxactivationkey = $Selection
   ##########################
   #Activate HCX
   ###########################
+  if ("" -eq $hcxactivationkey) {
+   Write-Host -ForegroundColor Red "You will need to activate HCX Later"
+
+  }
+  else {
+    
+  
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
   $headers.Add("Accept", "application/json")
   $headers.Add("Content-Type", "application/json")
@@ -1068,7 +1075,7 @@ $hcxactivationkey = $Selection
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/hcx -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-  
+}
   
   ################################
   ## login to HCX Connector and get the session info / Certificate for future API Call
@@ -1096,9 +1103,15 @@ $hcxactivationkey = $Selection
   Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword
     ##This username and password combination is used because it's the same as the on-prem vcenter
 
-  $command = New-HCXSitePairing -Url $HCXCloudIP -Username $HCXCloudUserID -Password $HCXCloudPassword 
-  $command | ConvertTo-Json
+ 
+######################
+# Site Pairing
+######################
+    $command = New-HCXSitePairing -Url $HCXCloudIP -Username $HCXCloudUserID -Password $HCXCloudPassword 
+    $command | ConvertTo-Json
+        
   
+
   ######################
   # Create vMotion Network Profile
   ######################
@@ -1140,7 +1153,7 @@ $hcxactivationkey = $Selection
   ###############
   #Service Mesh
   ##########
-  
+    
   
   $hcxDestinationSite = Get-HCXSite -Destination 
   $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName
@@ -1149,7 +1162,6 @@ $hcxactivationkey = $Selection
   $hcxSourceUplinkNetworkProfile = Get-HCXNetworkProfile -Name $managementNetworkProfile
   $command = New-HCXServiceMesh -Name $hcxServiceMeshName -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension 
   $command | ConvertTo-Json
-  
   
   
   ###############
@@ -1164,6 +1176,5 @@ $hcxactivationkey = $Selection
   Press Any Key To Continue
   "
   $Selection = Read-Host
-  Start-Process "https://$OnPremVIServerIP"
-    }
+  Start-Process "https://$OnPremVIServerIP"  
     
