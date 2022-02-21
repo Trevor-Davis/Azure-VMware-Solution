@@ -7,7 +7,6 @@ $OnPremVIServerUsername = "administrator@vsphere.local"
 $OnPremVIServerPassword = '0hDG3VqFyTd!'
 }
 
-
 #######################################################################################
 # Read In Variables
 #######################################################################################
@@ -38,13 +37,25 @@ $rgfordeployment = "Name of the existing RG" #rgfordeployment
 
 $SameSubAVSAndExRGW = "Yes or No ... Does AVS and the ExR GW connecting in the same subscriptoin?" #SameSubAVSAndExRGW
 if ("Yes" -eq $SameSubAVSAndExRGW) {
-$OnPremExRCircuitSub = $sub
 $vnetgwsub = $sub
 }
 else {
-    $OnPremExRCircuitSub = "The sub where the ExR is deployed" #OnPremExRCircuitSub #OnPremExRCircuitSub ..... does not matter when doing internal testing
     $vnetgwsub = "the sub where the ExR GW exists" #vnetgwsub
 }
+
+
+$SameSubVnetGWandOnPremExR = "No"
+if ("Yes" -eq $SameSubVnetGWandOnPremExR) {
+  $OnPremExRCircuitSub = "The sub where the ExR is deployed" #OnPremExRCircuitSub #OnPremExRCircuitSub ..... does not matter when doing internal testing
+
+}
+else {
+    $OnPremExRCircuitSub = "exrsub-diff-than-vnetgw"
+}
+
+
+
+
 
   
 $OnPremVIServerIP = "the On Prem vCenter server IP " #OnPremVIServerIP
@@ -261,7 +272,7 @@ Success: The Azure VMware Solution Private Cloud Deployment Has Begun
 Write-Host -ForegroundColor White "
 Deployment Status Will Begin To Show Shortly
 "
-#New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
+New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
 
 Write-Host -foregroundcolor Blue "
 The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours.

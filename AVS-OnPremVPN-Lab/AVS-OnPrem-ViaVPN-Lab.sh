@@ -2,13 +2,14 @@
 #Variables
 rg=VPN #Define your resource group
 VMAdminUsername=avs-admin #specify your user
+VMAdminPassword=Microsoft.123!
 location=australiaeast #Set Region
 mypip=$(curl ifconfig.io -s) #captures your local Public IP and adds it to NSG to restrict access to SSH only for your Public IP.
 sharedkey=$(openssl rand -base64 24) #VPN Gateways S2S shared key is automatically generated.
 ERenvironmentName=AVS #Set remove environment connecting via Expressroute (Example: AVS, Skytap, HLI, OnPremDC)
-ERResourceID="/subscriptions/SubID/resourceGroups/RG/providers/Microsoft.Network/expressRouteCircuits/ERCircuitName" ## ResourceID of your ExpressRoute Circuit.
-UseAutorizationKey="No" #Use authorization Key, possible values Yes or No.
-AutorizationKey="null" #Only add ER Authorization Key if UseAutorizationKey=Yes
+ERResourceID="/subscriptions/be8569eb-b087-4090-a1e2-ac12df4818d8/resourceGroups/tnt17-cust-p01-southeastasia/providers/Microsoft.Network/expressRouteCircuits/tnt17-cust-p01-southeastasia-er" ## ResourceID of your ExpressRoute Circuit.
+UseAutorizationKey="Yes" #Use authorization Key, possible values Yes or No.
+AutorizationKey="566c3b75-662b-4c28-9ae5-03cc76bfea14" #Only add ER Authorization Key if UseAutorizationKey=Yes
 #Define emulated On-premises parameters:
 OnPremName=OnPrem #On-premises Name
 OnPremVnetAddressSpace=10.34.0.0/16 #On-premises VNET address space
@@ -33,9 +34,6 @@ Azurespoke2Subnet1Prefix=10.14.1.0/24 # Azure Spoke 1 VNET address space
 JsonAzure={\"hubName\":\"$AzurehubName\",\"addressSpacePrefix\":\"$AzurehubaddressSpacePrefix\",\"subnetName\":\"$AzurehubNamesubnetName\",\"subnet1Prefix\":\"$Azurehubsubnet1Prefix\",\"AzureFirewallPrefix\":\"$AzureFirewallPrefix\",\"gatewaySubnetPrefix\":\"$AzurehubgatewaySubnetPrefix\",\"rssubnetPrefix\":\"$AzurehubrssubnetPrefix\",\"spoke1Name\":\"$Azurespoke1Name\",\"spoke1AddressSpacePrefix\":\"$Azurespoke1AddressSpacePrefix\",\"spoke1Subnet1Prefix\":\"$Azurespoke1Subnet1Prefix\",\"spoke2Name\":\"$Azurespoke2Name\",\"spoke2AddressSpacePrefix\":\"$Azurespoke2AddressSpacePrefix\",\"spoke2Subnet1Prefix\":\"$Azurespoke2Subnet1Prefix\"}
 JsonOnPrem={\"name\":\"$OnPremName\",\"addressSpacePrefix\":\"$OnPremVnetAddressSpace\",\"subnet1Prefix\":\"$OnPremSubnet1prefix\",\"gatewaySubnetPrefix\":\"$OnPremgatewaySubnetPrefix\",\"asn\":\"$OnPremgatewayASN\"}
 az group create --name $rg --location $location
-az deployment group create --name RSERVPNTransitLab-$location --resource-group $rg \
---template-uri https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/azuredeploy.json \
---parameters VmAdminUsername=$VMAdminUsername gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 sharedKey=$sharedkey ExpressRouteEnvironmentName=$ERenvironmentName expressRouteCircuitID=$ERResourceID UseAutorizationKey=$UseAutorizationKey UseAutorizationKey=$UseAutorizationKey Onprem=$JsonOnPrem Azure=$JsonAzure \
---no-wait
+az deployment group create --name RSERVPNTransitLab-$location --resource-group $rg --template-uri https://raw.githubusercontent.com/dmauser/Lab/master/RS-ER-VPN-Gateway-Transit/azuredeploy.json --parameters VmAdminUsername=$VMAdminUsername VmAdminPassword=$VMAdminPassword gatewaySku=VpnGw1 vpnGatewayGeneration=Generation1 sharedKey=$sharedkey ExpressRouteEnvironmentName=$ERenvironmentName expressRouteCircuitID=$ERResourceID UseAutorizationKey=$UseAutorizationKey UseAutorizationKey=$UseAutorizationKey Onprem=$JsonOnPrem Azure=$JsonAzure --no-wait
 #Check Deployment Status
 az deployment group list -g $rg -o table
