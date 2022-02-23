@@ -316,8 +316,10 @@ $myvnetforrouteserver = Get-AzVirtualNetwork -Name $VpnGwVnetName
 $mysubnetforrouteserver = Get-AzVirtualNetworkSubnetConfig -Name "RouteserverSubnet" -VirtualNetwork $myvnetforrouteserver
 
 $command = New-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -hostedsubnet $mysubnetforrouteserver.id -PublicIpAddress $publicIp
+$command | ConvertTo-Json
 
-Update-AzRouteServer -RouteServerName 'myRouteServer' -ResourceGroupName $ExrGWforAVSResourceGroup -AllowBranchToBranchTraffic
+$command = Update-AzRouteServer -RouteServerName 'myRouteServer' -ResourceGroupName $ExrGWforAVSResourceGroup -AllowBranchToBranchTraffic
+$command | ConvertTo-Json
 }
 
 
