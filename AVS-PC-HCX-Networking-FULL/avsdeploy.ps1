@@ -1,3 +1,4 @@
+Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
 #######################################################################################
