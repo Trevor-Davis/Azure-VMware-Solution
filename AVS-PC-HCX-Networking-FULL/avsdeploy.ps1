@@ -331,7 +331,7 @@ if("Failed" -eq $currentprovisioningstate)
 }
 
 #######################################################################################
-# Connect AVS To vNet w/ VPN GW Already There AND Create Route Server
+# Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
 #######################################################################################
 if ("Site-to-Site VPN" -eq $AzureConnection) {
   
@@ -343,7 +343,7 @@ $GWIPconfName = "gwipconf" #
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
-Connect-AzAccount -Subscription $subofvpngw
+Connect-AzAccount -Subscription $vnetgwsub
 
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
