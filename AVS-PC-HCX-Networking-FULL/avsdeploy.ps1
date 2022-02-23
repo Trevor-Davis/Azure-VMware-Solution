@@ -1,98 +1,8 @@
-<#$internaltest="No" #put yes if this is an internal test
+. $env:TEMP\AVSDeploy\variables.ps1
 
-if ("Yes" -eq $internaltest){
-$InternalAuthKey = "89193c55-f013-4b76-bf2f-05b92a1534ef"
-$InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
-$OnPremVIServerUsername = "administrator@vsphere.local"
-$OnPremVIServerPassword = '0hDG3VqFyTd!'
-}
-
-#######################################################################################
-# Read In Variables
-#######################################################################################
-$sub = "Sub for AVS Private Cloud" #subfordeployment
-$regionfordeployment = "Region for deployment of AVS" #regionfordeployment
-$pcname = "Name of AVS Private Cloud" #NameOfAVSPC
-$skus = "AVS Private Cloud SKU (AV36 or AV36T for Trial Nodes)" #SKUType
-$addressblock = "The /22 Network Block for AVS" #AVSAddressBlock
-$ExrGatewayForAVS = "The ExR GW Name The AVS Private Cloud Will Connect" #existingvnetgwname
-$deployhcxyesorno = "Yes Or No" #DeployHCX
-$ExrGWforAVSResourceGroup = "The Resource Group of the ExR GW Which AVS Will Connect" #RGofOnPremExRCircuit
-$NameOfOnPremExRCircuit = "The name of the on-prem ExR Circuit" #NameOfOnPremExRCircuit
-$ExRGWForAVSRegion = "The ExR GW Region for AVS" #ExRGWForAVSRegion
-$AzureConnection = "How the environment connects, is it Site-to-Site VPN OR ExpressRoute"
-
-$RGofOnPremExRCircuit = "The RG where the the On-Prem ExR is deployed" #RGofOnPremExRCircuit
-$internet = "Enabled"
-$numberofhosts = "3"
-
-$RGNewOrExisting = "New Or Existing ... Use an existing RG for AVS or create a new one" #RGforAVSNewOrExisting
-if("New" -eq $RGNewOrExisting)
-{
-$rgfordeployment = "Name of the new resource group" #rgfordeployment
-}
-else {
-$rgfordeployment = "Name of the existing RG" #rgfordeployment
-}
-
-
-$SameSubAVSAndExRGW = "Yes or No ... Does AVS and the ExR GW connecting in the same subscriptoin?" #SameSubAVSAndExRGW
-if ("Yes" -eq $SameSubAVSAndExRGW) {
-$vnetgwsub = $sub
-}
-else {
-    $vnetgwsub = "the sub where the ExR GW exists" #vnetgwsub
-}
-
-
-$SameSubVnetGWandOnPremExR = "No"
-if ("Yes" -eq $SameSubVnetGWandOnPremExR) {
-  $OnPremExRCircuitSub = "The sub where the ExR is deployed" #OnPremExRCircuitSub #OnPremExRCircuitSub ..... does not matter when doing internal testing
-
-}
-else {
-    $OnPremExRCircuitSub = "exrsub-diff-than-vnetgw"
-}
-
-
-
-
-
-  
-$OnPremVIServerIP = "the On Prem vCenter server IP " #OnPremVIServerIP
-$PSCSameAsvCenterYesOrNo = "Is the PSC the same IP as the vCenter Server? ... Yes or No" #PSCIPSameAsVcenterYesOrNo
-
-if ($PSCSameAsvCenterYesOrNo -eq "Yes" ) {
-  $PSCIP = $OnPremVIServerIP
-}
-else {
-  $PSCIP = "The PSCIP" #PSCIP
-  
-}
-
-$HCXOnPremRoleMapping = "What is the SSO domain for vCenter, i.e., vsphere.local, mycompany.local" #HCXOnPremRoleMapping
-
-if ("Yes" -eq $VPNGWSameSubAsAVS){
-  $subofvpngw = $sub
-
-}
-else
-{
-  $subofvpngw = "@{outputs('Create_SharePoint_Entry')?['body/subofvpngw']}" #sub where the existing VPN GW Exists.
-} 
-
-$VpnGwVnetName = "@{outputs('Create_SharePoint_Entry')?['body/VpnGwVnetName']}" #name of the vNet where the current VPN GW Exists.
-
-$RouteServerSubnetAddressPrefix = "@{outputs('Create_SharePoint_Entry')?['body/RouteServerSubnetAddressPrefix']}"
-
-#>
-
-.\variables.ps1
 #######################################################################################
 # Create Temp Storage Location
 #######################################################################################
-
-mkdir $env:TEMP\AVSDeploy
 Clear-Host
 
 #######################################################################################
@@ -289,6 +199,7 @@ Success: The Azure VMware Solution Private Cloud Deployment Has Begun
 Write-Host -ForegroundColor White "
 Deployment Status Will Begin To Show Shortly
 "
+
 New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
 
 Write-Host -foregroundcolor Blue "
@@ -298,7 +209,7 @@ Write-Host -foregroundcolor Yellow "
 The status of the deployment will update every 5 minutes.
 "
 
-#Start-Sleep -Seconds 300
+Start-Sleep -Seconds 300
 
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 $currentprovisioningstate = $provisioningstate.ProvisioningState
@@ -361,13 +272,16 @@ $pip
 $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $GWIPconfName -Subnet $subnet -PublicIpAddress $pip
 $ipconf
 
+Write-Host -ForegroundColor Yellow "
+Creating a ExpressRoute Gateway for AVS ... this could take 30-40 minutes ..."
+
 $command = New-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard
 $command | ConvertTo-Json
 
 Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
 
-$exrauthkey = New-AzVMWareAuthorization -Name "Connection-To-$ExrGatewayForAVS" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment 
+$exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 
@@ -376,22 +290,17 @@ Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAV
 
 $exrgwtouse = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 
-New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
+New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key
  
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
 
 #Create and Configure Route Server
-$subnet = @{
-  Name = 'RouteServerSubnet'
-  VirtualNetwork = $VpnGwVnetName
-  AddressPrefix = $RouteServerSubnetAddressPrefix
-}
+$virtualnetworkforsubnet = Get-AzVirtualNetwork -Name $VpnGwVnetName
 
-$subnetConfig = Add-AzVirtualNetworkSubnetConfig @subnet
-
-$virtualnetwork | Set-AzVirtualNetwork
+Add-AzVirtualNetworkSubnetConfig -Name "RouteServerSubnet" -VirtualNetwork $virtualnetworkforsubnet -AddressPrefix $RouteServerSubnetAddressPrefix
+$virtualnetworkforsubnet | Set-AzVirtualNetwork
 
 $ip = @{
   Name = 'myRouteServerIP'
@@ -403,15 +312,10 @@ $ip = @{
 }
 $publicIp = New-AzPublicIpAddress @ip
 
-$routeserver = @{
-  RouteServerName = 'myRouteServer'
-  ResourceGroupName = $ExrGWforAVSResourceGroup
-  Location = $ExRGWForAVSRegion
-  HostedSubnet = $subnetConfig.Id
-  PublicIP = $publicIp
+$myvnetforrouteserver = Get-AzVirtualNetwork -Name $VpnGwVnetName
+$mysubnetforrouteserver = Get-AzVirtualNetworkSubnetConfig -Name "RouteserverSubnet" -VirtualNetwork $myvnetforrouteserver
 
-}
-New-AzRouteServer @routeserver
+$command = New-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -hostedsubnet $mysubnetforrouteserver.id -PublicIpAddress $publicIp
 
 Update-AzRouteServer -RouteServerName 'myRouteServer' -ResourceGroupName $ExrGWforAVSResourceGroup -AllowBranchToBranchTraffic
 }
@@ -427,7 +331,7 @@ $peerid = $myprivatecloud.CircuitExpressRouteId
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
-$exrauthkey = New-AzVMWareAuthorization -Name "Connection-To-$ExrGatewayForAVS" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment 
+$exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 
@@ -447,6 +351,7 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 #######################################################################################
 # Connecting AVS To On-Prem ExR
 #######################################################################################
+if ("ExpressRoute" -eq $AzureConnection) {
 
 if ("yes" -eq $internaltest) {
 
@@ -509,7 +414,8 @@ if ("yes" -eq $internaltest) {
   
   
   }
-  
+}
+
 #######################################################################################
 # Install HCX To Private Cloud
 #######################################################################################
@@ -524,7 +430,7 @@ else
   az login
   az account set --subscription $sub
   write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 45 minutes ... "
- # az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
+ az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
   write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
   
   
@@ -961,15 +867,7 @@ $hcxactivationkey = $Selection
   Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
   Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
   Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
-  
-  <###
-  
-  #########################
-  # Only do this for internal testing
-  #########################
-  
-  $HCXVMIP = "192.168.89.152"
-  ###>
+
   
   #########################
   # Wait for PowerOn
