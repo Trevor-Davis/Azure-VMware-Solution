@@ -1,6 +1,20 @@
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
+
+#######################################################################################
+#Testing Stuff -- DO NOT MODIFY
+#######################################################################################
+
+$global:internaltest="No" #DO NOT MODIFY
+
+if ("Yes" -eq $global:internaltest){
+$global:InternalAuthKey = "89193c55-f013-4b76-bf2f-05b92a1534ef"
+$global:InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
+$global:OnPremVIServerUsername = "administrator@vsphere.local"
+$global:OnPremVIServerPassword = '0hDG3VqFyTd!'
+}
+
 #######################################################################################
 # Create Temp Storage Location
 #######################################################################################
