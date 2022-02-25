@@ -45,6 +45,8 @@ if ($PSVersionTable.PSVersion.Major -lt 7){
   Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
   Write-Host -ForegroundColor Green "
   Success: PowerShell Upgraded"
+  Write-Host -ForegroundColor Yellow "The script has stopped, please re-run the script from the PowerShell 7 command window"
+  Exit
 }
 Write-Host  "
 Powershell Version 7 Is a Requirement For This Script" -ForegroundColor Red
