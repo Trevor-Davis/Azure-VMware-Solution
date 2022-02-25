@@ -1221,7 +1221,7 @@ $hcxactivationkey = $Selection
   $command | ConvertTo-Json
   
   
-  ###############
+  ##########
   #Exit
   ##########
   
