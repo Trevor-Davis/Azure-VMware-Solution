@@ -52,14 +52,14 @@ Exit
 }
 
 #Az and Az.VMware Powershell Modules
-
+<#
 $vmwareazcheck = Find-Module -Name Az
 if ($vmwareazcheck.Name -ne "Az") {
   Write-Host -NoNewline -ForegroundColor Yellow "The AZ and the AZ.VMware Powershell Modules Are NOT Installed, Would You Like To Install Those Now? (Y/N): "
   $AZModuleInstall = Read-Host 
   
   if ($AZModuleInstall -eq "y"){
-  
+  #>
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
   Write-Host -ForegroundColor Yellow "Installing Azure Powershell Modules ..."
   Install-Module -Name Az -Repository PSGallery -Force
@@ -68,12 +68,13 @@ if ($vmwareazcheck.Name -ne "Az") {
 
   Write-Host -ForegroundColor Green "
   Success: Azure Powershell Modules Installed"
-
+<#
 }
 Write-Host  "Az and Az.VMware Powershell Modules Are Requirements For This Script" -ForegroundColor Red
 Exit
 }
 
+#>
 
 #VMware PowerCLI Modules
 $vmwarepowerclicheck = Find-Module -Name VMware.PowerCLI
