@@ -1,3 +1,7 @@
+$quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
+Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
+$quickeditsettingatstartofscript.QuickEdit
+
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
@@ -46,10 +50,12 @@ if ($PSVersionTable.PSVersion.Major -lt 7){
   Write-Host -ForegroundColor Green "
   Success: PowerShell Upgraded"
   Write-Host -ForegroundColor Yellow "The script has stopped.  Please re-run the script from the PowerShell 7 command window"
-  Exit
+  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
+    Exit
 }
 Write-Host  "
 Powershell Version 7 Is a Requirement For This Script" -ForegroundColor Red
+Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 Exit
 }
 
@@ -73,6 +79,7 @@ if ($vmwareazcheck.Name -ne "Az") {
 <#
 }
 Write-Host  "Az and Az.VMware Powershell Modules Are Requirements For This Script" -ForegroundColor Red
+Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 Exit
 }
 
@@ -97,6 +104,7 @@ if ($vmwarepowerclicheck.Name -ne "VMware.PowerCLI") {
 
 }
 Write-Host  "VMware PowerCLI Modules Are Requirements For This Script" -ForegroundColor Red
+Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 Exit
 }
 
@@ -118,6 +126,7 @@ if ($vmwarepowerclihcxcheck.Name -ne "VMware.VimAutomation.Hcx") {
 
 }
 Write-Host  "VMware HCX PowerCLI Module Is Required For This Script" -ForegroundColor Red
+Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 Exit
 }
   
@@ -142,6 +151,7 @@ if ("False" -eq $installed) {
     }
 
     Write-Host  "Azure CLI Program Is Required For This Script" -ForegroundColor Red
+    Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
     Exit
 
   }
@@ -185,6 +195,7 @@ Subscription $sub Does NOT Have Quota for Azure VMware Solution, please visit th
 
 https://docs.microsoft.com/en-us/azure/azure-vmware/enable-azure-vmware-solution"
 
+Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 Exit
 
 }
@@ -254,6 +265,7 @@ if("Failed" -eq $currentprovisioningstate)
   Write-Host -ForegroundColor Red "$timestamp - Current Status: $currentprovisioningstate
 
   There appears to be a problem with the deployment of Azure VMware Solution Private Cloud $pcname in subscription $sub "
+  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 
   Exit
 
@@ -445,6 +457,7 @@ if ("yes" -eq $internaltest) {
 #######################################################################################
 
 if ($deployhcxyesorno -eq "No") {
+  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
   Exit
 }
 
@@ -1205,6 +1218,8 @@ $hcxactivationkey = $Selection
   #Exit
   ##########
   
+  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
+
   write-host -ForegroundColor Yellow -nonewline "
   HCX Is Now Deployed In Your On Premises Cluster, 
   Log into your On-Premises vCenter and You Should See a HCX Plug-In,
