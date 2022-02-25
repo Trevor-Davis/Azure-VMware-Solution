@@ -45,7 +45,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7){
   Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
   Write-Host -ForegroundColor Green "
   Success: PowerShell Upgraded"
-  Write-Host -ForegroundColor Yellow "The script has stopped, please re-run the script from the PowerShell 7 command window"
+  Write-Host -ForegroundColor Yellow "The script has stopped.  Please re-run the script from the PowerShell 7 command window"
   Exit
 }
 Write-Host  "
@@ -224,7 +224,7 @@ Write-Host -foregroundcolor Blue "
 The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours.
 "
 Write-Host -foregroundcolor Yellow "
-The status of the deployment will update every 5 minutes.
+The status of the deployment will begin to update in 5 minutes.
 "
 
 Start-Sleep -Seconds 300
@@ -237,7 +237,7 @@ $timeStamp = Get-Date -Format "hh:mm"
 while ("Succeeded" -ne $currentprovisioningstate)
 {
 $timeStamp = Get-Date -Format "hh:mm"
-"$timestamp - Current Status: $currentprovisioningstate "
+"$timestamp - Current Status: $currentprovisioningstate - Next Update In 5 Minutes"
 Start-Sleep -Seconds 300
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 $currentprovisioningstate = $provisioningstate.ProvisioningState
