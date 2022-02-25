@@ -49,7 +49,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7){
   Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
   Write-Host -ForegroundColor Green "
   Success: PowerShell Upgraded"
-  Write-Host -ForegroundColor Yellow "The script has stopped.  Please re-run the script from the PowerShell 7 command window"
+  Write-Host -ForegroundColor Yellow "Please re-run the script from the PowerShell 7 command window"
   Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
     Exit
 }
@@ -69,7 +69,7 @@ if ($vmwareazcheck.Name -ne "Az") {
   if ($AZModuleInstall -eq "y"){
   #>
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
-  Write-Host -ForegroundColor Yellow "Installing Azure Powershell Modules ..."
+  Write-Host -ForegroundColor Yellow "Downloading and Installing Azure Powershell Modules ..."
   Install-Module -Name Az -Repository PSGallery -Force
   Install-Module -Name Az.VMware -Repository PSGallery -Force
 
@@ -94,7 +94,7 @@ if ($vmwarepowerclicheck.Name -ne "VMware.PowerCLI") {
     if ($VMwarePowerCLIInstall -eq "y"){
     
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
-    Write-Host -ForegroundColor Yellow "Installing VMware PowerCLI Modules ..."
+    Write-Host -ForegroundColor Yellow "Downloading and Installing VMware PowerCLI Modules ..."
     Install-Module -Name VMware.PowerCLI -Force
     Install-Module -Name VMware.VimAutomation.Hcx -Force
 
@@ -117,7 +117,7 @@ if ($vmwarepowerclihcxcheck.Name -ne "VMware.VimAutomation.Hcx") {
     if ($VMwarePowerCLIHCXInstall -eq "y"){
     
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
-    Write-Host -ForegroundColor Yellow "Installing VMware HCX PowerCLI Module ..."
+    Write-Host -ForegroundColor Yellow "Downloading and Installing VMware HCX PowerCLI Module ..."
     Install-Module -Name VMware.VimAutomation.Hcx -Force
 
 
@@ -284,8 +284,7 @@ $GWIPconfName = "gwipconf" #
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
-Connect-AzAccount -Subscription $vnetgwsub
-
+Set-AzContext -Subscription $vnetgwsub
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
 $vnet
@@ -311,12 +310,16 @@ $command | ConvertTo-Json
 Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
 
+Set-AzContext -Subscription $sub
+
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
+
+Set-AzContext -Subscription $vnetgwsub
 
 $exrgwtouse = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 
@@ -361,6 +364,8 @@ $command | ConvertTo-Json
 #######################################################################################
 # Connect AVS To vNet w/ ExR
 #######################################################################################
+Set-AzContext -Subscription $sub
+
 if ("ExpressRoute" -eq $AzureConnection) {
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
@@ -375,7 +380,7 @@ Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
 
 
-Select-AzSubscription -SubscriptionId $vnetgwsub
+Set-AzContext -SubscriptionId $vnetgwsub
 $exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
 
 New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
@@ -387,11 +392,13 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 #######################################################################################
 # Connecting AVS To On-Prem ExR
 #######################################################################################
+
 if ("ExpressRoute" -eq $AzureConnection) {
 
 if ("yes" -eq $internaltest) {
 
-    Select-AzSubscription -SubscriptionId $sub
+  Set-AzContext -Subscription $sub
+
     Write-Host -ForegroundColor Yellow "Building Global Reach connection from $pcname to the on-premises Express Route $NameOfOnPremExRCircuit...
     "
     New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey "$InternalAuthKey" -PeerExpressRouteResourceId "$InternalPeerURI"
@@ -416,8 +423,8 @@ if ("yes" -eq $internaltest) {
   else {
   
   
-    Select-AzSubscription -SubscriptionId $OnPremExRCircuitSub
-  
+    Set-AzContext -Subscription $OnPremExRCircuitSub
+
     $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
     Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
     Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
@@ -429,7 +436,7 @@ if ("yes" -eq $internaltest) {
     $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
     $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
     
-    Select-AzSubscription -SubscriptionId $sub
+    Set-AzContext -Subscription $sub
     New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
     
     $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
@@ -1097,7 +1104,7 @@ $hcxactivationkey = $Selection
   #Activate HCX
   ###########################
   if ("" -eq $hcxactivationkey) {
-   Write-Host -ForegroundColor Red "You will need to activate HCX Later"
+   Write-Host -ForegroundColor Red "You will need to activate HCX Later..."
 
   }
   else {
