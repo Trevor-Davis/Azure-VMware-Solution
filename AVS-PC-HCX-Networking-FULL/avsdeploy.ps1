@@ -1045,6 +1045,7 @@ $hcxactivationkey = $Selection
   # Power On the HCX Connector VM after deployment
   Write-Host -ForegroundColor Yellow "Powering on HCX Connector ..."
   Start-VM -VM $HCXManagerVMName -Confirm:$false
+  Clear-Host
   # Waiting for HCX Connector to initialize
   while(1) {
       try {
