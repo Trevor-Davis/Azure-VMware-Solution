@@ -951,7 +951,7 @@ $warning = ""
 while ("NOTsamepassword" -eq $hcxcloudpasswordvalidate)
 {
   write-Host -ForegroundColor Red $warning
-  write-host -ForegroundColor Yellow -nonewline "Provide password for your HCX Cloud Connector (It's the same password as your CLOUD vCenter): "
+  write-host -ForegroundColor Yellow -nonewline "Provide password for your HCX Cloud Connector (It's the same password as your CLOUD vCenter). You can identify the vCenter and NSX-T Manager console's IP addresses and credentials in the Azure portal. Select your private cloud and then Manage > Identity: "
   $Selection1 = Read-Host -MaskInput
   write-host -ForegroundColor Yellow -nonewline "
 Enter the password again to validate: "
