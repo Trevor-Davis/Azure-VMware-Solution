@@ -277,6 +277,8 @@ if("Failed" -eq $currentprovisioningstate)
 #######################################################################################
 # Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
 #######################################################################################
+Connect-AzAccount -Subscription $sub
+
 if ("Site-to-Site VPN" -eq $AzureConnection) {
   
 
@@ -637,8 +639,6 @@ $vmotionprofilegateway = $Selection
 
 
 #Get and validate the network mask
-
-
 $validation = "false"
 $counter = 0
 
@@ -832,6 +832,8 @@ if ("Yes" -eq $internaltest){
     $AVSVMNTP = "pool.ntp.org"
 $HCXOnPremPassword = "Microsoft.123!"
     $HCXOnPremLocation = "Buffalo"
+    $HCXManagerVMName = "AVS-HCX-Connector"
+
     
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
   $HCXCloudURL = $myprivatecloud.EndpointHcxCloudManager
@@ -854,13 +856,48 @@ This OVA will be deployed to portgroup $VMNetwork
 Press Enter Key To Continue: "
   $Selection = Read-Host 
   
-  write-host -ForegroundColor Yellow -nonewline "IP Address for the HCX Connector: "
+  write-host -ForegroundColor Yellow -nonewline "VM Name: "
+  $Selection = Read-Host
+  $HCXManagerVMName = $Selection
+
+  
+  write-host -ForegroundColor Yellow -nonewline "IP Address: "
   $Selection = Read-Host
   $HCXVMIP = $Selection
+
   
-  write-host -ForegroundColor Yellow -nonewline "Netmask (in /xx format ... DO NOT INCLUDE the / ) for the HCX Connector: "
-  $Selection = Read-Host
+#Get and validate the network mask
+$validation = "false"
+$counter = 0
+
+
+while ("false" -eq $validation)
+{
+
+  if ($counter -ge 1 ) {
+write-host -ForegroundColor Red -nonewline "
+The entry for Network Prefix must be between 0-32"
+ }
+
+write-host -ForegroundColor Yellow -nonewline "
+What is the $VMNetwork Network Prefix?: "
+$Selection = Read-Host
+$SelectionConvert = [int]$Selection
+
+if ($SelectionConvert -le 32) {
   $HCXVMNetmask = $Selection
+  $validation = "True"
+
+}
+else  {
+$counter=$counter+1
+}
+
+}
+
+######################
+
+
   
   write-host -ForegroundColor Yellow -nonewline "Gateway for the HCX Connector: "
   $Selection = Read-Host
@@ -935,7 +972,6 @@ $hcxactivationkey = $Selection
 }
   
      $HCXOnPremUserID = "admin"
-     $HCXManagerVMName = "AVS-HCX-Connector"
      $mgmtnetworkprofilename = "Management"
      $vmotionnetworkprofilename = "vMotion"
      $hcxactivationurl = "https://connect.hcx.vmware.com"
@@ -944,7 +980,6 @@ $hcxactivationkey = $Selection
      $hcxServiceMeshName = "AVS-ServiceMesh"
      
   
-  mkdir $env:TEMP\AVSDeploy
   Clear-Host
   
   write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
