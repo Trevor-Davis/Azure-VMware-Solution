@@ -6,6 +6,9 @@ Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
 
+
+
+
 #######################################################################################
 #Testing Stuff -- DO NOT MODIFY
 #######################################################################################
@@ -68,7 +71,7 @@ if ($vmwareazcheck.Name -ne "Az") {
   
   if ($AZModuleInstall -eq "y"){
   #>
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Downloading and Installing Azure Powershell Modules ..."
   Install-Module -Name Az -Repository PSGallery -Force
   Install-Module -Name Az.VMware -Repository PSGallery -Force
@@ -93,8 +96,8 @@ if ($vmwarepowerclicheck.Name -ne "VMware.PowerCLI") {
     
     if ($VMwarePowerCLIInstall -eq "y"){
     
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
-    Write-Host -ForegroundColor Yellow "Downloading and Installing VMware PowerCLI Modules ..."
+      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+      Write-Host -ForegroundColor Yellow "Downloading and Installing VMware PowerCLI Modules ..."
     Install-Module -Name VMware.PowerCLI -Force
     Install-Module -Name VMware.VimAutomation.Hcx -Force
 
@@ -116,8 +119,8 @@ if ($vmwarepowerclihcxcheck.Name -ne "VMware.VimAutomation.Hcx") {
     
     if ($VMwarePowerCLIHCXInstall -eq "y"){
     
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
-    Write-Host -ForegroundColor Yellow "Downloading and Installing VMware HCX PowerCLI Module ..."
+      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+      Write-Host -ForegroundColor Yellow "Downloading and Installing VMware HCX PowerCLI Module ..."
     Install-Module -Name VMware.VimAutomation.Hcx -Force
 
 
@@ -140,7 +143,7 @@ if ("False" -eq $installed) {
     $begin = Read-Host
 
     if ("y" -eq $begin ) {
-      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned 
+      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
       $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
       $azureCLIDownloadFileName = "AzureCLI.msi"
       Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
@@ -284,6 +287,7 @@ $GWIPconfName = "gwipconf" #
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
+
 Set-AzContext -Subscription $vnetgwsub
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
@@ -304,8 +308,35 @@ $ipconf
 Write-Host -ForegroundColor Yellow "
 Creating a ExpressRoute Gateway for AVS ... this could take 30-40 minutes ..."
 
-$command = New-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard
+$command = New-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard -NoWait
 $command | ConvertTo-Json
+
+############################################
+while ("Succeeded" -ne $currentprovisioningstate)
+{
+$timeStamp = Get-Date -Format "hh:mm"
+Start-Sleep -Seconds 300
+"$timestamp - Current Status: $currentprovisioningstate - Next Update In 5 Minutes"
+$provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
+$currentprovisioningstate = $provisioningstate.ProvisioningState
+}
+
+if("Succeeded" -eq $currentprovisioningstate)
+{
+  Write-Host -ForegroundColor Green "$timestamp - Virtual Network Gateway is Deployed"
+  
+}
+
+if("Failed" -eq $currentprovisioningstate)
+{
+  Write-Host -ForegroundColor Red "$timestamp - Current Status: $currentprovisioningstate
+
+  There appears to be a problem with the deployment of the Virtual Network Gateway "
+  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
+  Exit
+}
+############################################
+
 
 Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
@@ -503,7 +534,7 @@ Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -pa
 #######################################################################################
 # Pick Cluster to Deploy HCX Connector
 #######################################################################################
-
+Clear-Host
 write-host -foregroundcolor blue "================================="
   
      $clusters = Get-Cluster 
@@ -544,7 +575,7 @@ write-host -foregroundcolor blue "================================="
 write-host -foregroundcolor blue "================================="
 
 write-host -ForegroundColor Yellow -nonewline "
-Select the switch from this list which contgains the portgroups which will be extended to AVS: "
+Select the VDS from this list which contains the portgroups which will be extended to AVS: "
 $Selection = Read-Host
 $hcxVDS = $items["$Selection"].Name
 Clear-Host
@@ -604,10 +635,38 @@ What is the Gateway for the vMotion Network on portgroup "$vmotionportgroup"?: "
 $Selection = Read-Host
 $vmotionprofilegateway = $Selection
 
+
+#Get and validate the network mask
+
+
+$validation = "false"
+$counter = 0
+
+
+while ("false" -eq $validation)
+{
+
+  if ($counter -ge 1 ) {
+write-host -ForegroundColor Red -nonewline "
+The entry for Network Prefix must be between 0-32"
+ }
+
 write-host -ForegroundColor Yellow -nonewline "
-What is the Netmask for the vMotion Network (in this format /xx ... DO NOT INCLUDE THE / ) on portgroup "$vmotionportgroup"?: "
+What is the $vmotionportgroup Network Prefix?: "
 $Selection = Read-Host
-$vmotionnetworkmask = $Selection
+$SelectionConvert = [int]$Selection
+
+if ($SelectionConvert -le 32) {
+  $vmotionnetworkmask = $Selection
+  $validation = "True"
+
+}
+else  {
+$counter=$counter+1
+}
+
+}
+######################
 
 write-host -ForegroundColor Yellow -nonewline "
 Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
@@ -672,10 +731,40 @@ What is the Gateway for the Management Network on portgroup "$managementportgrou
 $Selection = Read-Host
 $mgmtprofilegateway = $Selection
 
+#Get and validate the network mask
+
+
+$validation = "false"
+$counter = 0
+
+
+while ("false" -eq $validation)
+{
+
+  if ($counter -ge 1 ) {
+write-host -ForegroundColor Red -nonewline "
+The entry for Network Prefix must be between 0-32"
+ }
+
 write-host -ForegroundColor Yellow -nonewline "
-What is the Netmask for the Management Network (in this format /xx ... DO NOT INCLUDE THE / ) on portgroup "$managementportgroup"?: "
+What is the $managementportgroup Network Prefix?: "
 $Selection = Read-Host
-$mgmtnetworkmask = $Selection
+$SelectionConvert = [int]$Selection
+
+if ($SelectionConvert -le 32) {
+  $mgmtnetworkmask = $Selection
+  $validation = "True"
+
+}
+else  {
+$counter=$counter+1
+}
+
+}
+
+
+######################
+
 
 write-host -ForegroundColor Yellow -nonewline "
 Provide three contiguous FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
@@ -759,8 +848,9 @@ else
 
 
   write-Host -foregroundcolor Yellow -nonewline "
-You will now be asked to input the parameters for the HCX Connector OVA Deployment.  
-Remember the portgroup where it will be deployed is $VMNetwork
+You will now be asked to input the parameters for the HCX Connector OVA Deployment in your on-premises datacenter.  
+This OVA will be deployed to portgroup $VMNetwork
+
 Press Enter Key To Continue: "
   $Selection = Read-Host 
   
