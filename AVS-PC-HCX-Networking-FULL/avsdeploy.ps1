@@ -34,7 +34,7 @@ Clear-Host
 
 Write-Host -ForegroundColor White "Checking The Local System To Verify The Following Items Are Installed, If They Aren't Already Installed You Will Have The Option To Install Them:
 - PowerShell 7.x
-- AZ and the AZ.VMware Powershell Modules
+- Azure Powershell Modules
 - VMware PowerCLI Modules
 - Azure CLI
 "
