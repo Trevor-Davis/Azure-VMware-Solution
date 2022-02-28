@@ -6,9 +6,6 @@ Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
 
-
-
-
 #######################################################################################
 #Testing Stuff -- DO NOT MODIFY
 #######################################################################################
@@ -16,10 +13,10 @@ Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 $global:internaltest="No" #DO NOT MODIFY
 
 if ("Yes" -eq $global:internaltest){
-$global:InternalAuthKey = "89193c55-f013-4b76-bf2f-05b92a1534ef"
-$global:InternalPeerURI = "/subscriptions/52d4e37e-0e56-4016-98de-fe023475b435/resourceGroups/tnt15-cust-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
+$global:InternalAuthKey = "89193c55-xxxx-4b76-bf2f-05b92a1534ef"
+$global:InternalPeerURI = "/subscriptions/52d4e37e-xxxx-4016-98de-fe023475b435/resourceGroups/tnt15-xxxx-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
 $global:OnPremVIServerUsername = "administrator@vsphere.local"
-$global:OnPremVIServerPassword = '0hDG3VqFyTd!'
+$global:OnPremVIServerPassword = 'xxx'
 }
 
 #######################################################################################
@@ -135,6 +132,7 @@ Exit
   
 #Azure CLI
 
+<#
 $software = "Azure CLI"
 $installed = "Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -contains $software }" -ne $null
 
@@ -158,7 +156,49 @@ if ("False" -eq $installed) {
     Exit
 
   }
-    
+  #>  
+  write-host -ForegroundColor Yellow -nonewline "
+Azure CLI is REQUIRED for this script to execute properly.  Is Azure CLI already installed on this computer? (Y/N)"
+  $Selection = Read-Host
+  
+  If ("y" -eq $Selection)
+  {
+  }
+  else
+  {
+  
+    write-host -ForegroundColor Yellow -nonewline "
+Would you like to install Azure CLI? (Y/N)"
+    $Selection = Read-Host
+
+    If ("y" -eq $Selection) {
+
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
+    $azureCLIDownloadFileName = "AzureCLI.msi"
+    Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
+    Start-Process -wait "$env:TEMP\AVSDeploy\$azureCLIDownloadFileName"
+    Write-Host -ForegroundColor Green "
+    Success: Azure CLI Installed"
+    Write-Host -ForegroundColor Red "You will need to re-start the Powershell session and re-run the script .... Press Any Key To Continue"
+    Read-Host
+    stop-process $PID
+
+  }
+  
+  else
+  {
+  
+  Write-Host  "
+Azure CLI Program Is Required For This Script" -ForegroundColor Red
+  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
+  Exit
+
+
+}}
+
+
+
 
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
@@ -506,7 +546,7 @@ else
 
   az login
   az account set --subscription $sub
-  write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 45 minutes ... "
+  write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 20 minutes ... "
  az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
   write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
   
