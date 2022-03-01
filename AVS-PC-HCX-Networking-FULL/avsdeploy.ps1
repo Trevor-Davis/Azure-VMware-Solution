@@ -1,3 +1,27 @@
+#############################################
+#Make Lines Not Wrap when entering data
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+############################################
+
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
@@ -678,35 +702,17 @@ $Selection = Read-Host
 $vmotionprofilegateway = $Selection
 
 
+#########################################
 #Get and validate the network mask
-$validation = "false"
-$counter = 0
+
+write-host -ForegroundColor Red "
+The entry for Network Prefix must be between 0-32" 
+$Selection = Read-Host "What is the $vmotionportgroup Network Prefix?"
+$vmotionnetworkmask = $Selection
+
+#########################################
 
 
-while ("false" -eq $validation)
-{
-
-  if ($counter -ge 1 ) {
-write-host -ForegroundColor Red -nonewline "
-The entry for Network Prefix must be between 0-32"
- }
-
-write-host -ForegroundColor Yellow -nonewline "
-What is the $vmotionportgroup Network Prefix?: "
-$Selection = Read-Host
-$SelectionConvert = [int]$Selection
-
-if ($SelectionConvert -le 32) {
-  $vmotionnetworkmask = $Selection
-  $validation = "True"
-
-}
-else  {
-$counter=$counter+1
-}
-
-}
-######################
 
 write-host -ForegroundColor Yellow -nonewline "
 Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
@@ -771,37 +777,13 @@ What is the Gateway for the Management Network on portgroup "$managementportgrou
 $Selection = Read-Host
 $mgmtprofilegateway = $Selection
 
+#########################################
 #Get and validate the network mask
 
-
-$validation = "false"
-$counter = 0
-
-
-while ("false" -eq $validation)
-{
-
-  if ($counter -ge 1 ) {
-write-host -ForegroundColor Red -nonewline "
-The entry for Network Prefix must be between 0-32"
- }
-
-write-host -ForegroundColor Yellow -nonewline "
-What is the $managementportgroup Network Prefix?: "
-$Selection = Read-Host
-$SelectionConvert = [int]$Selection
-
-if ($SelectionConvert -le 32) {
-  $mgmtnetworkmask = $Selection
-  $validation = "True"
-
-}
-else  {
-$counter=$counter+1
-}
-
-}
-
+write-host -ForegroundColor Red "
+The entry for Network Prefix must be between 0-32" 
+$Selection = Read-Host "What is the $managementportgroup Network Prefix?"
+$mgmtnetworkmask = $Selection
 
 ######################
 
@@ -919,8 +901,7 @@ write-host -ForegroundColor Red -nonewline "
 The entry for Network Prefix must be between 0-32"
  }
 
-write-host -ForegroundColor Yellow -nonewline "
-What is the $VMNetwork Network Prefix?: "
+write-host -ForegroundColor Yellow -nonewline "What is the $VMNetwork Network Prefix?: "
 $Selection = Read-Host
 $SelectionConvert = [int]$Selection
 
@@ -1386,6 +1367,24 @@ $hcxactivationkey = $Selection
   $command = New-HCXServiceMesh -Name $hcxServiceMeshName -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension 
   $command | ConvertTo-Json
   
+  
+write-host "Building Service Mesh, Script is Paused for 5 Minutes Waiting To Get Status of Service Mesh"
+start-sleep -Seconds 300
+
+while ($deploymentstatus -ne "Complete") {
+    start-sleep -Seconds 15 
+    $status=Get-HCXAppliance
+    $status.Status
+    if($status.Status -eq "down" -or $null -eq $status.Status){
+        $deploymentstatus = "Building"
+    write-host "Service Mesh: $deploymentstatus"}
+        else{
+        $deploymentstatus = "Complete"
+        write-host -ForegroundColor Green "Service Mesh: $deploymentstatus"}
+  
+}
+
+
   
   ##########
   #Exit
