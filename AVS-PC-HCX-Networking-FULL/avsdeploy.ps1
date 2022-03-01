@@ -256,7 +256,7 @@ AVS Private Cloud Resource Group is $rgfordeployment"
 if ( "New" -eq $RGNewOrExisting){
     New-AzResourceGroup -Name $rgfordeployment -Location $regionfordeployment
 
-    write-host -foregroundcolor Green = "
+    write-host -foregroundcolor Green "
 Success: AVS Private Cloud Resource Group $rgfordeployment Created"   
 
 }
@@ -317,7 +317,7 @@ if("Failed" -eq $currentprovisioningstate)
 #######################################################################################
 # Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
 #######################################################################################
-Connect-AzAccount -Subscription $sub
+Set-AzContext -Subscription $sub
 
 if ("Site-to-Site VPN" -eq $AzureConnection) {
   
