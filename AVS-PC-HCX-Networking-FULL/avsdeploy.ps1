@@ -4,22 +4,6 @@
 #
 #
 #
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
 ############################################
 
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
@@ -53,34 +37,38 @@ Clear-Host
 #######################################################################################
 #PowerShell 7
 
-Write-Host -ForegroundColor White "Checking The Local System To Verify The Following Items Are Installed, If They Aren't Already Installed You Will Have The Option To Install Them:
+Write-Host -ForegroundColor Yellow "The following are required for this script to run properly.
 - PowerShell 7.x
 - Azure Powershell Modules
 - VMware PowerCLI Modules
-- Azure CLI
-"
-if ($PSVersionTable.PSVersion.Major -lt 7){
-  $PSVersion = $PSVersionTable.PSVersion.Major
-  Write-Host -NoNewline -ForegroundColor Yellow "Your Powershell Version Is $PSVersion ... Would You Like To Upgrade To Powershell Version 7 Now? (Y/N): "
-  $PSVersionUpgrade = Read-Host 
+- Azure CLI"
+write-host -foregroundcolor white -nonewline "If these packages aren't already installed would you like this script to install them? (Y/N): "
+$installpackages = Read-Host
+
+if ($installpackages -eq "N") {
+write-Host -foregroundcolor red "This script requires these modules, if you do not install them the script will not properly run.  Please install the latest versions of all these modules offline and re-run this script."
+Exit
+}
+else {
   
-  if ($PSVersionUpgrade -eq "y"){
+#powershell
+if ($PSVersionTable.PSVersion.Major -lt 7){
+$PSVersion = $PSVersionTable.PSVersion.Major
+Write-Host -ForegroundColor Yellow "
+Your Powershell Version Is $PSVersion ... Upgrading to PowerShell 7"
   
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   $PowerShellDownloadURL = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/PowerShell-7.2.1-win-x64.msi"
   $PowerShellDownloadFileName = "PowerShell-7.2.1-win-x64.msi"
-  Invoke-WebRequest -Uri $PowerShellDownloadURL -OutFile $env:TEMP\AVSDeploy\$PowerShellDownloadFileName 
+  Invoke-WebRequest -Uri $PowerShellDownloadURL -OutFile $env:TEMP\AVSDeploy\$PowerShellDownloadFileName
   Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
+  Clear-Host
   Write-Host -ForegroundColor Green "
-  Success: PowerShell Upgraded"
-  Write-Host -ForegroundColor Yellow "Please re-run the script from the PowerShell 7 command window"
+Success: PowerShell Upgraded"
+  Write-Host -ForegroundColor Red "
+Please re-run the script from the PowerShell 7 command window"
   Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-    Exit
-}
-Write-Host  "
-Powershell Version 7 Is a Requirement For This Script" -ForegroundColor Red
-Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-Exit
+  Exit
 }
 
 #Az and Az.VMware Powershell Modules
@@ -92,11 +80,12 @@ if ($vmwareazcheck.Name -ne "Az") {
   
   if ($AZModuleInstall -eq "y"){
   #>
+  Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Downloading and Installing Azure Powershell Modules ..."
   Install-Module -Name Az -Repository PSGallery -Force
   Install-Module -Name Az.VMware -Repository PSGallery -Force
-
+  Clear-Host
 
   Write-Host -ForegroundColor Green "
   Success: Azure Powershell Modules Installed"
@@ -111,47 +100,32 @@ Exit
 
 #VMware PowerCLI Modules
 $vmwarepowerclicheck = Find-Module -Name VMware.PowerCLI
+
 if ($vmwarepowerclicheck.Name -ne "VMware.PowerCLI") {
-    Write-Host -NoNewline -ForegroundColor Yellow "The VMware PowerCLI Modules Are Not Installed, Would You Like To Install Those Now? (Y/N): "
-    $VMwarePowerCLIInstall = Read-Host 
-    
-    if ($VMwarePowerCLIInstall -eq "y"){
+
     
       Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
       Write-Host -ForegroundColor Yellow "Downloading and Installing VMware PowerCLI Modules ..."
     Install-Module -Name VMware.PowerCLI -Force
     Install-Module -Name VMware.VimAutomation.Hcx -Force
-
+Clear-Host
 
     Write-Host -ForegroundColor Green "
     Success: VMware PowerCLI Modules Installed"
 
 }
-Write-Host  "VMware PowerCLI Modules Are Requirements For This Script" -ForegroundColor Red
-Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-Exit
-}
-
 
 $vmwarepowerclihcxcheck = Find-Module -Name VMware.VimAutomation.Hcx
 if ($vmwarepowerclihcxcheck.Name -ne "VMware.VimAutomation.Hcx") {
-    Write-Host -NoNewline -ForegroundColor Yellow "The VMware HCX PowerCLI Module Is Not Installed, Would You Like To Install It Now? (Y/N): "
-    $VMwarePowerCLIHCXInstall = Read-Host 
-    
-    if ($VMwarePowerCLIHCXInstall -eq "y"){
     
       Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
       Write-Host -ForegroundColor Yellow "Downloading and Installing VMware HCX PowerCLI Module ..."
     Install-Module -Name VMware.VimAutomation.Hcx -Force
-
+Clear-Host
 
     Write-Host -ForegroundColor Green "
     Success: VMware HCX PowerCLI Modules Installed"
 
-}
-Write-Host  "VMware HCX PowerCLI Module Is Required For This Script" -ForegroundColor Red
-Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-Exit
 }
   
 #Azure CLI
@@ -182,7 +156,7 @@ if ("False" -eq $installed) {
   }
   #>  
   write-host -ForegroundColor Yellow -nonewline "
-Azure CLI is REQUIRED for this script to execute properly.  Is Azure CLI already installed on this computer? (Y/N)"
+Azure CLI is REQUIRED for this script to execute properly.  Is Azure CLI already installed on this computer? (Y/N): "
   $Selection = Read-Host
   
   If ("y" -eq $Selection)
@@ -192,7 +166,7 @@ Azure CLI is REQUIRED for this script to execute properly.  Is Azure CLI already
   {
   
     write-host -ForegroundColor Yellow -nonewline "
-Would you like to install Azure CLI? (Y/N)"
+Would you like to install Azure CLI? (Y/N): "
     $Selection = Read-Host
 
     If ("y" -eq $Selection) {
@@ -202,6 +176,7 @@ Would you like to install Azure CLI? (Y/N)"
     $azureCLIDownloadFileName = "AzureCLI.msi"
     Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
     Start-Process -wait "$env:TEMP\AVSDeploy\$azureCLIDownloadFileName"
+    Clear-Host
     Write-Host -ForegroundColor Green "
     Success: Azure CLI Installed"
     Write-Host -ForegroundColor Red "You will need to re-start the Powershell session and re-run the script .... Press Any Key To Continue"
@@ -222,18 +197,17 @@ Azure CLI Program Is Required For This Script" -ForegroundColor Red
 }}
 
 
-
+}
 
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
-
+Clear-Host
 write-host -ForegroundColor Yellow "
-Connecting to your Azure Subscription $sub ... there should be a web browser pop-up ... go there to login"
+Connecting to your Azure Subscription $sub"
 Connect-AzAccount -Subscription $sub
 write-host -ForegroundColor Green "
-Azure Login Successful
-"
+Azure Login Successful"
 Write-Host -ForegroundColor Yellow  "
 Validating Subscription Readiness ..." 
 
@@ -243,14 +217,12 @@ if ("Enabled" -eq $quota.Enabled)
 {
 
 Write-Host -ForegroundColor Green "
-Success: Quota is Enabled on Subscription
-"    
+Success: Quota is Enabled on Subscription"    
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
 
 Write-Host -ForegroundColor Green "
-Success: Resource Provider Enabled
-"    
+Success: Resource Provider Enabled"    
 
 }
 
@@ -273,7 +245,7 @@ Exit
 
 if ( "Existing" -eq $RGNewOrExisting )
 {
-    write-host -foregroundcolor Green "
+    write-host -foregroundcolor Yellow "
 AVS Private Cloud Resource Group is $rgfordeployment"
 }
 
@@ -290,20 +262,16 @@ Success: AVS Private Cloud Resource Group $rgfordeployment Created"
 #######################################################################################
 
 Write-Host -ForegroundColor Green "
-Success: The Azure VMware Solution Private Cloud Deployment Has Begun
-"
+Success: The Azure VMware Solution Private Cloud Deployment Has Begun"
 Write-Host -ForegroundColor White "
-Deployment Status Will Begin To Show Shortly
-"
+Deployment Status Will Begin To Show Shortly"
 
 New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
 
 Write-Host -foregroundcolor Blue "
-The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours.
-"
+The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours."
 Write-Host -foregroundcolor Yellow "
-The status of the deployment will begin to update in 5 minutes.
-"
+The status of the deployment will begin to update in 5 minutes."
 
 Start-Sleep -Seconds 300
 
@@ -315,8 +283,8 @@ $timeStamp = Get-Date -Format "hh:mm"
 while ("Succeeded" -ne $currentprovisioningstate)
 {
 $timeStamp = Get-Date -Format "hh:mm"
-"$timestamp - Current Status: $currentprovisioningstate - Next Update In 5 Minutes"
-Start-Sleep -Seconds 300
+"$timestamp - Current Status: $currentprovisioningstate - Next Update In 10 Minutes"
+Start-Sleep -Seconds 600
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 $currentprovisioningstate = $provisioningstate.ProvisioningState
 }
@@ -590,9 +558,10 @@ else {
 
 
 
-write-host -ForegroundColor Yellow -nonewline "What Is The Username for the ON-PREMISES vCenter Server ($OnPremVIServerIP) Where HCX Connector Will Be Deployed?: "
+write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
+write-host -ForegroundColor White -nonewline "Username: "
 $OnPremVIServerUsername = Read-Host 
-write-host -ForegroundColor Yellow -nonewline "What Is The Password for the ON-PREMISES vCenter Server ($OnPremVIServerIP) Where HCX Connector Will Be Deployed?: "
+write-host -ForegroundColor White -nonewline "Password: "
 $OnPremVIServerPassword = Read-Host -MaskInput
 Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
 }
@@ -614,8 +583,10 @@ write-host -foregroundcolor blue "================================="
          
 write-host -foregroundcolor blue "================================="
 
-write-host -ForegroundColor Yellow -nonewline "
-Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector (SUGGESTION: pick the one which has the VMs you are going to be migrating): "
+write-host -ForegroundColor Yellow "
+Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector.
+SUGGESTION: Pick the Cluster which has the VMs you are going to be migrating."
+write-host -ForegroundColor White -nonewline "Selection: "
 $Selection = Read-Host
 $OnPremCluster = $clusters["$Selection"].Name
 Clear-Host
@@ -640,11 +611,13 @@ write-host -foregroundcolor blue "================================="
            }
 write-host -foregroundcolor blue "================================="
 
-write-host -ForegroundColor Yellow -nonewline "
-Select the VDS from this list which contains the portgroups which will be extended to AVS: "
+write-host -ForegroundColor Yellow "
+Select the number which corresponds to the VDS which contains the portgroups which will be extended to AVS: "
+write-host -ForegroundColor White -nonewline "Selection: "
 $Selection = Read-Host
 $hcxVDS = $items["$Selection"].Name
 Clear-Host
+
   }
   
   
@@ -691,31 +664,30 @@ write-host -foregroundcolor blue "================================="
            
            write-host -foregroundcolor blue "================================="
 
-write-host -ForegroundColor Yellow -nonewline "
-Select the number of the vMotion Network Portgroup: "
+write-host -ForegroundColor Yellow "
+Select the number which corresponds to the vMotion Network Portgroup: "
+write-host -ForegroundColor White -nonewline "Selection: "
 $Selection = Read-Host
 $vmotionportgroup = $items["$Selection"].Name
-
+Clear-Host
+           
+#gateway
 write-host -ForegroundColor Yellow -nonewline "
-What is the Gateway for the vMotion Network on portgroup "$vmotionportgroup"?: "
+What is the GATEWAY for the vMotion Network on portgroup "$vmotionportgroup"?: "
 $Selection = Read-Host
 $vmotionprofilegateway = $Selection
 
 
-#########################################
-#Get and validate the network mask
-
+#network mask
 write-host -ForegroundColor Red "
 The entry for Network Prefix must be between 0-32" 
-$Selection = Read-Host "What is the $vmotionportgroup Network Prefix?"
+$Selection = Read-Host "What is the $vmotionportgroup Network Prefix?: "
 $vmotionnetworkmask = $Selection
 
-#########################################
-
-
-
+#ip range
 write-host -ForegroundColor Yellow -nonewline "
-Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
+Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x): 
+" 
 $Selection = Read-Host
 $vmotionippool = $Selection
 Clear-Host
@@ -767,32 +739,33 @@ write-host -foregroundcolor blue "================================="
            
            write-host -foregroundcolor blue "================================="
 
-write-host -ForegroundColor Yellow -nonewline "
-Select the number of the Management Network Portgroup: "
-$Selection = Read-Host
-$managementportgroup = $items["$Selection"].Name
+           write-host -ForegroundColor Yellow "
+Select the number which corresponds to the Management Network Portgroup: "
+           write-host -ForegroundColor White -nonewline "Selection: "
+           $Selection = Read-Host
+           $managementportgroup = $items["$Selection"].Name
+           Clear-Host
 
+#gateway
 write-host -ForegroundColor Yellow -nonewline "
-What is the Gateway for the Management Network on portgroup "$managementportgroup"?: "
+What is the GATEWAY for the Management Network on portgroup "$managementportgroup"?: "
 $Selection = Read-Host
 $mgmtprofilegateway = $Selection
 
-#########################################
-#Get and validate the network mask
-
+#network mask
 write-host -ForegroundColor Red "
 The entry for Network Prefix must be between 0-32" 
-$Selection = Read-Host "What is the $managementportgroup Network Prefix?"
+$Selection = Read-Host "What is the $managementportgroup Network Prefix?: "
 $mgmtnetworkmask = $Selection
 
-######################
-
-
+#ip range
 write-host -ForegroundColor Yellow -nonewline "
-Provide three contiguous FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x): " 
+Provide three contiguous FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x):
+" 
 $Selection = Read-Host
 $mgmtippool = $Selection
 Clear-Host
+
         }
 #######################################################################################
 # Define the Portgroup To Deploy the HCX Connector
@@ -810,9 +783,10 @@ write-host -foregroundcolor blue "================================="
            
            write-host -foregroundcolor blue "================================="
   
-write-host -ForegroundColor Yellow -nonewline "
-Select the number of the Portgroup Where You Would Like To Deploy the HCX Connector."
-write-host -foregroundcolor yellow "This is typically the same portgroup which is used for other management type of workloads, but could be any portgroup you like.: "
+write-host -ForegroundColor Yellow  "
+Select the number which corresponds to the Portgroup Where You Would Like To Deploy the HCX Connector."
+write-host -foregroundcolor Yellow "This is typically the same portgroup which is used for other management type of workloads, but could be any portgroup you like."
+write-host -ForegroundColor White -nonewline "Selection: "
 $Selection = Read-Host
 $VMNetwork = $items["$Selection"].Name
 Clear-Host           
@@ -834,13 +808,13 @@ Clear-Host
            
            write-host -foregroundcolor blue "================================="
   
-write-host -ForegroundColor Yellow -nonewline "
-Select the datastore where the HCX Connector and other HCX appliances should be deployed (not a significant amount of space required): "
+write-host -ForegroundColor Yellow  "
+Select the number which corresponds to the datastore where the HCX Connector and other HCX appliances should be deployed"
+write-host -foregroundcolor Yellow "Approximate space required is 165 GB"
+write-host -ForegroundColor White -nonewline "Selection: "
 $Selection = Read-Host
 $Datastore = $items["$Selection"].Name
-Clear-Host           
-
-
+Clear-Host 
 
 #######################################################################################
   #Define the HCX Connector Deployment Details
@@ -870,128 +844,119 @@ $HCXOnPremPassword = "Microsoft.123!"
 else
 {
 
-
   write-Host -foregroundcolor Yellow -nonewline "
-You will now be asked to input the parameters for the HCX Connector OVA Deployment in your on-premises datacenter.  
-This OVA will be deployed to portgroup $VMNetwork
-
-Press Enter Key To Continue: "
-  $Selection = Read-Host 
+  You will now be asked to input the parameters for the HCX Connector OVA Deployment in your on-premises datacenter.  
+  This OVA will be deployed to portgroup $VMNetwork
   
-  write-host -ForegroundColor Yellow -nonewline "VM Name: "
+  Press Enter Key To Continue"
+    $Selection = Read-Host 
+    
+    write-host -ForegroundColor Yellow -nonewline "VM Name: "
+    $Selection = Read-Host
+    $HCXManagerVMName = $Selection
+  
+    
+    write-host -ForegroundColor Yellow -nonewline "IP Address: "
+    $Selection = Read-Host
+    $HCXVMIP = $Selection
+  
+    #network mask
+  write-host -ForegroundColor Red "The entry for Network Prefix must be between 0-32" 
+  write-host -ForegroundColor Yellow -nonewline "$VMNetwork Network Prefix?: "
   $Selection = Read-Host
-  $HCXManagerVMName = $Selection
-
-  
-  write-host -ForegroundColor Yellow -nonewline "IP Address: "
-  $Selection = Read-Host
-  $HCXVMIP = $Selection
-
-  
-#Get and validate the network mask
-$validation = "false"
-$counter = 0
-
-
-while ("false" -eq $validation)
-{
-
-  if ($counter -ge 1 ) {
-write-host -ForegroundColor Red -nonewline "
-The entry for Network Prefix must be between 0-32"
- }
-
-write-host -ForegroundColor Yellow -nonewline "What is the $VMNetwork Network Prefix?: "
-$Selection = Read-Host
-$SelectionConvert = [int]$Selection
-
-if ($SelectionConvert -le 32) {
   $HCXVMNetmask = $Selection
-  $validation = "True"
-
-}
-else  {
-$counter=$counter+1
-}
-
-}
-
-######################
-
-
   
-  write-host -ForegroundColor Yellow -nonewline "Gateway for the HCX Connector: "
-  $Selection = Read-Host
-  $HCXVMGateway = $Selection
-
-  write-host -ForegroundColor Yellow -nonewline "DNS Server for the HCX Connector: "
-  $Selection = Read-Host
-  $HCXVMDNS = $Selection
+     
+    write-host -ForegroundColor Yellow -nonewline "Gateway for the HCX Connector: "
+    $Selection = Read-Host
+    $HCXVMGateway = $Selection
   
-  write-host -ForegroundColor Yellow -nonewline "Domain for the HCX Connector (example: mycompany.com): "
-  $Selection = Read-Host
-  $HCXVMDomain = $Selection
+    write-host -ForegroundColor Yellow -nonewline "DNS Server for the HCX Connector: "
+    $Selection = Read-Host
+    $HCXVMDNS = $Selection
     
-  write-host -ForegroundColor Yellow -nonewline "NTP Server for the HCX Connector (example: pool.ntp.org): "
-  $Selection = Read-Host
-  $AVSVMNTP = $Selection
-  
-#get the hcx admin password
-  $hcxadminpasswordvalidate = "NOTsamepassword"
-  $warning = ""
-  while ("NOTsamepassword" -eq $hcxadminpasswordvalidate)
-  {
-    write-Host -ForegroundColor Red $warning
-    write-host -ForegroundColor Yellow -nonewline "Provide a admin password of your choice for the HCX Connector: "
-    $Selection1 = Read-Host -MaskInput
-    write-host -ForegroundColor Yellow -nonewline "
-Enter the password again to validate: "
-    $Selection2 = Read-Host -MaskInput
-    $warning = "
-The Passwords Which Were Entered Do Not Match"
+    write-host -ForegroundColor Yellow -nonewline "Domain for the HCX Connector (example: mycompany.com): "
+    $Selection = Read-Host
+    $HCXVMDomain = $Selection
+      
+    write-host -ForegroundColor Yellow -nonewline "NTP Server for the HCX Connector (example: pool.ntp.org): "
+    $Selection = Read-Host
+    $AVSVMNTP = $Selection
     
-    if ($Selection1 -eq $Selection2 ) {      
-      $hcxadminpasswordvalidate = "samepassword"
+  #get the hcx admin password
+    $hcxadminpasswordvalidate = "NOTsamepassword"
+    $warning = ""
+    while ("NOTsamepassword" -eq $hcxadminpasswordvalidate)
+    
+    
+    {
+    
+    
+      write-Host -ForegroundColor Red -NoNewline $warning
+      write-host -ForegroundColor Yellow -nonewline "Provide a admin password of your choice for the HCX Connector: "
+      $Selection1 = Read-Host -MaskInput
+      write-host -ForegroundColor Yellow -nonewline "Enter the password again to validate: "
+      $Selection2 = Read-Host -MaskInput
+      $warning = "
+  The Passwords Which Were Entered Do Not Match"
+      
+      if ($Selection1 -eq $Selection2 ) {      
+        $hcxadminpasswordvalidate = "samepassword"
+        $HCXOnPremPassword = $Selection1
+
+      }
+    
+    
     }
-  }
-  $HCXOnPremPassword = $Selection1
-
-
-  write-host -ForegroundColor Yellow -nonewline "What is the nearest major city to where the HCX Connector is being deployed (example: New York, London, Miami, Melbourne, etc..): "
-  $Selection = Read-Host
-  $HCXOnPremLocation = $Selection
-
+    
+  
+    
+    write-host -ForegroundColor Yellow -nonewline "
+What is the nearest major city to where the HCX Connector is being deployed?
+Example: New York, London, Miami, Melbourne, etc..: "
+    $Selection = Read-Host
+    $HCXOnPremLocation = $Selection
+  
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
   $HCXCloudURL = $myprivatecloud.EndpointHcxCloudManager
-$length = $HCXCloudURL.length 
-$HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
-
-
-$hcxcloudpasswordvalidate = "NOTsamepassword"
-$warning = ""
-while ("NOTsamepassword" -eq $hcxcloudpasswordvalidate)
-{
-  write-Host -ForegroundColor Red $warning
-  write-host -ForegroundColor Yellow -nonewline "Provide password for your HCX Cloud Connector (It's the same password as your CLOUD vCenter). You can identify the vCenter and NSX-T Manager console's IP addresses and credentials in the Azure portal. Select your private cloud and then Manage > Identity: "
-  $Selection1 = Read-Host -MaskInput
-  write-host -ForegroundColor Yellow -nonewline "
-Enter the password again to validate: "
-  $Selection2 = Read-Host -MaskInput
-  $warning = "
-The Passwords Which Were Entered Do Not Match"
+  $length = $HCXCloudURL.length 
+  $HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
   
-  if ($Selection1 -eq $Selection2 ) {      
-    $hcxcloudpasswordvalidate = "samepassword"
+  
+  $hcxcloudpasswordvalidate = "NOTsamepassword"
+  $warning = ""
+  while ("NOTsamepassword" -eq $hcxcloudpasswordvalidate)
+  
+  
+  {
+    write-Host -ForegroundColor Red $warning
+    write-host -ForegroundColor Yellow -nonewline "Provide password for your HCX Cloud Connector (It's the same password as your CLOUD vCenter). 
+You can identify the vCenter and NSX-T Manager console's IP addresses and credentials in the Azure portal. 
+Select your PRIVATE CLOUD and then MANAGE > IDENTITY
+Password: "
+    $Selection1 = Read-Host -MaskInput
+    write-host -ForegroundColor Yellow -nonewline "Enter the password again to validate: "
+    $Selection2 = Read-Host -MaskInput
+    $warning = "
+  The Passwords Which Were Entered Do Not Match"
+    
+    if ($Selection1 -eq $Selection2 ) {      
+      $hcxcloudpasswordvalidate = "samepassword"
+      $HCXCloudPassword = $Selection1
+
+    }
   }
 }
-$HCXCloudPassword = $Selection1
 
-write-host -ForegroundColor Yellow -nonewline "Enter a HCX Activiation Key: "
+write-host -ForegroundColor Yellow -nonewline "Enter a HCX Activation Key
+You can create a HCX Activation Key in the Azure Portal.  
+Select your PRIVATE CLOUD > ADD-ONs > MIGRATION USING HCX
+Activation Key: "
 $Selection = Read-Host
 $hcxactivationkey = $Selection
 
-}
-  
+
+
      $HCXOnPremUserID = "admin"
      $mgmtnetworkprofilename = "Management"
      $vmotionnetworkprofilename = "vMotion"
@@ -1000,13 +965,14 @@ $hcxactivationkey = $Selection
      $hcxComputeProfileName = "AVS-ComputeProfile"
      $hcxServiceMeshName = "AVS-ServiceMesh"
      
-  
+
   Clear-Host
   
   write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
   $hcxfilename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
   
   Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
+  Clear-Host
   write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
   
