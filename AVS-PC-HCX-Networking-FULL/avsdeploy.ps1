@@ -1,10 +1,36 @@
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
+Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
+
+#azure login function
+function azurelogin {
+
+  param (
+      $subtoconnect
+  )
+$ErrorActionPreference = "SilentlyContinue"
+$WarningPreference = "SilentlyContinue"
+
+$sublist = @()
+  $sublist = Get-AzSubscription
+  $checksub = $sublist -match $sub
+  If ($checksub.Count -eq 1) {
+Set-AzContext -Subscription $subtoconnect
+  }
+  else {
+    Connect-AzAccount -Subscription $subtoconnect
+    Set-AzContext -Subscription $subtoconnect
+  }
+
+$ErrorActionPreference = "Continue"
+$WarningPreference = "Continue"
+
+}
 
 #######################################################################################
 #Testing Stuff -- DO NOT MODIFY
@@ -74,21 +100,16 @@ if ($vmwareazcheck.Name -ne "Az") {
   #>
   Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-  Write-Host -ForegroundColor Yellow "Downloading and Installing Azure Powershell Modules ..."
+  Write-Host -ForegroundColor Yellow "Installing/Updating Azure Powershell Modules ..."  
   Install-Module -Name Az -Repository PSGallery -Force
+  Write-Host -ForegroundColor Yellow "Az Powershell Module Installed/Updated"
   Install-Module -Name Az.VMware -Repository PSGallery -Force
+  Write-Host -ForegroundColor Yellow "Az.VMware Powershell Module Installed/Updated"
+start-sleep 5
   Clear-Host
 
   Write-Host -ForegroundColor Green "
-  Success: Azure Powershell Modules Installed"
-<#
-}
-Write-Host  "Az and Az.VMware Powershell Modules Are Requirements For This Script" -ForegroundColor Red
-Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-Exit
-}
-
-#>
+Success: Azure Powershell Modules Installed"
 
 #VMware PowerCLI Modules
 $vmwarepowerclicheck = Find-Module -Name VMware.PowerCLI
@@ -122,47 +143,11 @@ Clear-Host
   
 #Azure CLI
 
-<#
-$software = "Azure CLI"
-$installed = "Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* | Where-Object { $_.DisplayName -contains $software }" -ne $null
-
-if ("False" -eq $installed) {
-    Write-Host -nonewline -ForegroundColor Yellow "It Appears Azure CLI Is NOT Installed On This Computer, Would You Like To Install It Now (Y/N): "
-    $begin = Read-Host
-
-    if ("y" -eq $begin ) {
-      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-      $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
-      $azureCLIDownloadFileName = "AzureCLI.msi"
-      Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
-      Start-Process -wait "$env:TEMP\AVSDeploy\$azureCLIDownloadFileName"
-      Write-Host -ForegroundColor Green "
-      Success: Azure CLI Installed"
-      
-    }
-
-    Write-Host  "Azure CLI Program Is Required For This Script" -ForegroundColor Red
-    Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-    Exit
-
-  }
-  #>  
-  write-host -ForegroundColor Yellow -nonewline "
-Azure CLI is REQUIRED for this script to execute properly.  Is Azure CLI already installed on this computer? (Y/N): "
-  $Selection = Read-Host
-  
-  If ("y" -eq $Selection)
-  {
-  }
-  else
-  {
-  
-    write-host -ForegroundColor Yellow -nonewline "
-Would you like to install Azure CLI? (Y/N): "
-    $Selection = Read-Host
-
-    If ("y" -eq $Selection) {
-
+  $programlist = @()
+  $programlist += Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
+  $programlist  += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
+  $checkazurecli = $programlist -match 'Microsoft Azure CLI'
+  If ($checkazurecli.Count -eq 0) {
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
     $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
     $azureCLIDownloadFileName = "AzureCLI.msi"
@@ -174,21 +159,9 @@ Would you like to install Azure CLI? (Y/N): "
     Write-Host -ForegroundColor Red "You will need to re-start the Powershell session and re-run the script .... Press Any Key To Continue"
     Read-Host
     stop-process $PID
-
   }
+
   
-  else
-  {
-  
-  Write-Host  "
-Azure CLI Program Is Required For This Script" -ForegroundColor Red
-  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-  Exit
-
-
-}}
-
-
 }
 
 #######################################################################################
@@ -197,14 +170,18 @@ Azure CLI Program Is Required For This Script" -ForegroundColor Red
 Clear-Host
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
-Connect-AzAccount -Subscription $sub
+
+azurelogin -subtoconnect $sub
+
 write-host -ForegroundColor Green "
 Azure Login Successful"
 Write-Host -ForegroundColor Yellow  "
 Validating Subscription Readiness ..." 
-
+$ErrorActionPreference = "SilentlyContinue"
+$WarningPreference = "SilentlyContinue"
 $quota = Test-AzVMWareLocationQuotaAvailability -Location $regionfordeployment -SubscriptionId $sub
-
+$ErrorActionPreference = "Continue"
+$WarningPreference = "Continue"
 if ("Enabled" -eq $quota.Enabled)
 {
 
@@ -222,9 +199,11 @@ Else
 
 {
 Write-Host -ForegroundColor Red "
-Subscription $sub Does NOT Have Quota for Azure VMware Solution, please visit the following site for guidance on how to get this service enabled for your subscription.
+Subscription $sub Does NOT Have Quota for Azure VMware Solution, please visit the following site for guidance on how to get this service enabled for your subscription."
 
-https://docs.microsoft.com/en-us/azure/azure-vmware/enable-azure-vmware-solution"
+Write-Host -ForegroundColor White "
+https://docs.microsoft.com/en-us/azure/azure-vmware/enable-azure-vmware-solution
+"
 
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
 Exit
@@ -266,6 +245,7 @@ Write-Host -foregroundcolor Yellow "
 The status of the deployment will begin to update in 5 minutes."
 
 Start-Sleep -Seconds 300
+Clear-Host
 
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 $currentprovisioningstate = $provisioningstate.ProvisioningState
@@ -275,7 +255,7 @@ $timeStamp = Get-Date -Format "hh:mm"
 while ("Succeeded" -ne $currentprovisioningstate)
 {
 $timeStamp = Get-Date -Format "hh:mm"
-"$timestamp - Current Status: $currentprovisioningstate - Next Update In 10 Minutes"
+write-host -foregroundcolor yellow "$timestamp - Current Status: $currentprovisioningstate - Next Update In 10 Minutes"
 Start-Sleep -Seconds 600
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 $currentprovisioningstate = $provisioningstate.ProvisioningState
@@ -301,7 +281,9 @@ if("Failed" -eq $currentprovisioningstate)
 #######################################################################################
 # Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
 #######################################################################################
-Set-AzContext -Subscription $sub
+
+azurelogin -subtoconnect $sub
+
 
 if ("Site-to-Site VPN" -eq $AzureConnection) {
   
@@ -314,7 +296,8 @@ $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgf
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
 
-Set-AzContext -Subscription $vnetgwsub
+azurelogin -subtoconnect $vnetgwsub
+
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
 $vnet
@@ -367,7 +350,8 @@ if("Failed" -eq $currentprovisioningstate)
 Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
 
-Set-AzContext -Subscription $sub
+azurelogin -subtoconnect $sub
+
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
@@ -421,7 +405,8 @@ $command | ConvertTo-Json
 #######################################################################################
 # Connect AVS To vNet w/ ExR
 #######################################################################################
-Set-AzContext -Subscription $sub
+azurelogin -subtoconnect $sub
+
 
 if ("ExpressRoute" -eq $AzureConnection) {
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
@@ -436,8 +421,8 @@ AVS ExpressRoute Auth Key Generated"
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
 
+azurelogin -subtoconnect $vnetgwsub
 
-Set-AzContext -SubscriptionId $vnetgwsub
 $exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
 
 New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
@@ -454,7 +439,8 @@ if ("ExpressRoute" -eq $AzureConnection) {
 
 if ("yes" -eq $internaltest) {
 
-  Set-AzContext -Subscription $sub
+  azurelogin -subtoconnect $sub
+
 
     Write-Host -ForegroundColor Yellow "Building Global Reach connection from $pcname to the on-premises Express Route $NameOfOnPremExRCircuit...
     "
@@ -479,8 +465,7 @@ if ("yes" -eq $internaltest) {
    
   else {
   
-  
-    Set-AzContext -Subscription $OnPremExRCircuitSub
+    azurelogin -subtoconnect $OnPremExRCircuitSub
 
     $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
     Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
@@ -493,8 +478,10 @@ if ("yes" -eq $internaltest) {
     $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
     $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
     
-    Set-AzContext -Subscription $sub
-    New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
+azurelogin -subtoconnect $sub
+
+
+New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
     
     $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
     $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus
@@ -525,10 +512,10 @@ if ($deployhcxyesorno -eq "No") {
   Exit
 }
 
-else
-{
+else{
 
   az login
+  az config set extension.use_dynamic_install=yes_without_prompt
   az account set --subscription $sub
   write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 20 minutes ... "
  az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
@@ -1303,10 +1290,10 @@ $hcxactivationkey = $Selection
   
   $managementNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename
   $vmotionNetworkProfile = Get-HCXNetworkProfile -Name $vmotionnetworkprofilename
-  $hcxComputeCluster = Get-HCXApplianceCompute -ClusterComputeResource
+  $hcxComputeCluster = Get-HCXApplianceCompute -ClusterComputeResource -Name $OnPremCluster
   $hcxVDS = Get-HCXInventoryDVS -Name $hcxVDS
   $hcxDatastore = Get-HCXApplianceDatastore -Compute $hcxComputeCluster -Name $Datastore
-  
+
   $command = New-HCXComputeProfile -Name $hcxComputeProfileName -ManagementNetworkProfile $managementNetworkProfile -vMotionNetworkProfile $vmotionNetworkProfile -DistributedSwitch $hcxVDS -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension -Datastore $hcxDatastore -DeploymentResource $hcxComputeCluster -ServiceCluster $hcxComputeCluster
   $command | ConvertTo-Json
   
@@ -1326,7 +1313,7 @@ $hcxactivationkey = $Selection
   $command | ConvertTo-Json
   
   
-write-host "Building Service Mesh, Script is Paused for 5 Minutes Waiting To Get Status of Service Mesh"
+write-host -foregroundcolor Yellow "Building Service Mesh, Script is Paused for 5 Minutes Waiting To Get Status of Service Mesh"
 start-sleep -Seconds 300
 
 while ($deploymentstatus -ne "Complete") {
