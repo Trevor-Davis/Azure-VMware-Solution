@@ -1,11 +1,3 @@
-#############################################
-#Make Lines Not Wrap when entering data
-#
-#
-#
-#
-############################################
-
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
