@@ -1,10 +1,31 @@
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
+
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
+
+#######################################################################################
+#FUNCTIONS
+#######################################################################################
+
+#azure silence enable and disable function
+function azuresilence {
+
+
+$ErrorActionPreference = "SilentlyContinue"
+$WarningPreference = "SilentlyContinue"
+}
+
+function remove-azuresilence {
+
+
+  $ErrorActionPreference = "Continue"
+  $WarningPreference = "Continue"
+  }
+ 
 
 
 #azure login function
@@ -13,8 +34,7 @@ function azurelogin {
   param (
       $subtoconnect
   )
-$ErrorActionPreference = "SilentlyContinue"
-$WarningPreference = "SilentlyContinue"
+azuresilence
 
 $sublist = @()
   $sublist = Get-AzSubscription
@@ -27,10 +47,25 @@ Set-AzContext -Subscription $subtoconnect
     Set-AzContext -Subscription $subtoconnect
   }
 
-$ErrorActionPreference = "Continue"
-$WarningPreference = "Continue"
+remove-azuresilence
 
 }
+
+function permissioncheck {
+
+  param (
+      $subtocheck = '$sub',
+      $roletocheck = "Contributor"
+  )
+azuresilence
+
+$userpermissions = Get-AzRoleAssignment | Where-Object {($_.Scope -eq "/subscriptions/$sub" -and $_.RoleDefinitionName -eq "Contributor")}
+$userpermissions
+remove-azuresilence
+}
+
+
+
 
 #######################################################################################
 #Testing Stuff -- DO NOT MODIFY
@@ -177,11 +212,9 @@ write-host -ForegroundColor Green "
 Azure Login Successful"
 Write-Host -ForegroundColor Yellow  "
 Validating Subscription Readiness ..." 
-$ErrorActionPreference = "SilentlyContinue"
-$WarningPreference = "SilentlyContinue"
+azuresilence
 $quota = Test-AzVMWareLocationQuotaAvailability -Location $regionfordeployment -SubscriptionId $sub
-$ErrorActionPreference = "Continue"
-$WarningPreference = "Continue"
+remove-azuresilence
 if ("Enabled" -eq $quota.Enabled)
 {
 
@@ -517,7 +550,8 @@ else{
   az login
   az config set extension.use_dynamic_install=yes_without_prompt
   az account set --subscription $sub
-  write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 20 minutes ... "
+  Clear-Host
+  write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 30 minutes ... "
  az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
   write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
   
@@ -1294,7 +1328,7 @@ $hcxactivationkey = $Selection
   $hcxVDS = Get-HCXInventoryDVS -Name $hcxVDS
   $hcxDatastore = Get-HCXApplianceDatastore -Compute $hcxComputeCluster -Name $Datastore
 
-  $command = New-HCXComputeProfile -Name $hcxComputeProfileName -ManagementNetworkProfile $managementNetworkProfile -vMotionNetworkProfile $vmotionNetworkProfile -DistributedSwitch $hcxVDS -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension -Datastore $hcxDatastore -DeploymentResource $hcxComputeCluster -ServiceCluster $hcxComputeCluster
+  $command = New-HCXComputeProfile -Name $hcxComputeProfileName -ManagementNetworkProfile $managementNetworkProfile -vMotionNetworkProfile $vmotionNetworkProfile -DistributedSwitch $hcxVDS -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension -Datastore $hcxDatastore -DeploymentResource $hcxComputeCluster -ServiceCluster $hcxComputeCluster -SourceUplinkNetworkProfile $managementNetworkProfile
   $command | ConvertTo-Json
   
   
@@ -1319,7 +1353,6 @@ start-sleep -Seconds 300
 while ($deploymentstatus -ne "Complete") {
     start-sleep -Seconds 15 
     $status=Get-HCXAppliance
-    $status.Status
     if($status.Status -eq "down" -or $null -eq $status.Status){
         $deploymentstatus = "Building"
     write-host "Service Mesh: $deploymentstatus"}
