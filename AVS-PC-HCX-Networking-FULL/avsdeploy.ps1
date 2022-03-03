@@ -136,9 +136,9 @@ if ($vmwareazcheck.Name -ne "Az") {
   Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Installing/Updating Azure Powershell Modules ..."  
-  Install-Module -Name Az -Repository PSGallery -Force
+  #Install-Module -Name Az -Repository PSGallery -Force
   Write-Host -ForegroundColor Yellow "Az Powershell Module Installed/Updated"
-  Install-Module -Name Az.VMware -Repository PSGallery -Force
+  #Install-Module -Name Az.VMware -Repository PSGallery -Force
   Write-Host -ForegroundColor Yellow "Az.VMware Powershell Module Installed/Updated"
 start-sleep 5
   Clear-Host
