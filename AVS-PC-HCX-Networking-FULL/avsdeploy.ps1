@@ -64,9 +64,6 @@ $userpermissions
 remove-azuresilence
 }
 
-
-
-
 #######################################################################################
 #Testing Stuff -- DO NOT MODIFY
 #######################################################################################
@@ -199,9 +196,9 @@ Clear-Host
   
 }
 
-#######################################################################################
+#########################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
-#######################################################################################
+#########################################################
 Clear-Host
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
@@ -310,6 +307,8 @@ if("Failed" -eq $currentprovisioningstate)
   Exit
 
 }
+
+Read-Host
 
 #######################################################################################
 # Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
