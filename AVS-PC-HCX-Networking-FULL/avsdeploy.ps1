@@ -86,7 +86,7 @@ Please re-run the script from the PowerShell 7 command window"
   Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
   Exit
 }
-<#
+
   Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Installing/Updating Azure Powershell Modules ..."  
@@ -153,7 +153,7 @@ Clear-Host
 
   
 }
-#>
+
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
@@ -167,6 +167,8 @@ azurelogin -subtoconnect $sub
 write-host -ForegroundColor Green "
 Azure Login Successful"
 
+Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
+
 $testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
@@ -175,16 +177,12 @@ if ($testforpc.count -eq 1) {
 if ($pcdeployed -eq 0){
 Write-Host -ForegroundColor Yellow  "
 Validating Subscription Readiness ..." 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 $quota = Test-AzVMWareLocationQuotaAvailability -Location $regionfordeployment -SubscriptionId $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 if ("Enabled" -eq $quota.Enabled)
 {
 
 Write-Host -ForegroundColor Green "
 Success: Quota is Enabled on Subscription"    
-
-Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
 
 Write-Host -ForegroundColor Green "
 Success: Resource Provider Enabled"    
@@ -206,8 +204,8 @@ Exit
 
 }
 
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 }
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 #######################################################################################
 # Define The Resource Group For AVS Deploy
