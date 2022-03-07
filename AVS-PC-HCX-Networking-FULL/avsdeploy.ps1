@@ -308,8 +308,6 @@ if("Failed" -eq $currentprovisioningstate)
 
 }
 
-Read-Host
-
 #######################################################################################
 # Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
 #######################################################################################
