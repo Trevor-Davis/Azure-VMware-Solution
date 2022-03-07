@@ -7,26 +7,22 @@ Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 . $env:TEMP\AVSDeploy\variables.ps1
 
+$pcdeployed = 0
+$hcxdeployed = 0
+$pcexrdeployed = 0
+$pconpremdeployed = 0
+$hcxonpremdeployed = 0
+$hcxclouddeployed = 0
+$exrgwforvpndeployed = 0
+$avsexrauthkeydeployed = 0
+$onpremexrauthkeydeployed = 0
+$rsdeployed = 0
+$exrglobalreachdeployed = 0
+
+
 #######################################################################################
 #FUNCTIONS
 #######################################################################################
-
-#azure silence enable and disable function
-function azuresilence {
-
-
-$ErrorActionPreference = "SilentlyContinue"
-$WarningPreference = "SilentlyContinue"
-}
-
-function remove-azuresilence {
-
-
-  $ErrorActionPreference = "Continue"
-  $WarningPreference = "Continue"
-  }
- 
-
 
 #azure login function
 function azurelogin {
@@ -34,48 +30,18 @@ function azurelogin {
   param (
       $subtoconnect
   )
-azuresilence
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 
 $sublist = @()
   $sublist = Get-AzSubscription
   $checksub = $sublist -match $sub
-  If ($checksub.Count -eq 1) {
-Set-AzContext -Subscription $subtoconnect
+  If ($checksub.Count -eq 1 -and $checksub.id -eq $subtoconnect) {}
+  if ($checksub.Count -eq 1 -and $checksub.id -ne $subtoconnect) {Set-AzContext -Subscription $subtoconnect}
+  if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
+
   }
-  else {
-    Connect-AzAccount -Subscription $subtoconnect
-    Set-AzContext -Subscription $subtoconnect
-  }
-
-remove-azuresilence
-
-}
-
-function permissioncheck {
-
-  param (
-      $subtocheck = '$sub',
-      $roletocheck = "Contributor"
-  )
-azuresilence
-
-$userpermissions = Get-AzRoleAssignment | Where-Object {($_.Scope -eq "/subscriptions/$sub" -and $_.RoleDefinitionName -eq "Contributor")}
-$userpermissions
-remove-azuresilence
-}
-
-#######################################################################################
-#Testing Stuff -- DO NOT MODIFY
-#######################################################################################
-
-$global:internaltest="No" #DO NOT MODIFY
-
-if ("Yes" -eq $global:internaltest){
-$global:InternalAuthKey = "89193c55-xxxx-4b76-bf2f-05b92a1534ef"
-$global:InternalPeerURI = "/subscriptions/52d4e37e-xxxx-4016-98de-fe023475b435/resourceGroups/tnt15-xxxx-p01-australiaeast/providers/Microsoft.Network/expressRouteCircuits/tnt15-cust-p01-australiaeast-er"
-$global:OnPremVIServerUsername = "administrator@vsphere.local"
-$global:OnPremVIServerPassword = 'xxx'
-}
 
 #######################################################################################
 # Create Temp Storage Location
@@ -121,21 +87,12 @@ Please re-run the script from the PowerShell 7 command window"
   Exit
 }
 
-#Az and Az.VMware Powershell Modules
-<#
-$vmwareazcheck = Find-Module -Name Az
-if ($vmwareazcheck.Name -ne "Az") {
-  Write-Host -NoNewline -ForegroundColor Yellow "The AZ and the AZ.VMware Powershell Modules Are NOT Installed, Would You Like To Install Those Now? (Y/N): "
-  $AZModuleInstall = Read-Host 
-  
-  if ($AZModuleInstall -eq "y"){
-  #>
   Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Installing/Updating Azure Powershell Modules ..."  
-  #Install-Module -Name Az -Repository PSGallery -Force
+  Install-Module -Name Az -Repository PSGallery -Force
   Write-Host -ForegroundColor Yellow "Az Powershell Module Installed/Updated"
-  #Install-Module -Name Az.VMware -Repository PSGallery -Force
+  Install-Module -Name Az.VMware -Repository PSGallery -Force
   Write-Host -ForegroundColor Yellow "Az.VMware Powershell Module Installed/Updated"
 start-sleep 5
   Clear-Host
@@ -196,9 +153,10 @@ Clear-Host
   
 }
 
-#########################################################
+#######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
-#########################################################
+#######################################################################################
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 Clear-Host
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
@@ -207,11 +165,18 @@ azurelogin -subtoconnect $sub
 
 write-host -ForegroundColor Green "
 Azure Login Successful"
+
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+if ($testforpc.count -eq 1) {
+  $pcdeployed=1
+}
+
+if ($pcdeployed -eq 0){
 Write-Host -ForegroundColor Yellow  "
 Validating Subscription Readiness ..." 
-azuresilence
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 $quota = Test-AzVMWareLocationQuotaAvailability -Location $regionfordeployment -SubscriptionId $sub
-remove-azuresilence
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 if ("Enabled" -eq $quota.Enabled)
 {
 
@@ -240,13 +205,23 @@ Exit
 
 }
 
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+}
+
 #######################################################################################
 # Define The Resource Group For AVS Deploy
 #######################################################################################
 
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+if ($testforpc.count -eq 1) {
+  $pcdeployed=1
+}
+
+if($pcdeployed -eq 0){
+
 if ( "Existing" -eq $RGNewOrExisting )
 {
-    write-host -foregroundcolor Yellow "
+    write-host -foregroundcolor Green "
 AVS Private Cloud Resource Group is $rgfordeployment"
 }
 
@@ -257,10 +232,21 @@ if ( "New" -eq $RGNewOrExisting){
 Success: AVS Private Cloud Resource Group $rgfordeployment Created"   
 
 }
+}
 
 #######################################################################################
 # Kickoff Private Cloud Deployment
 #######################################################################################
+
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+if ($testforpc.count -eq 1) {
+  $pcdeployed=1
+  write-Host -ForegroundColor Blue "
+Azure VMware Solution Private Cloud $pcname Is Already Deployed, Skipping To Next Step..."
+}
+
+
+if ($pcdeployed -eq 0) {
 
 Write-Host -ForegroundColor Green "
 Success: The Azure VMware Solution Private Cloud Deployment Has Begun"
@@ -308,17 +294,33 @@ if("Failed" -eq $currentprovisioningstate)
 
 }
 
+}
+
 #######################################################################################
 # Connect AVS To vNet w/ VPN GW from On-Prem AND Create Route Server
 #######################################################################################
 
 azurelogin -subtoconnect $sub
 
-
 if ("Site-to-Site VPN" -eq $AzureConnection) {
   
 
-#connect AVS ExR
+#Create Expressroute gateway for AVS to use
+
+$provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
+$currentprovisioningstate = $provisioningstate.ProvisioningState
+if ($currentprovisioningstate -eq "Succeeded") {
+   
+  $exrgwforvpndeployed=1
+  write-Host -ForegroundColor Blue "
+ExpressRoute Gateway for Azure VMware Solution Private Cloud Is Already Deployed, Skipping To Next Step..."
+}
+
+if ($exrgwforvpndeployed -eq 0)
+
+{ #start
+  
+
 $ExrGatewayForAVS = "ExRGWfor-$pcname" #the new ExR GW name.
 $GWIPName = "ExRGWfor-$pcname-IP" #name of the public IP for ExR GW
 $GWIPconfName = "gwipconf" #
@@ -350,7 +352,6 @@ Creating a ExpressRoute Gateway for AVS ... this could take 30-40 minutes ..."
 $command = New-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard -NoWait
 $command | ConvertTo-Json
 
-############################################
 while ("Succeeded" -ne $currentprovisioningstate)
 {
 $timeStamp = Get-Date -Format "hh:mm"
@@ -374,8 +375,20 @@ if("Failed" -eq $currentprovisioningstate)
   Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
   Exit
 }
-############################################
 
+} #finish
+
+
+#Connect AVS to vNet
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+if ($status.count -eq 1) {
+  $avsexrauthkeydeployed=1
+  write-Host -ForegroundColor Blue "
+ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
+}
+
+
+if ($avsexrauthkeydeployed -eq 0) {
 
 Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
@@ -386,6 +399,19 @@ azurelogin -subtoconnect $sub
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
+}
+
+#Connecting private cloud to ExR GW
+$status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
+if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
+  $pcexrdeployed = 1
+  write-Host -ForegroundColor Blue "
+Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway, Skipping To Next Step..."
+}
+
+
+if ($pcexrdeployed -eq 0) {
+
 
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
@@ -399,8 +425,20 @@ New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
+}
+
 
 #Create and Configure Route Server
+$status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup
+if ($status.count -eq 1) {
+  $rsdeployed = 1
+  write-Host -ForegroundColor Blue "
+Azure RouteServer Already Deployed, Skipping To Next Step..."
+}
+
+
+if ($rsdeployed -eq 0) {
+
 $virtualnetworkforsubnet = Get-AzVirtualNetwork -Name $VpnGwVnetName
 
 Add-AzVirtualNetworkSubnetConfig -Name "RouteServerSubnet" -VirtualNetwork $virtualnetworkforsubnet -AddressPrefix $RouteServerSubnetAddressPrefix
@@ -427,10 +465,9 @@ $command | ConvertTo-Json
 
 $command = Update-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup -AllowBranchToBranchTraffic
 $command | ConvertTo-Json
-
 }
 
-
+}
 
 #######################################################################################
 # Connect AVS To vNet w/ ExR
@@ -439,14 +476,41 @@ azurelogin -subtoconnect $sub
 
 
 if ("ExpressRoute" -eq $AzureConnection) {
+  
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
+
+
+
+
+
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+if ($status.count -eq 1) {
+  $avsexrauthkeydeployed = 1
+  write-Host -ForegroundColor Blue "
+ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
+}
+
+if ($avsexrauthkeydeployed -eq 0) {
+  
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
+}
+
+
+$status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
+if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
+  $pcexrdeployed = 1
+  write-Host -ForegroundColor Blue "
+Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway, Skipping To Next Step..."
+}
+
+
+if ($pcexrdeployed -eq 0) {
 
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
@@ -461,41 +525,27 @@ Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
 }
+}
 #######################################################################################
 # Connecting AVS To On-Prem ExR
 #######################################################################################
 
 if ("ExpressRoute" -eq $AzureConnection) {
 
-if ("yes" -eq $internaltest) {
-
-  azurelogin -subtoconnect $sub
-
-
-    Write-Host -ForegroundColor Yellow "Building Global Reach connection from $pcname to the on-premises Express Route $NameOfOnPremExRCircuit...
-    "
-    New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey "$InternalAuthKey" -PeerExpressRouteResourceId "$InternalPeerURI"
-    
-    $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
-    $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus
-    
-    while ("Connected" -ne $currentprovisioningstate)
-    {
-    write-Host -ForegroundColor Yellow "Current Status of Global Reach Connection: $currentprovisioningstate"
-    Start-Sleep -Seconds 10
-    $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
-    $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus}
-    
-    if("Connected" -eq $currentprovisioningstate)
-    {
-      Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
-    }  
-  
-  }
-   
-  else {
-  
+  #generate auth key on on-prem ExR circut
     azurelogin -subtoconnect $OnPremExRCircuitSub
+
+################
+$OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
+$status = get-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
+
+    if ($status.count -eq 1) {
+      $onpremexrauthkeydeployed = 1
+      write-Host -ForegroundColor Blue "
+On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
+    }
+
+    if ($onpremexrauthkeydeployed -eq 0){
 
     $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
     Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
@@ -503,15 +553,26 @@ if ("yes" -eq $internaltest) {
     
     Write-Host -ForegroundColor Green "
     Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
-    
+  }
+
+
     $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
     $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
     $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
     
-azurelogin -subtoconnect $sub
 
+  #Connect Global Reach
+  azurelogin -subtoconnect $sub
 
-New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
+   $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+   if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
+    $exrglobalreachdeployed = 1
+    write-Host -ForegroundColor Blue "
+ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..."
+  }
+  
+  if ($exrglobalreachdeployed = 0) {
+    New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
     
     $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
     $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus
@@ -528,11 +589,9 @@ New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudNam
       Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
       
     }
-  
+  }
   
   }
-}
-
 #######################################################################################
 # Install HCX To Private Cloud
 #######################################################################################
@@ -542,7 +601,20 @@ if ($deployhcxyesorno -eq "No") {
   Exit
 }
 
+
 else{
+azurelogin -subtoconnect $sub
+
+   $status = Get-AzVMwareAddon -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+   if ($status.name -eq "hcx") {
+    $hcxdeployed = 1
+    write-Host -ForegroundColor Blue "
+HCX Has Already Been Deployed to $pcname Private Cloud, Skipping To Next Step..."
+  }
+
+
+if ($hcxdeployed = 0) {
+  ExpressRoute GlobalReach Connection Established Already
 
   az login
   az config set extension.use_dynamic_install=yes_without_prompt
@@ -555,18 +627,11 @@ else{
   
  
   Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
+}
 }  
 #######################################################################################
 # Get On-Prem vCenter Creds
 #######################################################################################  
-if ("Yes" -eq $internaltest){
-
-Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
-
-}
-else {
-
-
 
 write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
 write-host -ForegroundColor White -nonewline "Username: "
@@ -574,7 +639,7 @@ $OnPremVIServerUsername = Read-Host
 write-host -ForegroundColor White -nonewline "Password: "
 $OnPremVIServerPassword = Read-Host -MaskInput
 Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
-}
+
 
 #######################################################################################
 # Pick Cluster to Deploy HCX Connector
