@@ -86,7 +86,7 @@ Please re-run the script from the PowerShell 7 command window"
   Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
   Exit
 }
-
+<#
   Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Installing/Updating Azure Powershell Modules ..."  
@@ -129,6 +129,7 @@ Clear-Host
     Success: VMware HCX PowerCLI Modules Installed"
 
 }
+#>
   
 #Azure CLI
 
