@@ -129,7 +129,7 @@ Clear-Host
     Success: VMware HCX PowerCLI Modules Installed"
 
 }
-#>
+
   
 #Azure CLI
 
@@ -153,7 +153,7 @@ Clear-Host
 
   
 }
-
+#>
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
