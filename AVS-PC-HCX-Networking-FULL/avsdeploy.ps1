@@ -2,6 +2,7 @@ $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name 
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
 
+
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
