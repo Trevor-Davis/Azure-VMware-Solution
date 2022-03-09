@@ -34,11 +34,11 @@ function azurelogin {
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 
 $sublist = @()
-  $sublist = Get-AzSubscription
-  $checksub = $sublist -match $sub
-  If ($checksub.Count -eq 1 -and $checksub.id -eq $subtoconnect) {}
-  if ($checksub.Count -eq 1 -and $checksub.id -ne $subtoconnect) {Set-AzContext -Subscription $subtoconnect}
-  if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
+$sublist = Get-AzSubscription
+$checksub = $sublist -match $subtoconnect
+If ($checksub.Count -eq 1 -and $checksub.id -eq $subtoconnect) {""}
+if ($checksub.Count -eq 1 -and $checksub.id -ne $subtoconnect) {Set-AzContext -SubscriptionId $subtoconnect}
+if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 
