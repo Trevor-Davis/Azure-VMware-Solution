@@ -45,7 +45,7 @@ function azurelogin {
     param (
         $port
     )
-    $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
     $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
