@@ -31,18 +31,46 @@ function azurelogin {
   param (
       $subtoconnect
   )
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-
-$sublist = @()
+  $sublist = @()
   $sublist = Get-AzSubscription
-  $checksub = $sublist -match $sub
-  If ($checksub.Count -eq 1 -and $checksub.id -eq $subtoconnect) {}
-  if ($checksub.Count -eq 1 -and $checksub.id -ne $subtoconnect) {Set-AzContext -Subscription $subtoconnect}
+  $checksub = $sublist -match $subtoconnect
+  If ($checksub.Count -eq 1 -and $checksub.id -eq $subtoconnect) {""}
+  if ($checksub.Count -eq 1 -and $checksub.id -ne $subtoconnect) {Set-AzContext -SubscriptionId $subtoconnect}
   if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-
-
   }
+
+  # START - Check Communication On-Prem <--> AVS
+  function checkavsvcentercommunication {
+
+    param (
+        $port
+    )
+    $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+    $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
+    $vcenterurl = $myprivatecloud.EndpointVcsa
+    $length = $vcenterurl.length 
+    $vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
+    $global:check = Test-Connection -IPv4 -TcpPort $port $vCenterCloudIP
+    $check | ConvertTo-Json
+     }
+     
+     
+
+if ("False" -eq $check){
+          write-Host -ForegroundColor Red "
+Communication Between AVS and On-Premises Has Failed.
+"
+write-host -ForegroundColor Yellow "The VPN Connection appears to have been setup successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
+"
+Exit
+}
+else {write-Host -foregroundcolor Green "
+Success: Communication Between AVS and On-Premises Has Been Validated"
+}
+# STOP - Check Communication On-Prem <--> AVS
+
 
 #######################################################################################
 # Create Temp Storage Location
@@ -161,7 +189,9 @@ Clear-Host
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
 
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 write-host -ForegroundColor Green "
 Azure Login Successful"
@@ -304,7 +334,9 @@ if ("Site-to-Site VPN" -eq $AzureConnection) {
   
 
 #Create Expressroute gateway for AVS to use
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 $currentprovisioningstate = $provisioningstate.ProvisioningState
 if ($currentprovisioningstate -eq "Succeeded") {
@@ -322,12 +354,16 @@ if ($exrgwforvpndeployed -eq 0)
 $ExrGatewayForAVS = "ExRGWfor-$pcname" #the new ExR GW name.
 $GWIPName = "ExRGWfor-$pcname-IP" #name of the public IP for ExR GW
 $GWIPconfName = "gwipconf" #
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
 
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
 $vnet
@@ -378,7 +414,9 @@ if("Failed" -eq $currentprovisioningstate)
 
 
 #Connect AVS to vNet
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed=1
@@ -398,7 +436,9 @@ AVS ExpressRoute Auth Key Generated"
 }
 
 #Connecting private cloud to ExR GW
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
@@ -425,7 +465,9 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 
 
 #Create and Configure Route Server
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup
 if ($status.count -eq 1) {
   $rsdeployed = 1
@@ -462,9 +504,40 @@ $command | ConvertTo-Json
 
 $command = Update-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup -AllowBranchToBranchTraffic
 $command | ConvertTo-Json
+
+Write-Host -ForegroundColor Green "
+Success: Azure RouteServer Created and Updated"
 }
 
+
+# START - Check Communication On-Prem <--> AVS
+
+
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+$myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
+$vcenterurl = $myprivatecloud.EndpointVcsa
+$length = $vcenterurl.length 
+$vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
+$check = Test-Connection -IPv4 -TcpPort 80 $vCenterCloudIP
+
+if ("False" -eq $check){
+          write-Host -ForegroundColor Red "
+Communication Between AVS and On-Premises Has Failed.
+"
+write-host -ForegroundColor Yellow "The VPN Connection appears to have been setup successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
+"
+Exit
 }
+else {write-Host -foregroundcolor Green "
+Success: Communication Between AVS and On-Premises Has Been Validated"
+}
+# STOP - Check Communication On-Prem <--> AVS
+
+
+}
+
 
 #######################################################################################
 # Connect AVS To vNet w/ ExR
@@ -472,7 +545,9 @@ $command | ConvertTo-Json
 
 
 if ("ExpressRoute" -eq $AzureConnection) {
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
@@ -480,7 +555,9 @@ $peerid = $myprivatecloud.CircuitExpressRouteId
 
 
 
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 if ($status.count -eq 1) {
@@ -494,14 +571,18 @@ if ($avsexrauthkeydeployed -eq 0) {
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 }
 
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
@@ -533,7 +614,9 @@ if ("ExpressRoute" -eq $AzureConnection) {
 
 #generate auth key on on-prem ExR circut
 
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $OnPremExRCircuitSub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 ################
 $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
@@ -561,7 +644,9 @@ On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next S
     $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
     
   #Connect Global Reach
-  azurelogin -subtoconnect $sub
+  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
    $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
    if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
@@ -587,15 +672,14 @@ ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..
     {
       Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
       
-# Check Communication On-Prem <--> AVS
-
+# START - Check Communication On-Prem <--> AVS
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
-
 $vcenterurl = $myprivatecloud.EndpointVcsa
 $length = $vcenterurl.length 
 $vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
-
 $check = Test-Connection -IPv4 -TcpPort 80 $vCenterCloudIP
 if ("False" -eq $check){
           write-Host -ForegroundColor Red "
@@ -603,14 +687,13 @@ Communication Between AVS and On-Premises Has Failed.
 "
 write-host -ForegroundColor Yellow "The Global Reach Connection has been established successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
 "
-         }
-         else {
-          write-Host -foregroundcolor Green "
-Success: Communication Between AVS and On-Premises Has Been Validated"
-
+Exit
 }
-
-    }
+else {write-Host -foregroundcolor Green "
+Success: Communication Between AVS and On-Premises Has Been Validated"
+}
+# STOP - Check Communication On-Prem <--> AVS
+}
   }
   
   }
@@ -626,7 +709,9 @@ if ($deployhcxyesorno -eq "No") {
 
 
 else{
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
    $status = Get-AzVMwareAddon -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
    if ($status.name -eq "hcx") {
