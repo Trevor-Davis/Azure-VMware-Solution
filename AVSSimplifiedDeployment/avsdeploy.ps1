@@ -34,42 +34,27 @@ function azurelogin {
   $sublist = @()
   $sublist = Get-AzSubscription
   $checksub = $sublist -match $subtoconnect
-  If ($checksub.Count -eq 1 -and $checksub.id -eq $subtoconnect) {""}
-  if ($checksub.Count -eq 1 -and $checksub.id -ne $subtoconnect) {Set-AzContext -SubscriptionId $subtoconnect}
+  $getazcontext = Get-AzContext
+  If ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -eq $subtoconnect) {" "}
+  if ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -ne $subtoconnect) {Set-AzContext -SubscriptionId $subtoconnect}
   if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
   }
 
-  # START - Check Communication On-Prem <--> AVS
+#vCenter Communication Test
+
   function checkavsvcentercommunication {
 
     param (
-        $port
+    
     )
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+    azurelogin -subtoconnect $sub
     $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
     $vcenterurl = $myprivatecloud.EndpointVcsa
     $length = $vcenterurl.length 
     $vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
-    $global:check = Test-Connection -IPv4 -TcpPort $port $vCenterCloudIP
+    $check = Test-Connection -IPv4 -TcpPort 443 $vCenterCloudIP
     $check | ConvertTo-Json
-     }
-     
-     
-
-if ("False" -eq $check){
-          write-Host -ForegroundColor Red "
-Communication Between AVS and On-Premises Has Failed.
-"
-write-host -ForegroundColor Yellow "The VPN Connection appears to have been setup successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
-"
-Exit
-}
-else {write-Host -foregroundcolor Green "
-Success: Communication Between AVS and On-Premises Has Been Validated"
-}
-# STOP - Check Communication On-Prem <--> AVS
+    }
 
 
 #######################################################################################
@@ -255,7 +240,10 @@ AVS Private Cloud Resource Group is $rgfordeployment"
 }
 
 if ( "New" -eq $RGNewOrExisting){
-    New-AzResourceGroup -Name $rgfordeployment -Location $regionfordeployment
+   $command = New-AzResourceGroup -Name $rgfordeployment -Location $regionfordeployment
+
+   if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the Resource Group $rgfordeployment Failed"
+    Exit}
 
     write-host -foregroundcolor Green "
 Success: AVS Private Cloud Resource Group $rgfordeployment Created"   
@@ -263,6 +251,49 @@ Success: AVS Private Cloud Resource Group $rgfordeployment Created"
 }
 }
 
+#######################################################################################
+# Get On-Prem vCenter Creds
+#######################################################################################  
+
+write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
+write-host -ForegroundColor White -nonewline "Username: "
+$OnPremVIServerUsername = Read-Host 
+write-host -ForegroundColor White -nonewline "Password: "
+$OnPremVIServerPassword = Read-Host -MaskInput
+Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
+Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
+
+
+#######################################################################################
+#get the hcx admin password
+#######################################################################################
+if ($deployhcxyesorno -eq "Yes") {
+
+$hcxadminpasswordvalidate = "NOTsamepassword"
+$warning = ""
+while ("NOTsamepassword" -eq $hcxadminpasswordvalidate)
+
+
+{
+
+
+  write-Host -ForegroundColor Red -NoNewline $warning
+  write-host -ForegroundColor Yellow -nonewline "Provide a admin password of your choice for the HCX Connector: "
+  $Selection1 = Read-Host -MaskInput
+  write-host -ForegroundColor Yellow -nonewline "Enter the password again to validate: "
+  $Selection2 = Read-Host -MaskInput
+  $warning = "
+The Passwords Which Were Entered Do Not Match"
+  
+  if ($Selection1 -eq $Selection2 ) {      
+    $hcxadminpasswordvalidate = "samepassword"
+    $HCXOnPremPassword = $Selection1
+
+  }
+
+
+}
+}
 #######################################################################################
 # Kickoff Private Cloud Deployment
 #######################################################################################
@@ -337,6 +368,7 @@ if ("Site-to-Site VPN" -eq $AzureConnection) {
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 $provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 $currentprovisioningstate = $provisioningstate.ProvisioningState
 if ($currentprovisioningstate -eq "Succeeded") {
@@ -376,6 +408,8 @@ $subnet
 
 $pip = New-AzPublicIpAddress -Name $GWIPName  -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -AllocationMethod Dynamic
 $pip
+if ($pip.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the Public IP Failed"
+Exit}
 
 $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $GWIPconfName -Subnet $subnet -PublicIpAddress $pip
 $ipconf
@@ -401,7 +435,7 @@ if("Succeeded" -eq $currentprovisioningstate)
   
 }
 
-if("Failed" -eq $currentprovisioningstate)
+else
 {
   Write-Host -ForegroundColor Red "$timestamp - Current Status: $currentprovisioningstate
 
@@ -431,6 +465,9 @@ Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExR Auth Key Failed"
+Exit}
+
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 }
@@ -456,8 +493,10 @@ Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAV
 
 $exrgwtouse = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 
-New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key
- 
+$command = New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key
+if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS Virtual Network Connection Failed"
+Exit}
+
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
@@ -501,6 +540,8 @@ Creating RouteServer ... this could take 30-40 minutes ..."
 
 $command = New-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -hostedsubnet $mysubnetforrouteserver.id -PublicIpAddress $publicIp
 $command | ConvertTo-Json
+if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of Azure RouteServer Failed"
+Exit}
 
 $command = Update-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup -AllowBranchToBranchTraffic
 $command | ConvertTo-Json
@@ -509,20 +550,15 @@ Write-Host -ForegroundColor Green "
 Success: Azure RouteServer Created and Updated"
 }
 
-
-# START - Check Communication On-Prem <--> AVS
-
-
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-azurelogin -subtoconnect $sub
+$vcentertest = checkavsvcentercommunication
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-$myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
-$vcenterurl = $myprivatecloud.EndpointVcsa
-$length = $vcenterurl.length 
-$vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
-$check = Test-Connection -IPv4 -TcpPort 80 $vCenterCloudIP
 
-if ("False" -eq $check){
+if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
+Success: Communication Between AVS and On-Premises Has Been Validated"
+}
+
+else {
           write-Host -ForegroundColor Red "
 Communication Between AVS and On-Premises Has Failed.
 "
@@ -530,11 +566,6 @@ write-host -ForegroundColor Yellow "The VPN Connection appears to have been setu
 "
 Exit
 }
-else {write-Host -foregroundcolor Green "
-Success: Communication Between AVS and On-Premises Has Been Validated"
-}
-# STOP - Check Communication On-Prem <--> AVS
-
 
 }
 
@@ -551,9 +582,6 @@ $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
-
-
-
 
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
@@ -576,9 +604,13 @@ azurelogin -subtoconnect $sub
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExpressRoute Auth Key Failed"
+Exit}
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 }
+
+
 
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
@@ -599,8 +631,10 @@ Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAV
 
 $exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
 
-New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
- 
+$command = New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
+if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS Virtual Network Gateway Connection Failed"
+Exit}
+
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
@@ -631,7 +665,9 @@ On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next S
     if ($onpremexrauthkeydeployed -eq 0){
 
     $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
-    Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
+    $command=Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
+    if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the On-Prem Authorization Key Failed"
+Exit}
     Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
     
     Write-Host -ForegroundColor Green "
@@ -656,14 +692,15 @@ ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..
   }
   
   if ($exrglobalreachdeployed = 0) {
-    New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
-    
+    $command=New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
+    if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS Global Reach Connection Failed"
+Exit}
     $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
     $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus
     
     while ("Connected" -ne $currentprovisioningstate)
     {
-    write-Host -Fore "Current Status of Global Reach Connection: $currentprovisioningstate"
+    write-Host -ForegroundColor Yellow "Current Status of Global Reach Connection: $currentprovisioningstate"
     Start-Sleep -Seconds 10
     $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
     $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus}
@@ -671,31 +708,26 @@ ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..
     if("Connected" -eq $currentprovisioningstate)
     {
       Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
-      
-# START - Check Communication On-Prem <--> AVS
+      }
+  }
+  
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-azurelogin -subtoconnect $sub
+$vcentertest = checkavsvcentercommunication
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-$myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
-$vcenterurl = $myprivatecloud.EndpointVcsa
-$length = $vcenterurl.length 
-$vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
-$check = Test-Connection -IPv4 -TcpPort 80 $vCenterCloudIP
-if ("False" -eq $check){
+
+if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
+Success: Communication Between AVS and On-Premises Has Been Validated"
+}
+
+else {
           write-Host -ForegroundColor Red "
 Communication Between AVS and On-Premises Has Failed.
 "
-write-host -ForegroundColor Yellow "The Global Reach Connection has been established successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
+write-host -ForegroundColor Yellow "The Global Reach Connection appears to have been setup successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
 "
 Exit
 }
-else {write-Host -foregroundcolor Green "
-Success: Communication Between AVS and On-Premises Has Been Validated"
-}
-# STOP - Check Communication On-Prem <--> AVS
-}
-  }
-  
+
   }
 
 #######################################################################################
@@ -729,25 +761,13 @@ if ($hcxdeployed = 0) {
   write-Host -ForegroundColor Yellow "Deploying VMware HCX to the $pcname Private Cloud ... This will take approximately 30 minutes ... "
  az vmware addon hcx create --resource-group $rgfordeployment --private-cloud $pcname --offer "VMware MaaS Cloud Provider"
   write-Host -ForegroundColor Green "Success: VMware HCX has been deployed to $pcname Private Cloud"
-  
-  
- 
+   
 }
 }  
-#######################################################################################
-# Get On-Prem vCenter Creds
-#######################################################################################  
-
-write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
-write-host -ForegroundColor White -nonewline "Username: "
-$OnPremVIServerUsername = Read-Host 
-write-host -ForegroundColor White -nonewline "Password: "
-$OnPremVIServerPassword = Read-Host -MaskInput
-Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
-Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
 
 
-#######################################################################################
+
+<#######################################################################################
 # Pick Cluster to Deploy HCX Connector
 #######################################################################################
 Clear-Host
@@ -771,7 +791,7 @@ write-host -ForegroundColor White -nonewline "Selection: "
 $Selection = Read-Host
 $OnPremCluster = $clusters["$Selection"].Name
 Clear-Host
-  
+
   
 #######################################################################################
 # Pick L2 Extension DVS
@@ -801,37 +821,10 @@ Clear-Host
 
   }
   
-  
-#######################################################################################
+    #>
+<#######################################################################################
 # Define the vMotion Portgroup and Config for the Network Profile
 #######################################################################################    
-if ("Yes" -eq $internaltest){
-    write-host -foregroundcolor blue "================================="
-    
-    $items = Get-VirtualNetwork
-       $Count = 0
-       
-        foreach ($item in $items) {
-           $list = $item.Name
-           Write-Host "$Count - $list"
-           $Count++
-        }
-        
-        write-host -foregroundcolor blue "================================="
-
-write-host -ForegroundColor Yellow -nonewline "
-Select the number of the vMotion Network Portgroup: "
-$Selection = Read-Host
-$vmotionportgroup = $items["$Selection"].Name
-
-
-$vmotionprofilegateway = "10.17.0.97"
-$vmotionnetworkmask = "27"
-$vmotionippool = "10.17.0.106-10.17.0.109"
-
-}
-
-else {
 write-host -foregroundcolor blue "================================="
     
        $items = Get-VirtualNetwork
@@ -872,39 +865,11 @@ Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in th
 $Selection = Read-Host
 $vmotionippool = $Selection
 Clear-Host
-}
+
 #######################################################################################
 # Define the Management Portgroup and Config for the Network Profile
 ####################################################################################### 
-if ("Yes" -eq $internaltest){
 
-
-    write-host -foregroundcolor blue "================================="
-    
-    $items = Get-VirtualNetwork
-       $Count = 0
-       
-        foreach ($item in $items) {
-           $list = $item.Name
-           Write-Host "$Count - $list"
-           $Count++
-        }
-        
-        write-host -foregroundcolor blue "================================="
-
-write-host -ForegroundColor Yellow -nonewline "
-Select the number of the Management Network Portgroup: "
-$Selection = Read-Host
-$managementportgroup = $items["$Selection"].Name
-
-$mgmtprofilegateway = "10.17.0.1"
-$mgmtnetworkmask = "27"
-$mgmtippool = "10.17.0.10-10.17.0.16"
-
-
-}
-else
-{
 
 
 write-host -foregroundcolor blue "================================="
@@ -947,7 +912,7 @@ $Selection = Read-Host
 $mgmtippool = $Selection
 Clear-Host
 
-        }
+       
 #######################################################################################
 # Define the Portgroup To Deploy the HCX Connector
 ####################################################################################### 
@@ -1039,32 +1004,8 @@ Clear-Host
     write-host -ForegroundColor Yellow -nonewline "NTP Server for the HCX Connector (example: pool.ntp.org): "
     $Selection = Read-Host
     $AVSVMNTP = $Selection
-    
-  #get the hcx admin password
-    $hcxadminpasswordvalidate = "NOTsamepassword"
-    $warning = ""
-    while ("NOTsamepassword" -eq $hcxadminpasswordvalidate)
-    
-    
-    {
-    
-    
-      write-Host -ForegroundColor Red -NoNewline $warning
-      write-host -ForegroundColor Yellow -nonewline "Provide a admin password of your choice for the HCX Connector: "
-      $Selection1 = Read-Host -MaskInput
-      write-host -ForegroundColor Yellow -nonewline "Enter the password again to validate: "
-      $Selection2 = Read-Host -MaskInput
-      $warning = "
-  The Passwords Which Were Entered Do Not Match"
-      
-      if ($Selection1 -eq $Selection2 ) {      
-        $hcxadminpasswordvalidate = "samepassword"
-        $HCXOnPremPassword = $Selection1
 
-      }
-    
-    
-    }
+  
     
   
     
@@ -1073,38 +1014,30 @@ What is the nearest major city to where the HCX Connector is being deployed?
 Example: New York, London, Miami, Melbourne, etc..: "
     $Selection = Read-Host
     $HCXOnPremLocation = $Selection
-  
+       #>
+
+
+#######################################################################################
+#Get HCX Cloud IP Address and Password
+#######################################################################################
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+azurelogin -subtoconnect $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
+#IP Address
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
   $HCXCloudURL = $myprivatecloud.EndpointHcxCloudManager
   $length = $HCXCloudURL.length 
   $HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
-  
-  
-  $hcxcloudpasswordvalidate = "NOTsamepassword"
-  $warning = ""
-  while ("NOTsamepassword" -eq $hcxcloudpasswordvalidate)
-  
-  
-  {
-    write-Host -ForegroundColor Red $warning
-    write-host -ForegroundColor Yellow -nonewline "Provide password for your HCX Cloud Connector (It's the same password as your CLOUD vCenter). 
-You can identify the vCenter and NSX-T Manager console's IP addresses and credentials in the Azure portal. 
-Select your PRIVATE CLOUD and then MANAGE > IDENTITY
-Password: "
-    $Selection1 = Read-Host -MaskInput
-    write-host -ForegroundColor Yellow -nonewline "Enter the password again to validate: "
-    $Selection2 = Read-Host -MaskInput
-    $warning = "
-  The Passwords Which Were Entered Do Not Match"
-    
-    if ($Selection1 -eq $Selection2 ) {      
-      $hcxcloudpasswordvalidate = "samepassword"
-      $HCXCloudPassword = $Selection1
 
-    }
-  }
+#Password
 
+$command = Get-AzVMwarePrivateCloudAdminCredential -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+$HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassword -AsPlainText
 
+#######################################################################################
+#Get HCX Activation Key
+#######################################################################################
 write-host -ForegroundColor Yellow -nonewline "Enter a HCX Activation Key
 You can create a HCX Activation Key in the Azure Portal.  
 Select your PRIVATE CLOUD > ADD-ONs > MIGRATION USING HCX
@@ -1113,16 +1046,9 @@ $Selection = Read-Host
 $hcxactivationkey = $Selection
 
 
-
-     $HCXOnPremUserID = "admin"
-     $mgmtnetworkprofilename = "Management"
-     $vmotionnetworkprofilename = "vMotion"
-     $hcxactivationurl = "https://connect.hcx.vmware.com"
-     $HCXCloudUserID = "cloudadmin@vsphere.local"
-     $hcxComputeProfileName = "AVS-ComputeProfile"
-     $hcxServiceMeshName = "AVS-ServiceMesh"
-     
-
+#######################################################################################
+#Deploy HCX OVA On-Prem
+#######################################################################################
   Clear-Host
   
   write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
@@ -1217,8 +1143,7 @@ $hcxactivationkey = $Selection
   $HCXOnPremCredentials = "$HCXOnPremUserID"+":"+"$HCXOnPremPassword"
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($HCXOnPremCredentials)
   $HCXOnPremCredentialsEncoded =[Convert]::ToBase64String($HCXBytes)
-  
-  
+    
   
   ######################################
   # Get The Certificate From HCX Cloud
@@ -1232,7 +1157,6 @@ $hcxactivationkey = $Selection
       `"url`": `"$HCXCloudIP`"
     }
   "
-  
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/certificates -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
