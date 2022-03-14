@@ -61,7 +61,6 @@ function azurelogin {
 # Create Temp Storage Location
 #######################################################################################
 Clear-Host
-
 #######################################################################################
 # Check for Installs
 #######################################################################################
@@ -108,6 +107,7 @@ Please re-run the script from the PowerShell 7 command window"
   Write-Host -ForegroundColor Yellow "Az Powershell Module Installed/Updated"
   Install-Module -Name Az.VMware -Repository PSGallery -Force
   Write-Host -ForegroundColor Yellow "Az.VMware Powershell Module Installed/Updated"
+  
 start-sleep 5
   Clear-Host
 
@@ -165,7 +165,7 @@ Clear-Host
     stop-process $PID
   }
 }
-  
+
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
@@ -254,6 +254,7 @@ Success: AVS Private Cloud Resource Group $rgfordeployment Created"
 #######################################################################################
 # Get On-Prem vCenter Creds
 #######################################################################################  
+if ($deployhcxyesorno -eq "Yes") {
 
 write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
 write-host -ForegroundColor White -nonewline "Username: "
@@ -262,7 +263,7 @@ write-host -ForegroundColor White -nonewline "Password: "
 $OnPremVIServerPassword = Read-Host -MaskInput
 Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 Connect-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
-
+}
 
 #######################################################################################
 #get the hcx admin password
@@ -585,7 +586,6 @@ $peerid = $myprivatecloud.CircuitExpressRouteId
 
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 if ($status.count -eq 1) {
@@ -593,6 +593,7 @@ if ($status.count -eq 1) {
   write-Host -ForegroundColor Blue "
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($avsexrauthkeydeployed -eq 0) {
   
@@ -614,7 +615,6 @@ AVS ExpressRoute Auth Key Generated"
 
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
@@ -623,12 +623,14 @@ if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
 Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway, Skipping To Next Step..."
 }
 
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($pcexrdeployed -eq 0) {
 
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to Virtual Network Gateway $ExrGatewayForAVS ... "
 
+$exrauthkey = Get-AzVMwareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $exrgwtouse = Get-AzVirtualNetworkGateway -ResourceGroupName $ExrGWforAVSResourceGroup -Name $ExrGatewayForAVS
 
 $command = New-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key 
@@ -650,7 +652,6 @@ if ("ExpressRoute" -eq $AzureConnection) {
 
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $OnPremExRCircuitSub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 ################
 $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
@@ -674,6 +675,7 @@ Exit}
     Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
   }
 
+  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
     $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
     $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
@@ -1035,6 +1037,8 @@ $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $command = Get-AzVMwarePrivateCloudAdminCredential -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
 $HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassword -AsPlainText
 
+
+
 #######################################################################################
 #Get HCX Activation Key
 #######################################################################################
@@ -1060,6 +1064,7 @@ $hcxactivationkey = $Selection
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
   
   # Connect to vCenter
+
   Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore
   Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $false
   Connect-VIServer $OnPremVIServerIP -WarningAction SilentlyContinue -User $OnPremVIServerUsername -Password $OnPremVIServerPassword
@@ -1112,6 +1117,7 @@ $hcxactivationkey = $Selection
   # Wait for PowerOn
   #########################
   
+
   # Power On the HCX Connector VM after deployment
   Write-Host -ForegroundColor Yellow "Powering on HCX Connector ..."
   Start-VM -VM $HCXManagerVMName -Confirm:$false
@@ -1130,7 +1136,7 @@ $hcxactivationkey = $Selection
           }
       }
       catch {
-          Write-Host -ForegroundColor Yellow "HCX Connector Being Configured ... Still Not Ready ... Will Check Again In 1 Minute ..."
+          Write-Host -ForegroundColor Yellow "Powering On HCX Connector ... Still Getting Ready ... Will Check Again In 1 Minute ..."
           Start-Sleep 60
       }
   }
