@@ -24,6 +24,60 @@ $exrglobalreachdeployed = 0
 #######################################################################################
 #FUNCTIONS
 #######################################################################################
+#inputbox
+function inputbox {
+  param (
+      $inputrequest
+  )
+  $boxtitle = "Azure VMware Solution Simplified Deployment"
+
+  Add-Type -AssemblyName System.Windows.Forms
+  Add-Type -AssemblyName System.Drawing
+  
+  $form = New-Object System.Windows.Forms.Form
+  $form.Text = $boxtitle
+  $form.Size = New-Object System.Drawing.Size(500,200)
+  $form.StartPosition = 'CenterScreen'
+  
+  $okButton = New-Object System.Windows.Forms.Button
+  $okButton.Location = New-Object System.Drawing.Point(175,120)
+  $okButton.Size = New-Object System.Drawing.Size(75,23)
+  $okButton.Text = 'Submit'
+  $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+  $form.AcceptButton = $okButton
+  $form.Controls.Add($okButton)
+  
+  $cancelButton = New-Object System.Windows.Forms.Button
+  $cancelButton.Location = New-Object System.Drawing.Point(250,120)
+  $cancelButton.Size = New-Object System.Drawing.Size(75,23)
+  $cancelButton.Text = 'Cancel'
+  $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+  $form.CancelButton = $cancelButton
+  $form.Controls.Add($cancelButton)
+  
+  $label = New-Object System.Windows.Forms.Label
+  $label.Location = New-Object System.Drawing.Point(10,20)
+  $label.Size = New-Object System.Drawing.Size(280,20)
+  $label.Text = $inputrequest
+  $form.Controls.Add($label)
+  
+  $textBox = New-Object System.Windows.Forms.TextBox
+  $textBox.Location = New-Object System.Drawing.Point(10,40)
+  $textBox.Size = New-Object System.Drawing.Size(470,20)
+  $form.Controls.Add($textBox)
+  
+  $form.Topmost = $true
+  
+  $form.Add_Shown({$textBox.Select()})
+  $result = $form.ShowDialog()
+  
+  if ($result -eq [System.Windows.Forms.DialogResult]::OK)
+  {
+      $x = $textBox.Text
+      $x
+  }
+
+}
 
 #azure login function
 function azurelogin {
@@ -766,257 +820,6 @@ if ($hcxdeployed = 0) {
    
 }
 }  
-
-
-
-<#######################################################################################
-# Pick Cluster to Deploy HCX Connector
-#######################################################################################
-Clear-Host
-write-host -foregroundcolor blue "================================="
-  
-     $clusters = Get-Cluster 
-        $Count = 0
-        
-         foreach ($cluster in $clusters) {
-            $clusterlist = $cluster.Name
-            Write-Host "$Count - $clusterlist"
-            $Count++
-         }
-         
-write-host -foregroundcolor blue "================================="
-
-write-host -ForegroundColor Yellow "
-Select the number which corresponds to the Cluster where you would like to deploy the HCX Connector.
-SUGGESTION: Pick the Cluster which has the VMs you are going to be migrating."
-write-host -ForegroundColor White -nonewline "Selection: "
-$Selection = Read-Host
-$OnPremCluster = $clusters["$Selection"].Name
-Clear-Host
-
-  
-#######################################################################################
-# Pick L2 Extension DVS
-#######################################################################################  
-write-host -ForegroundColor Yellow -nonewline "
-Are you extending L2 VDS portgroups to AVS? (Y/N): "
-$Selection = Read-Host
-
-if ($Selection -eq "y") {
-write-host -foregroundcolor blue "================================="
-       $items =   Get-VDSwitch -Server $OnPremVIServerIP
-          $Count = 0
-          
-           foreach ($item in $items) {
-              $list = $item.Name
-              Write-Host "$Count - $list"
-              $Count++
-           }
-write-host -foregroundcolor blue "================================="
-
-write-host -ForegroundColor Yellow "
-Select the number which corresponds to the VDS which contains the portgroups which will be extended to AVS: "
-write-host -ForegroundColor White -nonewline "Selection: "
-$Selection = Read-Host
-$hcxVDS = $items["$Selection"].Name
-Clear-Host
-
-  }
-  
-    #>
-<#######################################################################################
-# Define the vMotion Portgroup and Config for the Network Profile
-#######################################################################################    
-write-host -foregroundcolor blue "================================="
-    
-       $items = Get-VirtualNetwork
-          $Count = 0
-          
-           foreach ($item in $items) {
-              $list = $item.Name
-              Write-Host "$Count - $list"
-              $Count++
-           }
-           
-           write-host -foregroundcolor blue "================================="
-
-write-host -ForegroundColor Yellow "
-Select the number which corresponds to the vMotion Network Portgroup: "
-write-host -ForegroundColor White -nonewline "Selection: "
-$Selection = Read-Host
-$vmotionportgroup = $items["$Selection"].Name
-Clear-Host
-           
-#gateway
-write-host -ForegroundColor Yellow -nonewline "
-What is the GATEWAY for the vMotion Network on portgroup "$vmotionportgroup"?: "
-$Selection = Read-Host
-$vmotionprofilegateway = $Selection
-
-
-#network mask
-write-host -ForegroundColor Red "
-The entry for Network Prefix must be between 0-32" 
-$Selection = Read-Host "What is the $vmotionportgroup Network Prefix?: "
-$vmotionnetworkmask = $Selection
-
-#ip range
-write-host -ForegroundColor Yellow -nonewline "
-Provide three contiguous FREE IP Addresses on the vMotion Network Segment (in this format ... x.x.x.x-x.x.x.x): 
-" 
-$Selection = Read-Host
-$vmotionippool = $Selection
-Clear-Host
-
-#######################################################################################
-# Define the Management Portgroup and Config for the Network Profile
-####################################################################################### 
-
-
-
-write-host -foregroundcolor blue "================================="
-    
-       $items = Get-VirtualNetwork
-          $Count = 0
-          
-           foreach ($item in $items) {
-              $list = $item.Name
-              Write-Host "$Count - $list"
-              $Count++
-           }
-           
-           write-host -foregroundcolor blue "================================="
-
-           write-host -ForegroundColor Yellow "
-Select the number which corresponds to the Management Network Portgroup: "
-           write-host -ForegroundColor White -nonewline "Selection: "
-           $Selection = Read-Host
-           $managementportgroup = $items["$Selection"].Name
-           Clear-Host
-
-#gateway
-write-host -ForegroundColor Yellow -nonewline "
-What is the GATEWAY for the Management Network on portgroup "$managementportgroup"?: "
-$Selection = Read-Host
-$mgmtprofilegateway = $Selection
-
-#network mask
-write-host -ForegroundColor Red "
-The entry for Network Prefix must be between 0-32" 
-$Selection = Read-Host "What is the $managementportgroup Network Prefix?: "
-$mgmtnetworkmask = $Selection
-
-#ip range
-write-host -ForegroundColor Yellow -nonewline "
-Provide three contiguous FREE IP Addresses on the Management Network Segment (in this format ... x.x.x.x-x.x.x.x):
-" 
-$Selection = Read-Host
-$mgmtippool = $Selection
-Clear-Host
-
-       
-#######################################################################################
-# Define the Portgroup To Deploy the HCX Connector
-####################################################################################### 
-write-host -foregroundcolor blue "================================="
-    
-       $items = Get-VirtualNetwork
-          $Count = 0
-          
-           foreach ($item in $items) {
-              $list = $item.Name
-              Write-Host "$Count - $list"
-              $Count++
-           }
-           
-           write-host -foregroundcolor blue "================================="
-  
-write-host -ForegroundColor Yellow  "
-Select the number which corresponds to the Portgroup Where You Would Like To Deploy the HCX Connector."
-write-host -foregroundcolor Yellow "This is typically the same portgroup which is used for other management type of workloads, but could be any portgroup you like."
-write-host -ForegroundColor White -nonewline "Selection: "
-$Selection = Read-Host
-$VMNetwork = $items["$Selection"].Name
-Clear-Host           
- 
-
-#######################################################################################
-# Pick The Datastore to Use for HCX
-#######################################################################################   
-  write-host -foregroundcolor blue "================================="
-    
-       $items = Get-Datastore
-          $Count = 0
-          
-           foreach ($item in $items) {
-              $list = $item.Name
-              Write-Host "$Count - $list"
-              $Count++
-           }
-           
-           write-host -foregroundcolor blue "================================="
-  
-write-host -ForegroundColor Yellow  "
-Select the number which corresponds to the datastore where the HCX Connector and other HCX appliances should be deployed"
-write-host -foregroundcolor Yellow "Approximate space required is 165 GB"
-write-host -ForegroundColor White -nonewline "Selection: "
-$Selection = Read-Host
-$Datastore = $items["$Selection"].Name
-Clear-Host 
-
-#######################################################################################
-  #Define the HCX Connector Deployment Details
-#######################################################################################
-
-  write-Host -foregroundcolor Yellow -nonewline "
-  You will now be asked to input the parameters for the HCX Connector OVA Deployment in your on-premises datacenter.  
-  This OVA will be deployed to portgroup $VMNetwork
-  
-  Press Enter Key To Continue"
-    $Selection = Read-Host 
-    
-    write-host -ForegroundColor Yellow -nonewline "VM Name: "
-    $Selection = Read-Host
-    $HCXManagerVMName = $Selection
-  
-    
-    write-host -ForegroundColor Yellow -nonewline "IP Address: "
-    $Selection = Read-Host
-    $HCXVMIP = $Selection
-  
-    #network mask
-  write-host -ForegroundColor Red "The entry for Network Prefix must be between 0-32" 
-  write-host -ForegroundColor Yellow -nonewline "$VMNetwork Network Prefix?: "
-  $Selection = Read-Host
-  $HCXVMNetmask = $Selection
-  
-     
-    write-host -ForegroundColor Yellow -nonewline "Gateway for the HCX Connector: "
-    $Selection = Read-Host
-    $HCXVMGateway = $Selection
-  
-    write-host -ForegroundColor Yellow -nonewline "DNS Server for the HCX Connector: "
-    $Selection = Read-Host
-    $HCXVMDNS = $Selection
-    
-    write-host -ForegroundColor Yellow -nonewline "Domain for the HCX Connector (example: mycompany.com): "
-    $Selection = Read-Host
-    $HCXVMDomain = $Selection
-      
-    write-host -ForegroundColor Yellow -nonewline "NTP Server for the HCX Connector (example: pool.ntp.org): "
-    $Selection = Read-Host
-    $AVSVMNTP = $Selection
-
-  
-    
-  
-    
-    write-host -ForegroundColor Yellow -nonewline "
-What is the nearest major city to where the HCX Connector is being deployed?
-Example: New York, London, Miami, Melbourne, etc..: "
-    $Selection = Read-Host
-    $HCXOnPremLocation = $Selection
-       #>
 
 
 #######################################################################################
