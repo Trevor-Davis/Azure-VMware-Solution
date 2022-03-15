@@ -1035,29 +1035,40 @@ $hcxactivationkey = $Selection
   ######################################
   # Define the Role Mapping
   ####################################
+
+If ($HCXOnPremRoleMapping -eq "") {
+  Write-Host -ForegroundColor Green "HCX Role Mapping Set To vsphere.local\Administrators"
+    }
+    else{  
+    $refcharacter = $HCXOnPremRoleMapping.IndexOf("\")
+    $ssodomain = $HCXOnPremRoleMapping.Substring(0,$refcharacter)
+    $ssogroup = $HCXOnPremRoleMapping.Substring($refcharacter+1)
+    
+    
+      $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+      $headers.Add("Content-Type", "application/json;charset=UTF-8")
+      $headers.Add("Accept", "application/json")
+      $headers.Add("Authorization", "Basic $HCXOnPremCredentialsEncoded")
+      
+      $body = "[
+      `n    {
+      `n        `"role`": `"System Administrator`",
+      `n        `"userGroups`": [
+      `n            `"$ssodomain`\`\$ssogroup`"
+      `n        ]
+      `n    },
+      `n    {
+      `n        `"role`": `"Enterprise Administrator`",
+      `n        `"userGroups`": []
+      `n    }
+      `n]"
+      
+      $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/roleMappings -Method 'PUT' -Headers $headers -Body $body -SkipCertificateCheck
+      $response | ConvertTo-Json
   
-  $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-  $headers.Add("Content-Type", "application/json;charset=UTF-8")
-  $headers.Add("Accept", "application/json")
-  $headers.Add("Authorization", "Basic $HCXOnPremCredentialsEncoded")
+      Write-Host -ForegroundColor Green "HCX Role Mapping Set To $ssodomain\$ssogroup"
   
-  $body = "[
-  `n    {
-  `n        `"role`": `"System Administrator`",
-  `n        `"userGroups`": [
-  `n            `"$HCXOnPremRoleMapping`\`\Administrators`"
-  `n        ]
-  `n    },
-  `n    {
-  `n        `"role`": `"Enterprise Administrator`",
-  `n        `"userGroups`": []
-  `n    }
-  `n]"
-  
-  $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/roleMappings -Method 'PUT' -Headers $headers -Body $body -SkipCertificateCheck
-  $response | ConvertTo-Json
-  
-  
+    }
   
   #########################
   # Retrieve Location 
