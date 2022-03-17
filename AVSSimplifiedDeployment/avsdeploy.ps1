@@ -203,37 +203,49 @@ start-sleep -Seconds 5
 
 #########################################################################
 
+Write-Host -ForegroundColor Yellow "Checking for VMware.PowerCLI Powershell Modules ..."
+  
 $vmwarepowerclicheck = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction Ignore
-if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name -or "12.5" -ge $vmwarepowerclicheck.Version) {
-    
+if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
+  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+  Write-Host -ForegroundColor Yellow "Installing VMware.PowerCLI Modules ..."
+    start-sleep -Seconds 10 
+    Install-Module -Name VMware.PowerCLI -Force -Verbose
+    Install-Module -Name VMware.VimAutomation.Hcx -Force -Verbose
+    Write-Host -ForegroundColor Green "Success: VMware.PowerCLI Modules Installed"
+
+  }
+
+  $vmwarepowerclicheck = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction Ignore
+  if ("12.5" -ge $vmwarepowerclicheck.Version) {
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+    Write-Host -ForegroundColor Yellow "Installing VMware.PowerCLI Modules ..."
+      start-sleep -Seconds 10 
+      Update-Module -Name VMware.PowerCLI -Force -Verbose
+      Write-Host -ForegroundColor Green "Success: VMware.PowerCLI Modules Installed"
+  
+    }
+  ###########################################################
+  Write-Host -ForegroundColor Yellow "Checking for VMware.VimAutomation.Hcx Powershell Modules ..."
+  
+  $vmwarepowerclicheck = Get-InstalledModule -Name VMware.VimAutomation.Hcx -ErrorAction Ignore
+  if ("VMware.VimAutomation.Hcx" -ne $vmwarepowerclihcxcheck.Name ) {
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+    Write-Host -ForegroundColor Yellow "Downloading and Installing VMware.VimAutomation.Hcx PowerCLI Module ..."
+          start-sleep -Seconds 10 
+          Install-Module -Name VMware.VimAutomation.Hcx -Force -Verbose
+      Write-Host -ForegroundColor Green "Success: VMware.VimAutomation.Hcx Modules Installed"
+  
+    }
+  
+    $vmwarepowerclicheck = Get-InstalledModule -Name VMware.VimAutomation.Hcx -ErrorAction Ignore
+    if ("12.5" -ge $vmwarepowerclihcxcheck.Version) {
       Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-      Write-Host -ForegroundColor Yellow "Downloading and Installing VMware PowerCLI Modules ..."
-    Install-Module -Name VMware.PowerCLI -Force
-    Install-Module -Name VMware.VimAutomation.Hcx -Force
-Clear-Host
-
-    Write-Host -ForegroundColor Green "
-    Success: VMware PowerCLI Modules Installed"
-
-}
-
-
-
-
-
-########################################################
-$vmwarepowerclihcxcheck = Find-Module -Name VMware.VimAutomation.Hcx
-if ("VMware.VimAutomation.Hcx" -ne $vmwarepowerclihcxcheck.Name -or "12.5" -ge $vmwarepowerclihcxcheck.Version) {
-    
-      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-      Write-Host -ForegroundColor Yellow "Downloading and Installing VMware HCX PowerCLI Module ..."
-    Install-Module -Name VMware.VimAutomation.Hcx -Force
-Clear-Host
-
-    Write-Host -ForegroundColor Green "
-    Success: VMware HCX PowerCLI Modules Installed"
-
-}
+      Write-Host -ForegroundColor Yellow "Downloading and Updating VMware.VimAutomation.Hcx PowerCLI Module ..."
+            start-sleep -Seconds 10 
+            Update-Module -Name VMware.VimAutomation.Hcx -Force -Verbose
+        Write-Host -ForegroundColor Green "Success: VMware.VimAutomation.Hcx Modules Installed"
+          }
 
 #Azure CLI
 
