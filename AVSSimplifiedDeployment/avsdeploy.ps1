@@ -154,27 +154,59 @@ Please re-run the script from the PowerShell 7 command window"
   Exit
 }
 
+#az powershell module
   Clear-Host
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-  Write-Host -ForegroundColor Yellow "Installing/Updating Azure Powershell Modules ..."  
-  Install-Module -Name Az -Repository PSGallery -Force
-  Write-Host -ForegroundColor Yellow "Az Powershell Module Installed/Updated"
-  Install-Module -Name Az.VMware -Repository PSGallery -Force
-  Write-Host -ForegroundColor Yellow "Az.VMware Powershell Module Installed/Updated"
+  Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
   
-start-sleep 5
-  Clear-Host
+  $check = Get-InstalledModule -Name Az -ErrorAction Ignore
+  if ($check.count -eq 0)
+  {
+    Write-Host -ForegroundColor Yellow "Installing Azure Powershell Modules ..."
+    start-sleep -Seconds 10 
+    Install-Module -Name Az -Repository PSGallery -Force -Verbose
+    Write-Host -ForegroundColor Green "Success: Az Powershell Module Installed"
 
-  Write-Host -ForegroundColor Green "
-Success: Azure Powershell Modules Installed"
+  }
+  else
+  {
+    Write-Host -ForegroundColor Yellow "Updating Azure Powershell Modules ..."
+    start-sleep -Seconds 10 
+    Update-Module -Name Az -Force -Verbose
+    Write-Host -ForegroundColor Green "Success: Az Powershell Module Updated"
+start-sleep -Seconds 5
+  }
+
+#az.vmware powershell module
+  Write-Host -ForegroundColor Yellow "Checking for Az.VMware Powershell Modules ..."
+  
+  $check = Get-InstalledModule -Name Az.VMware -ErrorAction Ignore
+  if ($check.count -eq 0)
+  {
+    Write-Host -ForegroundColor Yellow "Installing Az.VMware Powershell Modules ..."
+    start-sleep -Seconds 10 
+    Install-Module -Name Az.VMware -Repository PSGallery -Force -Verbose
+    Write-Host -ForegroundColor Green "Success: Az.VMware Powershell Module Installed"
+
+  }
+  else
+  {
+    Write-Host -ForegroundColor Yellow "Updating Az.VMware Powershell Modules ..."
+    start-sleep -Seconds 10 
+    Update-Module -Name Az.VMware -Force -Verbose
+    Write-Host -ForegroundColor Green "Success: Az.VMware Powershell Module Updated"
+start-sleep -Seconds 5
+  }
+
 
 #VMware PowerCLI Modules
-$vmwarepowerclicheck = Find-Module -Name VMware.PowerCLI
 
+#########################################################################
+
+$vmwarepowerclicheck = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction Ignore
 if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name -or "12.5" -ge $vmwarepowerclicheck.Version) {
-
     
-      Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+      Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
       Write-Host -ForegroundColor Yellow "Downloading and Installing VMware PowerCLI Modules ..."
     Install-Module -Name VMware.PowerCLI -Force
     Install-Module -Name VMware.VimAutomation.Hcx -Force
@@ -185,6 +217,11 @@ Clear-Host
 
 }
 
+
+
+
+
+########################################################
 $vmwarepowerclihcxcheck = Find-Module -Name VMware.VimAutomation.Hcx
 if ("VMware.VimAutomation.Hcx" -ne $vmwarepowerclihcxcheck.Name -or "12.5" -ge $vmwarepowerclihcxcheck.Version) {
     
@@ -695,97 +732,97 @@ Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
 "
 }
-}
-#######################################################################################
+}#######################################################################################
 # Connecting AVS To On-Prem ExR
 #######################################################################################
 
 if ("ExpressRoute" -eq $AzureConnection) {
 
-#generate auth key on on-prem ExR circut
-
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-azurelogin -subtoconnect $OnPremExRCircuitSub
-
-################
-$OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
-$status = get-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
-
-    if ($status.count -eq 1) {
-      $onpremexrauthkeydeployed = 1
-      write-Host -ForegroundColor Blue "
-On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
-    }
-
-    if ($onpremexrauthkeydeployed -eq 0){
-
-    $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
-    $command=Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
-    if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the On-Prem Authorization Key Failed"
-Exit}
-    Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
-    
-    Write-Host -ForegroundColor Green "
-    Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
-  }
-
-  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-
-    $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
-    $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
-    $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
-    
-  #Connect Global Reach
+  #generate auth key on on-prem ExR circut
+  
   $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-
-   $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
-   if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
-    $exrglobalreachdeployed = 1
-    write-Host -ForegroundColor Blue "
-ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..."
-  }
+  azurelogin -subtoconnect $OnPremExRCircuitSub
   
-  if ($exrglobalreachdeployed = 0) {
-    $command=New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
-    if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS Global Reach Connection Failed"
-Exit}
-    $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
-    $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus
-    
-    while ("Connected" -ne $currentprovisioningstate)
-    {
-    write-Host -ForegroundColor Yellow "Current Status of Global Reach Connection: $currentprovisioningstate"
-    Start-Sleep -Seconds 10
-    $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
-    $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus}
-    $currentprovisioningstate = 'Connected'
-    if("Connected" -eq $currentprovisioningstate)
-    {
-      Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
+  ################
+  $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
+  $status = get-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
+  
+      if ($status.count -eq 1) {
+        $onpremexrauthkeydeployed = 1
+        write-Host -ForegroundColor Blue "
+  On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
       }
+  
+      if ($onpremexrauthkeydeployed -eq 0){
+  
+      $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
+      $command=Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
+      if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the On-Prem Authorization Key Failed"
+  Exit}
+      Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
+      
+      Write-Host -ForegroundColor Green "
+  Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
+    }
+  
+    $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  
+      $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
+      $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
+      $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
+      
+    #Connect Global Reach
+    $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  azurelogin -subtoconnect $sub
+  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  
+     $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+     if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
+      $exrglobalreachdeployed = 1
+      write-Host -ForegroundColor Blue "
+  ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..."
+    }
+    
+    if ($exrglobalreachdeployed -eq 0) {
+      $command=New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
+  
+      $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+      $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus
+      
+      while ("Connected" -ne $currentprovisioningstate)
+      {
+        if ($command.ProvisioningState -eq "Failed"){Write-Host -ForegroundColor Red "Creation of the AVS Global Reach Connection Failed"
+        Exit}
+        
+        write-Host -ForegroundColor Yellow "Current Status of Global Reach Connection: $currentprovisioningstate"
+      Start-Sleep -Seconds 10
+      $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+      $currentprovisioningstate = $provisioningstate.CircuitConnectionStatus}
+      $currentprovisioningstate = 'Connected'
+      if("Connected" -eq $currentprovisioningstate)
+      {
+        Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
+        }
+    }
+    
+  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  $vcentertest = checkavsvcentercommunication
+  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  
+  if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
+  Success: Communication Between AVS and On-Premises Has Been Validated"
   }
   
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-$vcentertest = checkavsvcentercommunication
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-
-if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
-Success: Communication Between AVS and On-Premises Has Been Validated"
-}
-
-else {
-          write-Host -ForegroundColor Red "
-Communication Between AVS and On-Premises Has Failed.
-"
-write-host -ForegroundColor Yellow "The Global Reach Connection appears to have been setup successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
-"
-Exit
-}
-
+  else {
+            write-Host -ForegroundColor Red "
+  Communication Between AVS and On-Premises Has Failed.
+  "
+  write-host -ForegroundColor Yellow "The Global Reach Connection appears to have been setup successfully, however, connecting to resources in Azure VMware Solution (vCenter) has failed, most likely this is due to firewall blocking communication.
+  "
+  Exit
   }
-
+  
+    }
 #######################################################################################
 # Install HCX To Private Cloud
 #######################################################################################
