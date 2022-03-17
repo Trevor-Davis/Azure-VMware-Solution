@@ -846,7 +846,7 @@ HCX Has Already Been Deployed to $pcname Private Cloud, Skipping To Next Step...
   }
 
 
-if ($hcxdeployed = 0) {
+if ($hcxdeployed -eq 0) {
   az login
   az config set extension.use_dynamic_install=yes_without_prompt
   az account set --subscription $sub
