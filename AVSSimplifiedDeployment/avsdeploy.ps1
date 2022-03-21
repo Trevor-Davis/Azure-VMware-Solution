@@ -20,6 +20,10 @@ $onpremexrauthkeydeployed = 0
 $rsdeployed = 0
 $exrglobalreachdeployed = 0
 
+#######################################################################################
+#Testing, DO NOT MODIFY
+#######################################################################################
+$skiptheprecheck= "No"
 
 #######################################################################################
 #FUNCTIONS
@@ -101,6 +105,8 @@ function azurelogin {
     param (
     
     )
+    Write-Host -ForegroundColor Yellow "
+Checking communication to AVS Private Cloud ... "
     azurelogin -subtoconnect $sub
     $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
     $vcenterurl = $myprivatecloud.EndpointVcsa
@@ -115,9 +121,13 @@ function azurelogin {
 # Create Temp Storage Location
 #######################################################################################
 Clear-Host
+
 #######################################################################################
 # Check for Installs
 #######################################################################################
+if ($skiptheprecheck -eq "No")
+{
+
 #PowerShell 7
 
 Write-Host -ForegroundColor Yellow "The following are required for this script to run properly.
@@ -268,7 +278,7 @@ if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
     stop-process $PID
   }
 }
-
+}
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
@@ -602,8 +612,7 @@ if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red 
 Exit}
 
 Write-host -ForegroundColor Green "
-Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
-"
+Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS"
 }
 
 
@@ -690,7 +699,7 @@ $peerid = $myprivatecloud.CircuitExpressRouteId
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
-$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction "SilentlyContinue"
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed = 1
   write-Host -ForegroundColor Blue "
@@ -741,8 +750,7 @@ if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red 
 Exit}
 
 Write-host -ForegroundColor Green "
-Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS
-"
+Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS"
 }
 }#######################################################################################
 # Connecting AVS To On-Prem ExR
@@ -762,11 +770,12 @@ if ("ExpressRoute" -eq $AzureConnection) {
       if ($status.count -eq 1) {
         $onpremexrauthkeydeployed = 1
         write-Host -ForegroundColor Blue "
-  On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
+On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
       }
   
       if ($onpremexrauthkeydeployed -eq 0){
-  
+        Write-Host -ForegroundColor Yellow "
+Generating Auth Key for AVS Global Reach Connection ... "
       $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
       $command=Add-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
       if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the On-Prem Authorization Key Failed"
@@ -774,7 +783,7 @@ if ("ExpressRoute" -eq $AzureConnection) {
       Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
       
       Write-Host -ForegroundColor Green "
-  Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
+Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
     }
   
     $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
@@ -796,6 +805,9 @@ if ("ExpressRoute" -eq $AzureConnection) {
     }
     
     if ($exrglobalreachdeployed -eq 0) {
+      Write-Host -ForegroundColor Yellow "
+Connecting the $pcname Private Cloud to On-Premises via Global Reach... " 
+      
       $command=New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
   
       $provisioningstate = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
@@ -813,7 +825,8 @@ if ("ExpressRoute" -eq $AzureConnection) {
       $currentprovisioningstate = 'Connected'
       if("Connected" -eq $currentprovisioningstate)
       {
-        Write-Host -ForegroundColor Green "Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
+        Write-Host -ForegroundColor Green "
+Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
         }
     }
     
@@ -821,8 +834,9 @@ if ("ExpressRoute" -eq $AzureConnection) {
   $vcentertest = checkavsvcentercommunication
   $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
-  if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
-  Success: Communication Between AVS and On-Premises Has Been Validated"
+  if ($vcentertest -eq "true"){
+    write-Host -foregroundcolor Green "
+Success: Communication Between AVS and On-Premises Has Been Validated"
   }
   
   else {
