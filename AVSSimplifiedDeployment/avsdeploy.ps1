@@ -28,6 +28,18 @@ $skiptheprecheck= "No"
 #######################################################################################
 #FUNCTIONS
 #######################################################################################
+#checkfilesize function
+
+function checkfilesize {
+
+  param (
+      $filename
+  )
+  ((Get-Item $filename).Length/1gb)
+  
+  }
+
+
 #inputbox
 function inputbox {
   param (
@@ -392,7 +404,7 @@ while ("NOTsamepassword" -eq $hcxadminpasswordvalidate)
 
 
   write-Host -ForegroundColor Red -NoNewline $warning
-  write-host -ForegroundColor Yellow -nonewline "Provide a admin password of your choice for the HCX Connector: "
+  write-host -ForegroundColor Yellow -nonewline "The HCX Connector which will be deployed will create a password for the user 'admin', please provide a password which will be assigned to this user: "
   $Selection1 = Read-Host -MaskInput
   write-host -ForegroundColor Yellow -nonewline "Enter the password again to validate: "
   $Selection2 = Read-Host -MaskInput
@@ -801,7 +813,7 @@ Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
      if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
       $exrglobalreachdeployed = 1
       write-Host -ForegroundColor Blue "
-  ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..."
+ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..."
     }
     
     if ($exrglobalreachdeployed -eq 0) {
@@ -921,14 +933,24 @@ $hcxactivationkey = $Selection
 #######################################################################################
   Clear-Host
   
-  write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
-  $hcxfilename = "VMware-HCX-Connector-4.3.0.0-19068550.ova"
-  
-  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
-  Clear-Host
-  write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
+  #download the HCX OVA
+
+
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
-  
+
+  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  $checkhcxfilesize = checkfilesize -filename $HCXApplianceOVA
+  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
+  if ($checkhcxfilesize -ne "3.0418777465820312")
+  {
+    write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
+    Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$hcxfilename -OutFile $env:TEMP\AVSDeploy\$hcxfilename
+    Clear-Host
+    write-Host -foregroundcolor Green "Success: VMware HCX Connector Downloaded"
+  }
+
+
   # Connect to vCenter
 
   Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore
@@ -1181,10 +1203,10 @@ If ($HCXOnPremRoleMapping -eq "") {
   #Activate HCX
   ###########################
   if ("" -eq $hcxactivationkey) {
-   Write-Host -ForegroundColor Red "You will need to activate HCX Later..."
-
-  }
-  else {
+    Write-Host -ForegroundColor Red "You did not enter an HCX Activation Key, HCX will be deployed in evaluation mode."
+    
+   }
+   else {
     
   
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -1231,19 +1253,23 @@ If ($HCXOnPremRoleMapping -eq "") {
   $session
   
   
+
   ######################################
   # Connect To On Prem HCX Server
   ######################################
-  Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword
-    ##This username and password combination is used because it's the same as the on-prem vcenter
+  $connecthcx = Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword -ErrorAction:SilentlyContinue
+  while ($connecthcx.IsConnected -ne "True" ) {
+    Write-Host -ForegroundColor yellow 'Waiting for On-Premises HCX Connector Services To Re-Start ... Checking Again In 1 Minute ....'
+    Start-Sleep -Seconds 60
+    $connecthcx = Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword -ErrorAction:SilentlyContinue
+  
+  }
 
- 
 ######################
 # Site Pairing
 ######################
-    $command = New-HCXSitePairing -Url $HCXCloudIP -Username $HCXCloudUserID -Password $HCXCloudPassword 
+    $command = New-HCXSitePairing -Url https://$($HCXCloudIP) -Username $HCXCloudUserID -Password $HCXCloudPassword -Server $HCXVMIP
     $command | ConvertTo-Json
-        
   
 
   ######################
@@ -1272,15 +1298,22 @@ If ($HCXOnPremRoleMapping -eq "") {
   # Create ComputeProfile
   ######################
   
-  
   $managementNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename
   $vmotionNetworkProfile = Get-HCXNetworkProfile -Name $vmotionnetworkprofilename
   $hcxComputeCluster = Get-HCXApplianceCompute -ClusterComputeResource -Name $OnPremCluster
-  $hcxVDS = Get-HCXInventoryDVS -Name $hcxVDS
   $hcxDatastore = Get-HCXApplianceDatastore -Compute $hcxComputeCluster -Name $Datastore
 
-  $command = New-HCXComputeProfile -Name $hcxComputeProfileName -ManagementNetworkProfile $managementNetworkProfile -vMotionNetworkProfile $vmotionNetworkProfile -DistributedSwitch $hcxVDS -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension -Datastore $hcxDatastore -DeploymentResource $hcxComputeCluster -ServiceCluster $hcxComputeCluster 
-  #-SourceUplinkNetworkProfile $managementNetworkProfile
+  if ($l2networkextension -eq "Yes") {
+    $hcxVDS = Get-HCXInventoryDVS -Name $hcxVDS
+    $command = New-HCXComputeProfile -Name $hcxComputeProfileName -ManagementNetworkProfile $managementNetworkProfile -vMotionNetworkProfile $vmotionNetworkProfile -DistributedSwitch $hcxVDS -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension -Datastore $hcxDatastore -DeploymentResource $hcxComputeCluster -ServiceCluster $hcxComputeCluster 
+
+  }
+
+  if ($l2networkextension -eq "No") {
+    $command = New-HCXComputeProfile -Name $hcxComputeProfileName -ManagementNetworkProfile $managementNetworkProfile -vMotionNetworkProfile $vmotionNetworkProfile -Service BulkMigration,Interconnect,Vmotion,WANOptimization -Datastore $hcxDatastore -DeploymentResource $hcxComputeCluster -ServiceCluster $hcxComputeCluster -Server $HCXVMIP
+
+  }
+
   $command | ConvertTo-Json
   
   
@@ -1289,33 +1322,64 @@ If ($HCXOnPremRoleMapping -eq "") {
   #Service Mesh
   ##########
     
-  
   $hcxDestinationSite = Get-HCXSite -Destination 
-  $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName
+  $hcxDestinationSite
+  $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName -Server $HCXVMIP
+  $hcxLocalComputeProfile
   $hcxRemoteComputeProfileName = Get-HCXComputeProfile -Site $hcxDestinationSite
+  $hcxRemoteComputeProfileName
   $hcxRemoteComputeProfile = Get-HCXComputeProfile -Site $hcxDestinationSite -Name $hcxRemoteComputeProfileName.Name
-  $hcxSourceUplinkNetworkProfile = Get-HCXNetworkProfile -Name $managementNetworkProfile
-  $command = New-HCXServiceMesh -Name $hcxServiceMeshName -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension 
-  $command | ConvertTo-Json
+  $hcxRemoteComputeProfile
+  $hcxSourceUplinkNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename -Server $hcxvmip
+  $hcxSourceUplinkNetworkProfile
+  $remoteuplinknetworkprofilename = $hcxRemoteComputeProfile.Network.Name -like '*uplink*'
+  $remoteuplinknetworkprofilename
+  $remoteuplinknetworkprofile = Get-HCXNetworkProfile -Site $hcxDestinationSite -Name $remoteuplinknetworkprofilename 
+  $remoteuplinknetworkprofile
+
+  if ($l2networkextension -eq "Yes") {
+    $command = New-HCXServiceMesh -Name $hcxServiceMeshName `
+    -SourceComputeProfile $hcxLocalComputeProfile `
+    -DestinationComputeProfile $hcxRemoteComputeProfile `
+    -Destination $hcxDestinationSite `
+    -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile `
+    -DestinationUplinkNetworkProfile $remoteuplinknetworkprofile `
+    -Service BulkMigration,Interconnect,Vmotion,WANOptimization,NetworkExtension -Server $HCXVMIP
+    $command | ConvertTo-Json
   
+  }
+
+  if ($l2networkextension -eq "No") {
+    $command = New-HCXServiceMesh -Name 'testservicemesh' -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile -DestinationUplinkNetworkProfile $remoteuplinknetworkprofile -Service BulkMigration,Interconnect,Vmotion,WANOptimization -Server $HCXVMIP
+    $command | ConvertTo-Json
   
-write-host -foregroundcolor Yellow "Building Service Mesh, Script is Paused for 5 Minutes Waiting To Get Status of Service Mesh"
-start-sleep -Seconds 300
+  }
+
+  #testing service mesh
+  $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1"
+  $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
+  $deploymentstatus = "Building"
+  write-host -ForegroundColor Yellow "Service Mesh: $deploymentstatus - Next Update in 60 Seconds"
+  
 
 while ($deploymentstatus -ne "Complete") {
-    start-sleep -Seconds 15 
-    $status=Get-HCXAppliance
-    if($status.Status -eq "down" -or $null -eq $status.Status){
-        $deploymentstatus = "Building"
-    write-host "Service Mesh: $deploymentstatus"}
-        else{
-        $deploymentstatus = "Complete"
-        write-host -ForegroundColor Green "Service Mesh: $deploymentstatus"}
-  
-}
 
+    start-sleep -Seconds 60 
+    $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1"
+    $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
+    
+    if ($testhcxservicemeshIXI1.TunnelStatus -ne "up" -or $testhcxservicemeshIXR1.TunnelStatus -ne "up"){
+      $deploymentstatus = "Building"
+      write-host -ForegroundColor Yellow "Service Mesh: $deploymentstatus - Next Update in 60 Seconds"
+    }
+   
+    if ($testhcxservicemeshIXI1.TunnelStatus -eq "up" -and $testhcxservicemeshIXR1.TunnelStatus -eq "up"){
+      $deploymentstatus = "Complete"
+      write-host -ForegroundColor Green "Service Mesh: $deploymentstatus"
+    }
 
-  
+    }
+
   ##########
   #Exit
   ##########
@@ -1331,4 +1395,3 @@ while ($deploymentstatus -ne "Complete") {
   "
   $Selection = Read-Host
   Start-Process "https://$OnPremVIServerIP"  
-    
