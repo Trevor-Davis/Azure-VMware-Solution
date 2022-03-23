@@ -162,7 +162,7 @@ $PSVersion = $PSVersionTable.PSVersion.Major
 Write-Host -ForegroundColor Yellow "
 Your Powershell Version Is $PSVersion ... Upgrading to PowerShell 7"
   
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
   $PowerShellDownloadURL = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/PowerShell-7.2.1-win-x64.msi"
   $PowerShellDownloadFileName = "PowerShell-7.2.1-win-x64.msi"
   Invoke-WebRequest -Uri $PowerShellDownloadURL -OutFile $env:TEMP\AVSDeploy\$PowerShellDownloadFileName
@@ -178,7 +178,7 @@ Please re-run the script from the PowerShell 7 command window"
 
 #az powershell module
   Clear-Host
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
   Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
   
   $check = Get-InstalledModule -Name Az -ErrorAction Ignore
@@ -276,7 +276,7 @@ if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
   $programlist  += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
   $checkazurecli = $programlist -match 'Microsoft Azure CLI'
   If ($checkazurecli.Count -eq 0) {
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
     $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
     $azureCLIDownloadFileName = "AzureCLI.msi"
     Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
@@ -1350,14 +1350,21 @@ If ($HCXOnPremRoleMapping -eq "") {
   }
 
   if ($l2networkextension -eq "No") {
-    $command = New-HCXServiceMesh -Name 'testservicemesh' -SourceComputeProfile $hcxLocalComputeProfile -Destination $hcxDestinationSite -DestinationComputeProfile $hcxRemoteComputeProfile -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile -DestinationUplinkNetworkProfile $remoteuplinknetworkprofile -Service BulkMigration,Interconnect,Vmotion,WANOptimization -Server $HCXVMIP
+    $command = New-HCXServiceMesh -Name $hcxServiceMeshName `
+    -SourceComputeProfile $hcxLocalComputeProfile `
+    -DestinationComputeProfile $hcxRemoteComputeProfile `
+    -Destination $hcxDestinationSite `
+    -SourceUplinkNetworkProfile $hcxSourceUplinkNetworkProfile `
+    -DestinationUplinkNetworkProfile $remoteuplinknetworkprofile `
+    -Service BulkMigration,Interconnect,Vmotion,WANOptimization -Server $HCXVMIP
     $command | ConvertTo-Json
   
   }
 
   #testing service mesh
-  $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1"
-  $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
+  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1" 
+#  $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
   $deploymentstatus = "Building"
   write-host -ForegroundColor Yellow "Service Mesh: $deploymentstatus - Next Update in 60 Seconds"
   
@@ -1366,19 +1373,20 @@ while ($deploymentstatus -ne "Complete") {
 
     start-sleep -Seconds 60 
     $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1"
-    $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
+#    $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
     
-    if ($testhcxservicemeshIXI1.TunnelStatus -ne "up" -or $testhcxservicemeshIXR1.TunnelStatus -ne "up"){
+    if ($testhcxservicemeshIXI1.TunnelStatus -ne "up"){
       $deploymentstatus = "Building"
       write-host -ForegroundColor Yellow "Service Mesh: $deploymentstatus - Next Update in 60 Seconds"
     }
    
-    if ($testhcxservicemeshIXI1.TunnelStatus -eq "up" -and $testhcxservicemeshIXR1.TunnelStatus -eq "up"){
+    if ($testhcxservicemeshIXI1.TunnelStatus -eq "up"){
       $deploymentstatus = "Complete"
       write-host -ForegroundColor Green "Service Mesh: $deploymentstatus"
     }
 
     }
+    $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
   ##########
   #Exit
