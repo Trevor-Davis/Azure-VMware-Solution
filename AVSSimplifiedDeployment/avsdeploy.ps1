@@ -270,6 +270,7 @@ if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
           }
 
 #Azure CLI
+Write-Host -ForegroundColor Yellow "Checking for Azure CLI Installation ..."
 
   $programlist = @()
   $programlist += Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
@@ -279,15 +280,13 @@ if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
     Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
     $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
     $azureCLIDownloadFileName = "AzureCLI.msi"
+    Write-Host -ForegroundColor Yellow "Downloading Azure CLI ..."
     Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
     Start-Process -wait "$env:TEMP\AVSDeploy\$azureCLIDownloadFileName"
     Clear-Host
     Write-Host -ForegroundColor Green "
     Success: Azure CLI Installed"
-    Write-Host -ForegroundColor Red "This script will now re-run in a PowerShell 7 console, Press Any Key to Continue..."
-    Read-Host
-    start-process pwsh.exe c:\temp\jit.ps1
-    stop-process $PID
+
   }
 }
 }
@@ -295,7 +294,7 @@ if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-Clear-Host
+
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
 
@@ -542,17 +541,22 @@ $ipconf
 
 Write-Host -ForegroundColor Yellow "
 Creating a ExpressRoute Gateway for AVS ... this could take 30-40 minutes ..."
-
-$command = New-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard -NoWait
+$command = New-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup -Location $ExRGWForAVSRegion -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard
 $command | ConvertTo-Json
+
+$timeStamp = Get-Date -Format "hh:mm"
+$provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
+$currentprovisioningstate = $provisioningstate.ProvisioningState
+"$timestamp - Current Status: $currentprovisioningstate - Next Update In 5 Minutes"
+
 
 while ("Succeeded" -ne $currentprovisioningstate)
 {
-$timeStamp = Get-Date -Format "hh:mm"
 Start-Sleep -Seconds 300
-"$timestamp - Current Status: $currentprovisioningstate - Next Update In 5 Minutes"
+$timeStamp = Get-Date -Format "hh:mm"
 $provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 $currentprovisioningstate = $provisioningstate.ProvisioningState
+"$timestamp - Current Status: $currentprovisioningstate - Next Update In 5 Minutes"
 }
 
 if("Succeeded" -eq $currentprovisioningstate)
@@ -561,14 +565,6 @@ if("Succeeded" -eq $currentprovisioningstate)
   
 }
 
-else
-{
-  Write-Host -ForegroundColor Red "$timestamp - Current Status: $currentprovisioningstate
-
-  There appears to be a problem with the deployment of the Virtual Network Gateway "
-  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-  Exit
-}
 
 } #finish
 
@@ -576,8 +572,8 @@ else
 #Connect AVS to vNet
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed=1
   write-Host -ForegroundColor Blue "
@@ -601,9 +597,10 @@ AVS ExpressRoute Auth Key Generated"
 #Connecting private cloud to ExR GW
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
   $pcexrdeployed = 1
   write-Host -ForegroundColor Blue "
@@ -631,8 +628,9 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 #Create and Configure Route Server
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 if ($status.count -eq 1) {
   $rsdeployed = 1
   write-Host -ForegroundColor Blue "
