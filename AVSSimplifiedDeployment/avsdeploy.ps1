@@ -492,10 +492,11 @@ if ("Site-to-Site VPN" -eq $AzureConnection) {
 #Create Expressroute gateway for AVS to use
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 $currentprovisioningstate = $provisioningstate.ProvisioningState
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 if ($currentprovisioningstate -eq "Succeeded") {
    
   $exrgwforvpndeployed=1
