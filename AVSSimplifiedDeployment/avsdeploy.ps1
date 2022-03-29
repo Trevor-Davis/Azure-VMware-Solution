@@ -23,7 +23,7 @@ $exrglobalreachdeployed = 0
 #######################################################################################
 #Testing, DO NOT MODIFY
 #######################################################################################
-$skiptheprecheck= "No"
+$skiptheprecheck= "Yes"
 
 #######################################################################################
 #FUNCTIONS
@@ -573,7 +573,7 @@ if("Succeeded" -eq $currentprovisioningstate)
 #Connect AVS to vNet
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction:SilentlyContinue
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed=1
@@ -643,7 +643,7 @@ if ($rsdeployed -eq 0) {
 
 $virtualnetworkforsubnet = Get-AzVirtualNetwork -Name $VpnGwVnetName
 
-Add-AzVirtualNetworkSubnetConfig -Name "RouteServerSubnet" -VirtualNetwork $virtualnetworkforsubnet -AddressPrefix $RouteServerSubnetAddressPrefix
+Add-AzVirtualNetworkSubnetConfig -Name 'RouteServerSubnet' -VirtualNetwork $virtualnetworkforsubnet -AddressPrefix $RouteServerSubnetAddressPrefix
 $virtualnetworkforsubnet | Set-AzVirtualNetwork
 
 $ip = @{
