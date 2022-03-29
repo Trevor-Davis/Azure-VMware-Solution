@@ -698,7 +698,7 @@ Exit
 # Connect AVS To vNet w/ ExR
 #######################################################################################
 
-
+#############11111111111#############
 if ("ExpressRoute" -eq $AzureConnection) {
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
@@ -711,13 +711,16 @@ $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyConti
 azurelogin -subtoconnect $vnetgwsub
 
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction "SilentlyContinue"
+#############2222222222#############
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed = 1
   write-Host -ForegroundColor Blue "
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
+#############2222222222#############
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
+#############3333333333#############
 if ($avsexrauthkeydeployed -eq 0) {
   
 Write-Host -ForegroundColor Yellow "
@@ -733,8 +736,10 @@ Exit}
     Write-Host -ForegroundColor Green "
 AVS ExpressRoute Auth Key Generated"
 }
+#############3333333333#############
 
 
+# IF VWAN = NO THEN DO THIS #############4444444444#############
 
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
@@ -747,6 +752,7 @@ Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway
 }
 
 $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 if ($pcexrdeployed -eq 0) {
 
@@ -763,7 +769,21 @@ Exit}
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS"
 }
-}#######################################################################################
+#############4444444444#############
+
+# IF VWAN = YES THEN DO THIS #############5555555555#############
+. \$env:TEMP\AVSDeploy\Connect-AVSExR-To-vWAN.ps1
+
+
+#############5555555555#############
+
+
+
+
+}
+#############11111111111#############
+
+#######################################################################################
 # Connecting AVS To On-Prem ExR
 #######################################################################################
 
