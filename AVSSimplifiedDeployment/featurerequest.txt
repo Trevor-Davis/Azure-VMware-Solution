@@ -1,0 +1,4 @@
+Test  ports available prior to making OVF deploy call.
+Ability to connect to a vWAN Hub
+Confirmation screens confirming entries
+Ability to add a proxy to HCX deployment
