@@ -13,3 +13,5 @@ $global:nsxtip = "192.168.0.3"
   $global:nsxtcredentials = "$nsxtusername"+":"+"$nsxtpassword"
   $global:nsxbytes = [System.Text.Encoding]::UTF8.GetBytes($nsxtcredentials)
   $global:nsxtcredentialsencoded =[Convert]::ToBase64String($nsxbytes)
+
+  Write-Host "hello"
