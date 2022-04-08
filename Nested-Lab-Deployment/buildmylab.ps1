@@ -5,9 +5,19 @@ if (Test-Path -Path $Folder) {
 mkdir $env:TEMP\NestedLabDeploy
 }
 
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/variables.ps1" -OutFile $env:TEMP\AVSDeploy\avsdeploy.ps1
-$ProgressPreference = 'Continue'
 
 
-Invoke-Expression -Command $env:TEMP\NestedLabDeploy\variables.ps1
+$filename = "variables.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/$filename" `
+-OutFile $Folder\$filename
+
+$filename = "createt1router.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/$filename" `
+-OutFile $Folder\$filename
+
+
+
+
+clear
+Invoke-Expression -Command $Folder\variables.ps1
+Invoke-Expression -Command $Folder\createt1router.ps1

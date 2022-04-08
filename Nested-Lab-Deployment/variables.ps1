@@ -4,6 +4,7 @@
 $global:nsxtusername = "admin"
 $global:nsxtpassword = "!q9dy46!1sIC"
 $global:nsxtip = "192.168.0.3"
+$global:NestedBuildName = "NestedLab2"
 
 
 #########################################
@@ -14,4 +15,15 @@ $global:nsxtip = "192.168.0.3"
   $global:nsxbytes = [System.Text.Encoding]::UTF8.GetBytes($nsxtcredentials)
   $global:nsxtcredentialsencoded =[Convert]::ToBase64String($nsxbytes)
 
-  Write-Host "hello"
+#########################################
+# Functions
+#########################################
+
+function logintonsx {
+  param (
+  )
+
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("Authorization", "Basic $nsxtcredentialsencoded")
+$headers.Add("Content-Type", "application/json")
+}
