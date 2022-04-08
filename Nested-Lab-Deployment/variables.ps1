@@ -19,7 +19,7 @@ $global:NestedBuildName = "NestedLab2"
 # Functions
 #########################################
 
-function logintonsx {
+function global:logintonsx {
   param (
   )
 
