@@ -8,6 +8,11 @@ $global:NestedBuildName = "NestedLab2"
 $global:transportzone = "9a8f04f3-d09b-43f3-ae62-3fd3616edaa9"
 $global:vlanid = "74"
 
+$global:avsvcenterip = "192.168.0.2"
+$global:avsvcenterusername = "cloudadmin@vsphere.local"
+$global:avsvcenterpassword = "N-v9r2gR0%l8"
+$global:avsclustername = "Cluster-1"
+
 
 
 #########################################
