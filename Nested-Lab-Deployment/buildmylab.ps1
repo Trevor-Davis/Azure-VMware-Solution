@@ -23,6 +23,9 @@ $filename = "createswitches.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/$filename" `
 -OutFile $Folder\$filename
 
+$filename = "createresourcepool.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/$filename" `
+-OutFile $Folder\$filename
 
 ####################
 #DELETE THIS
@@ -35,3 +38,4 @@ Invoke-Expression -Command $Folder\variables.ps1
 #Invoke-Expression -Command $Folder\createt1router.ps1
 #Invoke-Expression -Command $Folder\createswitchingprofiles.ps1
 #Invoke-Expression -Command $Folder\createswitches.ps1
+Invoke-Expression -Command $Folder\createresourcepool.ps1
