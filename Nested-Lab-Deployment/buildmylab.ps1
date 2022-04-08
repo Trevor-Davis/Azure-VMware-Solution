@@ -34,4 +34,4 @@ Copy-Item "C:\Users\avs-admin\Documents\GitHub\Azure-VMware-Solution\Nested-Lab-
 Invoke-Expression -Command $Folder\variables.ps1
 #Invoke-Expression -Command $Folder\createt1router.ps1
 #Invoke-Expression -Command $Folder\createswitchingprofiles.ps1
-Invoke-Expression -Command $Folder\createswitches.ps1
+#Invoke-Expression -Command $Folder\createswitches.ps1
