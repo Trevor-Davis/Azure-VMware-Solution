@@ -26,3 +26,7 @@ $body = "{
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-router-ports/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
     $response | ConvertTo-Json
+
+    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
+    $global:mgmtdownlinkrouterportid = Read-Host
+    

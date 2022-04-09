@@ -1,15 +1,3 @@
-Write-Host -ForegroundColor Yellow "You are going to now have to input the IDs of the varying security profiles which were just created, please log into the NSX-T Manager Console, navigate you way to the Switch Security Profiles .... PRESS ANY KEY TO CONTINUE"
-Read-Host
-
-Write-Host -ForegroundColor Yellow "What is the ID of the Switch Profile $NestedBuildName-SwitchSecurity: " -NoNewline
-$securityprofileid = Read-Host
-
-Write-Host -ForegroundColor Yellow "What is the ID of the Switch Profile $NestedBuildName-MACManagement: " -NoNewline
-$macmanagementprofileid = Read-Host
-
-Write-Host -ForegroundColor Yellow "What is the ID of the Switch Profile $NestedBuildName-IPDiscovery: " -NoNewline
-$ipdiscoveryprofileid = Read-Host
-
 logintonsx
 
 ###################################
@@ -53,6 +41,11 @@ $body = "{
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
     $response | ConvertTo-Json
 
+    
+    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
+    $global:uplinkswitchid = Read-Host
+    
+
     ###################################
 #Mgmt Switch
 ###################################
@@ -94,6 +87,11 @@ $body = "{
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
     $response | ConvertTo-Json
 
+        
+    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
+    $global:mgmtswitchid = Read-Host
+
+
     ###################################
 #Workload Switch
 ###################################
@@ -134,3 +132,7 @@ $body = "{
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
     $response | ConvertTo-Json
+
+        
+    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
+    $global:workloadswitchid = Read-Host
