@@ -33,7 +33,7 @@ $body = "{
     `n    `"hybrid`": false,
     `n    `"span`": [],
     `n    `"resource_type`": `"LogicalSwitch`",
-    `n    `"display_name`": `"$NestedBuildName-UplinkSwitch`",
+    `n    `"display_name`": `"$NestedBuildName-WANSwitch`",
     `n    `"_revision`": 0,
     `n    `"_schema`": `"/v1/schema/LogicalSwitch`"
     `n}"
@@ -43,7 +43,7 @@ $body = "{
 
     
     Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:uplinkswitchid = Read-Host
+    $global:wanswitchid = Read-Host
     
 
     ###################################

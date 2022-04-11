@@ -12,7 +12,21 @@ $body = "{
     `n            `"prefix_length`": 24
     `n        }
     `n    ],
-    `n    `"urpf_mode`": `"STRICT`",
+    `n    `"switching_profile_ids`": [
+        `n        {
+        `n            `"key`": `"SwitchSecuritySwitchingProfile`",
+        `n            `"value`": `"$securityprofileid`"
+        `n        },
+        `n        {
+        `n            `"key`": `"IpDiscoverySwitchingProfile`",
+        `n            `"value`": `"$ipdiscoveryprofileid`"
+        `n        },
+        `n        {
+        `n            `"key`": `"MacManagementSwitchingProfile`",
+        `n            `"value`": `"$macmanagementprofileid`"
+        `n        }
+        `n    ],
+   `n    `"urpf_mode`": `"STRICT`",
     `n    `"enable_multicast`": true,
     `n    `"resource_type`": `"LogicalRouterDownLinkPort`",
     `n                `"tags`": [
@@ -48,6 +62,20 @@ $body = "{
         `n    ],
         `n    `"urpf_mode`": `"STRICT`",
         `n    `"enable_multicast`": true,
+        `n    `"switching_profile_ids`": [
+            `n        {
+            `n            `"key`": `"SwitchSecuritySwitchingProfile`",
+            `n            `"value`": `"$securityprofileid`"
+            `n        },
+            `n        {
+            `n            `"key`": `"IpDiscoverySwitchingProfile`",
+            `n            `"value`": `"$ipdiscoveryprofileid`"
+            `n        },
+            `n        {
+            `n            `"key`": `"MacManagementSwitchingProfile`",
+            `n            `"value`": `"$macmanagementprofileid`"
+            `n        }
+            `n    ],        
         `n    `"resource_type`": `"LogicalRouterDownLinkPort`",
         `n                `"tags`": [
     `n                {
