@@ -35,6 +35,12 @@ $filename = "createswitchuplinkports.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/$filename" `
 -OutFile $Folder\$filename
 
+$filename = "linkswitchandt1.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/Nested-Lab-Deployment/$filename" `
+-OutFile $Folder\$filename
+
+
+
 ####################
 #DELETE THIS
 #####################
@@ -50,3 +56,4 @@ Invoke-Expression -Command $Folder\createswitches.ps1
 Invoke-Expression -Command $Folder\createt1downlinkports.ps1
 Invoke-Expression -Command $Folder\createswitchuplinkports.ps1
 Invoke-Expression -Command $Folder\createresourcepool.ps1
+Invoke-Expression -Command $Folder\linkswitchandt1.ps1
