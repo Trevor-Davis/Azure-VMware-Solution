@@ -1,4 +1,4 @@
-$Folder = "$env:TEMP\NestedLabDeploy"
+$global:Folder = "$env:TEMP\NestedLabDeploy"
 if (Test-Path -Path $Folder) {
 ""
 } else {
@@ -42,10 +42,11 @@ Copy-Item "C:\Users\avs-admin\Documents\GitHub\Azure-VMware-Solution\Nested-Lab-
 
 
 
-#Invoke-Expression -Command $Folder\variables.ps1
-#Invoke-Expression -Command $Folder\createt1router.ps1
-#Invoke-Expression -Command $Folder\createswitchingprofiles.ps1
-#Invoke-Expression -Command $Folder\createswitches.ps1
-#Invoke-Expression -Command $Folder\createt1downlinkports.ps1
+Invoke-Expression -Command $Folder\variables.ps1
+
+Invoke-Expression -Command $Folder\createt1router.ps1
+Invoke-Expression -Command $Folder\createswitchingprofiles.ps1
+Invoke-Expression -Command $Folder\createswitches.ps1
+Invoke-Expression -Command $Folder\createt1downlinkports.ps1
 Invoke-Expression -Command $Folder\createswitchuplinkports.ps1
-#Invoke-Expression -Command $Folder\createresourcepool.ps1
+Invoke-Expression -Command $Folder\createresourcepool.ps1

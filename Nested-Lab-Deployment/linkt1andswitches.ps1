@@ -34,10 +34,10 @@ $body = "{
     `n}"
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-ports/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
+    $response | ConvertTo-Json | ConvertFrom-Json
 
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:mgmtuplinkswitchportid = Read-Host
+
+    $global:mgmtuplinkswitchportid = $response.id
 
  
 #########################################
@@ -75,7 +75,7 @@ $body = "{
     `n}"
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-ports/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
+    $response | ConvertTo-Json | ConvertFrom-Json
 
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:wanuplinkswitchportid = Read-Host
+
+    $global:wanuplinkswitchportid = $response.id

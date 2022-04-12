@@ -29,10 +29,9 @@ $body = "{
 `n}"
 
 $response = Invoke-RestMethod https://$nsxtip/api/v1/switching-profiles/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-$response | ConvertTo-Json
+$response | ConvertTo-Json | ConvertFrom-Json
 
-Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-$global:ipdiscoveryprofileid = Read-Host
+$global:ipdiscoveryprofileid = $response.id
 
 ###################################
 #Mac Manage Profile
@@ -61,11 +60,11 @@ $body = "{
     `n}"
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/switching-profiles/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
+    $response | ConvertTo-Json | ConvertFrom-Json
 
 
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:macmanagementprofileid = Read-Host
+    
+    $global:macmanagementprofileid = $response.id
     
         
 ###################################
@@ -104,7 +103,6 @@ $body = "{
     `n}"
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/switching-profiles/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
-
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:securityprofileid = Read-Host
+    $response | ConvertTo-Json | ConvertFrom-Json
+ 
+    $global:securityprofileid = $response.id

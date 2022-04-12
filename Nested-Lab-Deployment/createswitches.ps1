@@ -37,13 +37,10 @@ $body = "{
     `n    `"_revision`": 0,
     `n    `"_schema`": `"/v1/schema/LogicalSwitch`"
     `n}"
-    
-    $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
 
-    
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:wanswitchid = Read-Host
+$response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
+$response | ConvertTo-Json | ConvertFrom-Json
+$global:wanswitchid = $response.id
     
 
     ###################################
@@ -85,11 +82,10 @@ $body = "{
     `n}"
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
 
         
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:mgmtswitchid = Read-Host
+    $response | ConvertTo-Json | ConvertFrom-Json
+    $global:mgmtswitchid = $response.id
 
 
     ###################################
@@ -131,8 +127,5 @@ $body = "{
     `n}"
     
     $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
-    $response | ConvertTo-Json
-
-        
-    Write-Host -ForegroundColor Yellow "In the information above, you should see the ID field, copy the ID string (not including the quotes) and enter it here: " -NoNewline
-    $global:workloadswitchid = Read-Host
+     $response | ConvertTo-Json | ConvertFrom-Json
+    $global:workloadswitchid = $response.id
