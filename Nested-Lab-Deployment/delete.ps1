@@ -29,7 +29,7 @@ https://$nsxtip/api/v1/logical-switches/$global:wanswitchid -Method 'DELETE' -He
 $response | ConvertTo-Json
 
 $response = Invoke-RestMethod `
-https://$nsxtip/api/v1/logical-switches/$NestedBuildName-Workloads-VLAN-$vlanid -Method 'DELETE' -Headers $headers -SkipCertificateCheck
+https://192.168.0.3/api/v1/logical-switches/NestedLab2-Workloads-VLAN-74 -Method 'DELETE' -Headers $headers -SkipCertificateCheck
 $response | ConvertTo-Json
 
 $response = Invoke-RestMethod `
