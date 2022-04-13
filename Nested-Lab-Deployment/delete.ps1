@@ -29,18 +29,18 @@ https://$nsxtip/api/v1/logical-switches/$global:wanswitchid -Method 'DELETE' -He
 $response | ConvertTo-Json
 
 $response = Invoke-RestMethod `
-https://192.168.0.3/api/v1/logical-switches/NestedLab2-Workloads-VLAN-74 -Method 'DELETE' -Headers $headers -SkipCertificateCheck
+https://$nsxtip/api/v1/logical-switches/$global:workloadswitchid -Method 'DELETE' -Headers $headers -SkipCertificateCheck
 $response | ConvertTo-Json
 
 $response = Invoke-RestMethod `
-https://$nsxtip/api/v1/switching-profiles/$NestedBuildName-IPDiscovery -Method 'DELETE' -Headers $headers -SkipCertificateCheck
+https://$nsxtip/api/v1/switching-profiles/$ipdiscoveryprofileid -Method 'DELETE' -Headers $headers -SkipCertificateCheck
 $response | ConvertTo-Json
 
 $response = Invoke-RestMethod `
-https://$nsxtip/api/v1/switching-profiles/$NestedBuildName-MACManagement -Method 'DELETE' -Headers $headers -SkipCertificateCheck
+https://$nsxtip/api/v1/switching-profiles/$macmanagementprofileid -Method 'DELETE' -Headers $headers -SkipCertificateCheck
 $response | ConvertTo-Json
 
 $response = Invoke-RestMethod `
-https://$nsxtip/api/v1/switching-profiles/$NestedBuildName-SwitchSecurity -Method 'DELETE' -Headers $headers -SkipCertificateCheck
+https://$nsxtip/api/v1/switching-profiles/$securityprofileid -Method 'DELETE' -Headers $headers -SkipCertificateCheck
 $response | ConvertTo-Json
 
