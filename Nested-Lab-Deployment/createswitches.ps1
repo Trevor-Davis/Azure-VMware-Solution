@@ -33,10 +33,10 @@ $body = "{
     `n    `"hybrid`": false,
     `n    `"span`": [],
     `n    `"resource_type`": `"LogicalSwitch`",
-    `n    `"display_name`": `"$NestedBuildName-WANSwitch`",
+    `n    `"display_name`": `"$global:wannetworkportgroup`",
     `n    `"_revision`": 0,
     `n    `"_schema`": `"/v1/schema/LogicalSwitch`"
-    `n}"
+    `n}" 
 
 $response = Invoke-RestMethod https://$nsxtip/api/v1/logical-switches -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
 $response | ConvertTo-Json | ConvertFrom-Json

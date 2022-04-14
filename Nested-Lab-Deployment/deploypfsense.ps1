@@ -1,15 +1,14 @@
 
   global:logintovcenter
 
-  
+   
   # Load OVF/OVA configuration into a variable
   $ovfconfig = Get-OvfConfiguration $pfsensefilename2
-  
-  # Fill out the OVF/OVA configuration parameters
-  
-  # vSphere Portgroup Network Mapping
-  $ovfconfig.NetworkMapping.NestedLab2_WANSwitch.value = $wannetwork 
-  
+  $ovfconfig.NetworkMapping.NestedLab2_WANSwitch.value = $global:wannetworkportgroup
+
+  Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
+  Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
+
 
   $requestvcenter = Invoke-WebRequest -Uri "https://$($OnPremVIServerIP):443" -Method GET -SkipCertificateCheck -TimeoutSec 5
   if ($requestvcenter.StatusCode -ne 200) {
@@ -24,9 +23,7 @@ Exit
   }
 
 
-  Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
-  Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
-
+  
   
   #########################
   # Wait for PowerOn
