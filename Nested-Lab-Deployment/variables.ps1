@@ -18,10 +18,10 @@ $global:mgmtnetworkgateway = "10.35.0.1" #assumes /24 network
 $global:wannetworkgateway = "10.35.1.1" #assumes /24 network
 $global:workloadnetwork = "10.35.74.1" #assumes /24 network ... this is here so static routes can be entered, this is the network which will be created on the pfsense router LAN side.
 $global:wannetworkportgroup = "$NestedBuildName-WANSwitch" #This is also the name which will be assigned to the WAN Switch
-
  
-
-  #download the pfsense OVA
+ 
+### This is not needed until we created the OVA and put it online for download.
+ <# #download the pfsense OVA
   $global:pfsensefilename1 = "pfsense2.mf"
   $global:pfsensefilename2 = "pfsense2.ovf" # This must be the OVF File
   $global:pfsensefilename3 = "pfsense2-1.vmdk"
@@ -31,7 +31,8 @@ $global:wannetworkportgroup = "$NestedBuildName-WANSwitch" #This is also the nam
   Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$pfsensefilename3 -OutFile $env:TEMP\NestedLabDeploy\$pfsensefilename3
   Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$pfsensefilename4 -OutFile $env:TEMP\NestedLabDeploy\$pfsensefilename4
 
-  $
+  #>
+
 #########################################
 # Encode the NSX-T Credentials
 #########################################
