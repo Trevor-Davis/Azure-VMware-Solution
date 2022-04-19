@@ -352,7 +352,7 @@ $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 #######################################################################################
 # Define The Resource Group For AVS Deploy
 #######################################################################################
-
+ 
 $testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
