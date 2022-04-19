@@ -16,7 +16,22 @@ $global:avsclusterdatastore = "vsanDatastore"
 
 $global:mgmtnetworkgateway = "10.35.0.1" #assumes /24 network
 $global:wannetworkgateway = "10.35.1.1" #assumes /24 network
+$global:workloadnetwork = "10.35.74.1" #assumes /24 network ... this is here so static routes can be entered, this is the network which will be created on the pfsense router LAN side.
+$global:wannetworkportgroup = "$NestedBuildName-WANSwitch" #This is also the name which will be assigned to the WAN Switch
+ 
+ 
+### This is not needed until we created the OVA and put it online for download.
+ <# #download the pfsense OVA
+  $global:pfsensefilename1 = "pfsense2.mf"
+  $global:pfsensefilename2 = "pfsense2.ovf" # This must be the OVF File
+  $global:pfsensefilename3 = "pfsense2-1.vmdk"
+  $global:pfsensefilename4 = "pfsense2-2.nvram"
+  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$pfsensefilename1 -OutFile $env:TEMP\NestedLabDeploy\$pfsensefilename1
+  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$pfsensefilename2 -OutFile $env:TEMP\NestedLabDeploy\$pfsensefilename2
+  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$pfsensefilename3 -OutFile $env:TEMP\NestedLabDeploy\$pfsensefilename3
+  Invoke-WebRequest -Uri https://avsdesignpowerapp.blob.core.windows.net/downloads/$pfsensefilename4 -OutFile $env:TEMP\NestedLabDeploy\$pfsensefilename4
 
+  #>
 
 #########################################
 # Encode the NSX-T Credentials
@@ -38,3 +53,13 @@ $global:headers = New-Object "System.Collections.Generic.Dictionary[[String],[St
 $global:headers.Add("Authorization", "Basic $nsxtcredentialsencoded")
 $global:headers.Add("Content-Type", "application/json")
 }
+
+function global:logintovcenter {
+  param ( )
+
+Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore
+Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $false
+Connect-VIServer $avsvcenterip -WarningAction SilentlyContinue `
+-User $avsvcenterusername -Password $avsvcenterpassword
+}
+

@@ -1019,7 +1019,7 @@ $hcxactivationkey = $Selection
   
   # Deploy the OVF/OVA with the config parameters
   Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
-
+ 
   $requestvcenter = Invoke-WebRequest -Uri "https://$($OnPremVIServerIP):443" -Method GET -SkipCertificateCheck -TimeoutSec 5
   if ($requestvcenter.StatusCode -ne 200) {
 write-Host -ForegroundColor Red "The machine this script is running from cannot reach the vCenter Server on port 443, please resolve this issue and re-run the script."

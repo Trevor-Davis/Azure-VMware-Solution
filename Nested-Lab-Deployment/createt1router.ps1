@@ -19,3 +19,6 @@ $body = "{
 $response = Invoke-RestMethod https://$global:nsxtip/api/v1/logical-routers/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
 $response | ConvertTo-Json | ConvertFrom-Json
 $global:NestedLabT1RouterID = $response.id
+
+Write-Host -ForegroundColor Yellow "Manually attach the T1 router just created to the T0 Router ... After completing, Press Any Key To Continue"
+Read-Host
