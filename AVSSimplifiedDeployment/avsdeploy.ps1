@@ -742,8 +742,6 @@ AVS ExpressRoute Auth Key Generated"
 #############3333333333#############
 
 
-# IF VWAN = NO THEN DO THIS #############4444444444#############
-
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
@@ -772,19 +770,12 @@ Exit}
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS"
 }
-#############4444444444#############
 
-# IF VWAN = YES THEN DO THIS #############5555555555#############
-. \$env:TEMP\AVSDeploy\Connect-AVSExR-To-vWAN.ps1
-
-
-#############5555555555#############
 
 
 
 
 }
-#############11111111111#############
 
 #######################################################################################
 # Connecting AVS To On-Prem ExR
