@@ -178,7 +178,10 @@ Please re-run the script from the PowerShell 7 command window"
 
 #az powershell module
   Clear-Host
-  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+  
+  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
   
   $check = Get-InstalledModule -Name Az -ErrorAction Ignore
@@ -186,7 +189,7 @@ Please re-run the script from the PowerShell 7 command window"
   {
     Write-Host -ForegroundColor Yellow "Installing Azure Powershell Modules ..."
     start-sleep -Seconds 10 
-    Install-Module -Name Az -Repository PSGallery -Force -Verbose
+    Install-Module -Name Az -Repository PSGallery -Force -Verbose -AllowClobber
     Write-Host -ForegroundColor Green "Success: Az Powershell Module Installed"
 
   }
@@ -194,7 +197,7 @@ Please re-run the script from the PowerShell 7 command window"
   {
     Write-Host -ForegroundColor Yellow "Updating Azure Powershell Modules ..."
     start-sleep -Seconds 10 
-    Update-Module -Name Az -Force -Verbose
+    Update-Module -Name Az -Force -Verbose 
     Write-Host -ForegroundColor Green "Success: Az Powershell Module Updated"
 start-sleep -Seconds 5
   }
@@ -207,7 +210,7 @@ start-sleep -Seconds 5
   {
     Write-Host -ForegroundColor Yellow "Installing Az.VMware Powershell Modules ..."
     start-sleep -Seconds 10 
-    Install-Module -Name Az.VMware -Repository PSGallery -Force -Verbose
+    Install-Module -Name Az.VMware -Repository PSGallery -Force -Verbose -AllowClobber
     Write-Host -ForegroundColor Green "Success: Az.VMware Powershell Module Installed"
 
   }
@@ -349,7 +352,7 @@ $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 #######################################################################################
 # Define The Resource Group For AVS Deploy
 #######################################################################################
-
+ 
 $testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
@@ -739,8 +742,6 @@ AVS ExpressRoute Auth Key Generated"
 #############3333333333#############
 
 
-# IF VWAN = NO THEN DO THIS #############4444444444#############
-
 $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
@@ -769,19 +770,12 @@ Exit}
 Write-host -ForegroundColor Green "
 Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $ExrGatewayForAVS"
 }
-#############4444444444#############
 
-# IF VWAN = YES THEN DO THIS #############5555555555#############
-. \$env:TEMP\AVSDeploy\Connect-AVSExR-To-vWAN.ps1
-
-
-#############5555555555#############
 
 
 
 
 }
-#############11111111111#############
 
 #######################################################################################
 # Connecting AVS To On-Prem ExR
