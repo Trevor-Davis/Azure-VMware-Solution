@@ -5,7 +5,7 @@ Write-Host -ForegroundColor Blue "
 Checking Pre-Requisites ... "
  
 $alertarray = @()
-$MinPowerShellVersion = 9.1
+$MinPowerShellVersion = 7.1
 $MinAzPowerShellVersion = 7.1
 $MinAzVMWPowerShellVersion = 0.4
 $MinVMWPowerCLIVersion = 12.5

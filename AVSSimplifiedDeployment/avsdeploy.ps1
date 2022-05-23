@@ -82,10 +82,10 @@ Clear-Host
 #######################################################################################
 
 $filename = "checkprereqs.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/checkprereqs.ps1" `
--OutFile $Folder\$filename
-
-Invoke-Expression -Command $Folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
+-OutFile $env:TEMP\AVSDeploy\$filename
+Clear-Host
+Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
 
 
 <#
