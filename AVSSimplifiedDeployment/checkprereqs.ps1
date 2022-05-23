@@ -10,7 +10,7 @@ $MinAzPowerShellVersion = 7.1
 $MinAzVMWPowerShellVersion = 0.4
 $MinVMWPowerCLIVersion = 12.5
 $Minvmwarepowerclihcxversion = 12.5
-$count = 0
+$global:count = 0
 
 #######################################################################################
 # Get PowerShell Version
@@ -21,7 +21,7 @@ $Version = ($Major,$Minor) -Join "."
 $Version = [Decimal]"$Version"
 if ($Version -lt $MinPowerShellVersion) {
     $alertarray += "Powershell Needs to be Upgraded to Version $MinPowerShellVersion"
-    $count = $count + 1
+    $global:count = $global:count + 1
 }
 
 
@@ -34,7 +34,7 @@ $Version = ($AZPSVersion.Version)
 if ($Version -lt $MinAzPowerShellVersion) {
     $alertarray += "
 Azure Powershell Module Needs to be Upgraded to Version $MinAzPowerShellVersion"
-    $count = $count + 1
+    $global:count = $global:count + 1
 }
 
 #######################################################################################
@@ -46,7 +46,7 @@ $Version = ($AZVMWPSVersion.Version)
 if ($Version -lt $MinAzVMWPowerShellVersion) {
     $alertarray += "
 Azure VMware Powershell Module Needs to be Upgraded to Version $MinAzVMWPowerShellVersion"
-    $count = $count + 1
+    $global:count = $global:count + 1
 }
 
 #######################################################################################
@@ -57,7 +57,7 @@ $Version = ($vmwarepowercliversion.Version)
 if ($Version -lt $MinVMWPowerCLIVersion) {
     $alertarray += "
 VMware PowerCLI Module Needs to be Upgraded to Version $MinVMWPowerCLIVersion"
-    $count = $count + 1
+    $global:count = $global:count + 1
 }
 
 
@@ -66,7 +66,7 @@ $Version = ($vmwarepowerclihcxversion.Version)
 if ($Version -lt $Minvmwarepowerclihcxversion) {
     $alertarray += "
 VMware HCX PowerCLI Module Needs to be Upgraded to Version $Minvmwarepowerclihcxversion"
-    $count = $count + 1
+    $global:count = $global:count + 1
 }
 
 
@@ -81,7 +81,7 @@ $checkazurecli = $programlist -match 'Microsoft Azure CLI'
 If ($checkazurecli.Count -eq 0) {
     $alertarray += "
 Azure CLI Needs To Be Installed"
-    $count = $count + 1
+    $global:count = $global:count + 1
 }
 
 
@@ -89,6 +89,3 @@ Write-Host
 Write-Host -ForegroundColor Red $alertarray
 Write-Host
 
-if ($count -ne 0) {
-Exit
-}
