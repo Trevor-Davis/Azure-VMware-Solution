@@ -28,8 +28,8 @@ $skiptheprecheck= "No"
 #######################################################################################
 #FUNCTIONS
 #######################################################################################
-#checkfilesize function
 
+#checkfilesize function
 function checkfilesize {
 
   param (
@@ -38,62 +38,6 @@ function checkfilesize {
   ((Get-Item $filename).Length/1gb)
   
   }
-
-
-#inputbox
-function inputbox {
-  param (
-      $inputrequest
-  )
-  $boxtitle = "Azure VMware Solution Simplified Deployment"
-
-  Add-Type -AssemblyName System.Windows.Forms
-  Add-Type -AssemblyName System.Drawing
-  
-  $form = New-Object System.Windows.Forms.Form
-  $form.Text = $boxtitle
-  $form.Size = New-Object System.Drawing.Size(500,200)
-  $form.StartPosition = 'CenterScreen'
-  
-  $okButton = New-Object System.Windows.Forms.Button
-  $okButton.Location = New-Object System.Drawing.Point(175,120)
-  $okButton.Size = New-Object System.Drawing.Size(75,23)
-  $okButton.Text = 'Submit'
-  $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-  $form.AcceptButton = $okButton
-  $form.Controls.Add($okButton)
-  
-  $cancelButton = New-Object System.Windows.Forms.Button
-  $cancelButton.Location = New-Object System.Drawing.Point(250,120)
-  $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-  $cancelButton.Text = 'Cancel'
-  $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-  $form.CancelButton = $cancelButton
-  $form.Controls.Add($cancelButton)
-  
-  $label = New-Object System.Windows.Forms.Label
-  $label.Location = New-Object System.Drawing.Point(10,20)
-  $label.Size = New-Object System.Drawing.Size(280,20)
-  $label.Text = $inputrequest
-  $form.Controls.Add($label)
-  
-  $textBox = New-Object System.Windows.Forms.TextBox
-  $textBox.Location = New-Object System.Drawing.Point(10,40)
-  $textBox.Size = New-Object System.Drawing.Size(470,20)
-  $form.Controls.Add($textBox)
-  
-  $form.Topmost = $true
-  
-  $form.Add_Shown({$textBox.Select()})
-  $result = $form.ShowDialog()
-  
-  if ($result -eq [System.Windows.Forms.DialogResult]::OK)
-  {
-      $x = $textBox.Text
-      $x
-  }
-
-}
 
 #azure login function
 function azurelogin {
@@ -111,7 +55,6 @@ function azurelogin {
   }
 
 #vCenter Communication Test
-
   function checkavsvcentercommunication {
 
     param (
@@ -128,7 +71,7 @@ Checking communication to AVS Private Cloud ... "
     $check | ConvertTo-Json
     }
 
-
+ 
 #######################################################################################
 # Create Temp Storage Location
 #######################################################################################
@@ -137,6 +80,15 @@ Clear-Host
 #######################################################################################
 # Check for Installs
 #######################################################################################
+
+$filename = "checkprereqs.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/checkprereqs.ps1" `
+-OutFile $Folder\$filename
+
+Invoke-Expression -Command $Folder\$filename
+
+
+<#
 if ($skiptheprecheck -eq "No")
 {
 
@@ -163,8 +115,8 @@ Write-Host -ForegroundColor Yellow "
 Your Powershell Version Is $PSVersion ... Upgrading to PowerShell 7"
   
   Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-  $PowerShellDownloadURL = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/PowerShell-7.2.1-win-x64.msi"
-  $PowerShellDownloadFileName = "PowerShell-7.2.1-win-x64.msi"
+  $PowerShellDownloadURL = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.3/PowerShell-7.2.3-win-x64.msi"
+  $PowerShellDownloadFileName = "PowerShell-7.2.3-win-x64.msi"
   Invoke-WebRequest -Uri $PowerShellDownloadURL -OutFile $env:TEMP\AVSDeploy\$PowerShellDownloadFileName
   Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
   Clear-Host
@@ -176,15 +128,14 @@ Please re-run the script from the PowerShell 7 command window"
   Exit
 }
 
-#az powershell module
   Clear-Host
   
-  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-  Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
+Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
   
-  $check = Get-InstalledModule -Name Az -ErrorAction Ignore
+$check = Get-InstalledModule -Name Az -ErrorAction Ignore
   if ($check.count -eq 0)
   {
     Write-Host -ForegroundColor Yellow "Installing Azure Powershell Modules ..."
@@ -293,6 +244,11 @@ Write-Host -ForegroundColor Yellow "Checking for Azure CLI Installation ..."
   }
 }
 }
+
+$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
+#>
+
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
