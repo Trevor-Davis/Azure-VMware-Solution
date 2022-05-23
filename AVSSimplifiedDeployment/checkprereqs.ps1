@@ -21,7 +21,8 @@ $Version = ($Major,$Minor) -Join "."
 $Version = [Decimal]"$Version"
 if ($Version -lt $MinPowerShellVersion) {
     $alertarray += "Powershell Needs to be Upgraded to Version $MinPowerShellVersion or Higher
-The download can be found here: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows"
+The download can be found here: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
+"
     $global:count = $global:count + 1
 }
 
