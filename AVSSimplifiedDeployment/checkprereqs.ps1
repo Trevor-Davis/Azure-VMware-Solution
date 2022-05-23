@@ -1,0 +1,94 @@
+
+Clear-Host
+
+Write-Host -ForegroundColor Blue "
+Checking Pre-Requisites ... "
+
+$alertarray = @()
+$MinPowerShellVersion = 7.1
+$MinAzPowerShellVersion = 7.1
+$MinAzVMWPowerShellVersion = 0.4
+$MinVMWPowerCLIVersion = 12.5
+$Minvmwarepowerclihcxversion = 12.5
+$count = 0
+
+#######################################################################################
+# Get PowerShell Version
+#######################################################################################
+$Major = ($PSVersionTable.PSVersion.Major)
+$Minor = ($PSVersionTable.PSVersion.Minor)
+$Version = ($Major,$Minor) -Join "."
+$Version = [Decimal]"$Version"
+if ($Version -lt $MinPowerShellVersion) {
+    $alertarray += "Powershell Needs to be Upgraded to Version $MinPowerShellVersion"
+    $count = $count + 1
+}
+
+
+#######################################################################################
+# Get Azure PowerShell Module
+#######################################################################################
+$AZPSVersion = Get-InstalledModule -Name Az -ErrorAction Ignore
+
+$Version = ($AZPSVersion.Version)
+if ($Version -lt $MinAzPowerShellVersion) {
+    $alertarray += "
+Azure Powershell Module Needs to be Upgraded to Version $MinAzPowerShellVersion"
+    $count = $count + 1
+}
+
+#######################################################################################
+# Get Azure VMware PowerShell Module
+#######################################################################################
+$AZVMWPSVersion = Get-InstalledModule -Name Az.VMware -ErrorAction Ignore
+
+$Version = ($AZVMWPSVersion.Version)
+if ($Version -lt $MinAzVMWPowerShellVersion) {
+    $alertarray += "
+Azure VMware Powershell Module Needs to be Upgraded to Version $MinAzVMWPowerShellVersion"
+    $count = $count + 1
+}
+
+#######################################################################################
+# Get VMware PowerCLI Modules
+#######################################################################################
+$vmwarepowercliversion = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction Ignore
+$Version = ($vmwarepowercliversion.Version)
+if ($Version -lt $MinVMWPowerCLIVersion) {
+    $alertarray += "
+VMware PowerCLI Module Needs to be Upgraded to Version $MinVMWPowerCLIVersion"
+    $count = $count + 1
+}
+
+
+$vmwarepowerclihcxversion = Get-InstalledModule -Name VMware.VimAutomation.Hcx -ErrorAction Ignore
+$Version = ($vmwarepowerclihcxversion.Version)
+if ($Version -lt $Minvmwarepowerclihcxversion) {
+    $alertarray += "
+VMware HCX PowerCLI Module Needs to be Upgraded to Version $Minvmwarepowerclihcxversion"
+    $count = $count + 1
+}
+
+
+#######################################################################################
+# Get Azure CLI Info
+#######################################################################################
+$programlist = @()
+$programlist += Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
+$programlist  += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
+$checkazurecli = $programlist -match 'Microsoft Azure CLI'
+
+If ($checkazurecli.Count -eq 0) {
+    $alertarray += "
+Azure CLI Needs To Be Installed"
+    $count = $count + 1
+}
+
+
+Write-Host
+Write-Host -ForegroundColor Red $alertarray
+Write-Host
+
+if ($count -ne 0) {
+Exit
+}
