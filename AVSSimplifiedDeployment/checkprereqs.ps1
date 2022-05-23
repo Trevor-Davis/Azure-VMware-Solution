@@ -3,7 +3,7 @@ Clear-Host
 
 Write-Host -ForegroundColor Blue "
 Checking Pre-Requisites ... "
-
+ 
 $alertarray = @()
 $MinPowerShellVersion = 7.1
 $MinAzPowerShellVersion = 7.1
