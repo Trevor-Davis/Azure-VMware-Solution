@@ -20,7 +20,8 @@ $Minor = ($PSVersionTable.PSVersion.Minor)
 $Version = ($Major,$Minor) -Join "."
 $Version = [Decimal]"$Version"
 if ($Version -lt $MinPowerShellVersion) {
-    $alertarray += "Powershell Needs to be Upgraded to Version $MinPowerShellVersion"
+    $alertarray += "Powershell Needs to be Upgraded to Version $MinPowerShellVersion or Higher
+The download can be found here: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows"
     $global:count = $global:count + 1
 }
 
@@ -33,7 +34,8 @@ $AZPSVersion = Get-InstalledModule -Name Az -ErrorAction Ignore
 $Version = ($AZPSVersion.Version)
 if ($Version -lt $MinAzPowerShellVersion) {
     $alertarray += "
-Azure Powershell Module Needs to be Upgraded to Version $MinAzPowerShellVersion"
+Azure Powershell Module Needs to be Upgraded to Version $MinAzPowerShellVersion or Higher
+The download can be found here: https://www.powershellgallery.com/packages/Az"
     $global:count = $global:count + 1
 }
 
@@ -45,7 +47,8 @@ $AZVMWPSVersion = Get-InstalledModule -Name Az.VMware -ErrorAction Ignore
 $Version = ($AZVMWPSVersion.Version)
 if ($Version -lt $MinAzVMWPowerShellVersion) {
     $alertarray += "
-Azure VMware Powershell Module Needs to be Upgraded to Version $MinAzVMWPowerShellVersion"
+Azure VMware Powershell Module Needs to be Upgraded to Version $MinAzVMWPowerShellVersionor or Higher
+The download can be found here: https://www.powershellgallery.com/packages/Az.VMware"
     $global:count = $global:count + 1
 }
 
@@ -56,7 +59,8 @@ $vmwarepowercliversion = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction 
 $Version = ($vmwarepowercliversion.Version)
 if ($Version -lt $MinVMWPowerCLIVersion) {
     $alertarray += "
-VMware PowerCLI Module Needs to be Upgraded to Version $MinVMWPowerCLIVersion"
+VMware PowerCLI Module Needs to be Upgraded to Version $MinVMWPowerCLIVersion or Higher
+The download can be found here: hhttps://www.powershellgallery.com/packages/VMware.PowerCLI"
     $global:count = $global:count + 1
 }
 
@@ -65,7 +69,8 @@ $vmwarepowerclihcxversion = Get-InstalledModule -Name VMware.VimAutomation.Hcx -
 $Version = ($vmwarepowerclihcxversion.Version)
 if ($Version -lt $Minvmwarepowerclihcxversion) {
     $alertarray += "
-VMware HCX PowerCLI Module Needs to be Upgraded to Version $Minvmwarepowerclihcxversion"
+VMware HCX PowerCLI Module Needs to be Upgraded to Version $Minvmwarepowerclihcxversion or Higher
+The download can be found here: https://www.powershellgallery.com/packages/VMware.VimAutomation.Hcx"
     $global:count = $global:count + 1
 }
 
@@ -80,7 +85,8 @@ $checkazurecli = $programlist -match 'Microsoft Azure CLI'
 
 If ($checkazurecli.Count -eq 0) {
     $alertarray += "
-Azure CLI Needs To Be Installed"
+Azure CLI Needs To Be Installed
+The download can be found here: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"
     $global:count = $global:count + 1
 }
 
