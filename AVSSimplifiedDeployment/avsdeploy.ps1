@@ -402,7 +402,7 @@ if ($pcdeployed -eq 0) {
 
 Write-Host -ForegroundColor Green "
 Success: The Azure VMware Solution Private Cloud Deployment Has Begun"
-Write-Host -ForegroundColor White "
+Write-Host -ForegroundColor Yellow "
 Deployment Status Will Begin To Show Shortly"
 
 New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA -ErrorAction Stop
