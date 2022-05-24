@@ -23,11 +23,13 @@ if ($Version -lt $MinPowerShellVersion) {
     $alertarray += "Powershell Version $MinPowerShellVersion or Higher is required.
 The download can be found here: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
 
-NOTE: This script must run using Powershell 7"
+NOTE: This script must run using Powershell 7
+
+"
 $global:count = $global:count + 1
-Exit
 
 }
+
 
 
 #######################################################################################
