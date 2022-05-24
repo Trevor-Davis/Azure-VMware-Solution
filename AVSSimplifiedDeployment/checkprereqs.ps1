@@ -1,4 +1,3 @@
-
 Clear-Host
 
 Write-Host -ForegroundColor Blue "
@@ -10,7 +9,7 @@ $MinAzPowerShellVersion = 7.1
 $MinAzVMWPowerShellVersion = 0.4
 $MinVMWPowerCLIVersion = 12.5
 $Minvmwarepowerclihcxversion = 12.5
-$global:nopowershell7 = "no"
+$global:powershell7 = "yes"
 $global:count = 0
 
 #######################################################################################
@@ -27,7 +26,7 @@ The download can be found here: https://docs.microsoft.com/en-us/powershell/scri
 NOTE: This script must run using Powershell 7
 
 "
-$global:nopowershell7 = "yes"
+$global:powershell7 = "no"
 Exit
 
 } 
@@ -43,7 +42,7 @@ $Version = ($AZPSVersion.Version)
 if ($Version -lt $MinAzPowerShellVersion) {
     $alertarray += "
 Azure Powershell Module Needs to be Upgraded to Version $MinAzPowerShellVersion or Higher
-The download can be found here: https://www.powershellgallery.com/packages/Az
+The download can be found here: https://docs.microsoft.com/en-us/powershell/azure/install-az-ps
 "
     $global:count = $global:count + 1
 }
@@ -57,7 +56,7 @@ $Version = ($AZVMWPSVersion.Version)
 if ($Version -lt $MinAzVMWPowerShellVersion) {
     $alertarray += "
 Azure VMware Powershell Module Needs to be Upgraded to Version $MinAzVMWPowerShellVersionor or Higher
-The download can be found here: https://www.powershellgallery.com/packages/Az.VMware
+The download can be found here: https://docs.microsoft.com/en-us/powershell/module/az.vmware
 "
     $global:count = $global:count + 1
 }
@@ -70,7 +69,7 @@ $Version = ($vmwarepowercliversion.Version)
 if ($Version -lt $MinVMWPowerCLIVersion) {
     $alertarray += "
 VMware PowerCLI Module Needs to be Upgraded to Version $MinVMWPowerCLIVersion or Higher
-The download can be found here: hhttps://www.powershellgallery.com/packages/VMware.PowerCLI
+The download can be found here: https://www.powershellgallery.com/packages/VMware.PowerCLI
 "
     $global:count = $global:count + 1
 }
