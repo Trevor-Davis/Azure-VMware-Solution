@@ -28,7 +28,7 @@ NOTE: This script must run using Powershell 7
 "
 $global:count = $global:count + 1
 
-}
+} 
 
 
 
