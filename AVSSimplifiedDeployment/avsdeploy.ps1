@@ -87,9 +87,13 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 Clear-Host
 Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
 
+if ($global:nopowershell7 = "yes") {
+Exit
+}
+
 if ($global:count -ne 0) {
   Exit
-  }
+}
 
 <#
 if ($skiptheprecheck -eq "No")

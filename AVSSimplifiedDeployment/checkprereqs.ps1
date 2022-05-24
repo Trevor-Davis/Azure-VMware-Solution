@@ -10,6 +10,7 @@ $MinAzPowerShellVersion = 7.1
 $MinAzVMWPowerShellVersion = 0.4
 $MinVMWPowerCLIVersion = 12.5
 $Minvmwarepowerclihcxversion = 12.5
+$global:nopowershell7 = "no"
 $global:count = 0
 
 #######################################################################################
@@ -20,13 +21,13 @@ $Minor = ($PSVersionTable.PSVersion.Minor)
 $Version = ($Major,$Minor) -Join "."
 $Version = [Decimal]"$Version"
 if ($Version -lt $MinPowerShellVersion) {
-    $alertarray += "Powershell Version $MinPowerShellVersion or Higher is required.
+Write-Host -ForegroundColor Red "Powershell Version $MinPowerShellVersion or Higher is required.
 The download can be found here: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
 
 NOTE: This script must run using Powershell 7
 
 "
-$global:count = $global:count + 1
+$global:nopowershell7 = "yes"
 
 } 
 
