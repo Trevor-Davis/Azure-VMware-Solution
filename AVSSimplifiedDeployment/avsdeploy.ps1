@@ -274,7 +274,7 @@ Azure Login Successful"
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
 
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
@@ -317,7 +317,7 @@ $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 # Define The Resource Group For AVS Deploy
 #######################################################################################
  
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
@@ -390,7 +390,7 @@ The Passwords Which Were Entered Do Not Match"
 # Kickoff Private Cloud Deployment
 #######################################################################################
 
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
   write-Host -ForegroundColor Blue "
