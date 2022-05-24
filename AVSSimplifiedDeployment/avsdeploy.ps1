@@ -397,7 +397,7 @@ if ($testforpc.count -eq 1) {
 Azure VMware Solution Private Cloud $pcname Is Already Deployed, Skipping To Next Step..."
 }
 
-
+ 
 if ($pcdeployed -eq 0) {
 
 Write-Host -ForegroundColor Green "
