@@ -28,6 +28,7 @@ NOTE: This script must run using Powershell 7
 
 "
 $global:nopowershell7 = "yes"
+Exit
 
 } 
 
