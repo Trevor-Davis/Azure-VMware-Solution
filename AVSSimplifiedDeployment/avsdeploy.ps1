@@ -405,7 +405,7 @@ Success: The Azure VMware Solution Private Cloud Deployment Has Begun"
 Write-Host -ForegroundColor White "
 Deployment Status Will Begin To Show Shortly"
 
-New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA
+New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -NetworkBlock $addressblock -Sku $skus -Location $regionfordeployment -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA -ErrorAction Stop
 
 Write-Host -foregroundcolor Blue "
 The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours."
