@@ -71,23 +71,38 @@ if ($global:count -ne 0) {
 $progressPreference = 'Continue'
 
 #######################################################################################
-# Connect To Azure and Validate Sub Is Ready For AVS
+# Connect To Azure 
 #######################################################################################
 
 
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
 
-
 azurelogin -subtoconnect $sub
 
+#######################################################################################
+# Register Resource Provider
+#######################################################################################
+azurelogin -subtoconnect $sub
 
-write-host -ForegroundColor Green "
-Azure Login Successful"
+$status = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction Stop
 
-Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
+if ($status.RegistrationState -eq "NotRegistered") {
+  Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
+}
 
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
+if ($status.RegistrationState -eq "Registered") {
+  write-Host -ForegroundColor Blue "
+Microsoft.AVS Resource Provider Is Already Registered, Skipping To Next Step..."
+}
+
+
+#######################################################################################
+# Check for Quota
+#######################################################################################
+azurelogin -subtoconnect $sub
+
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Stop
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
@@ -95,15 +110,12 @@ if ($testforpc.count -eq 1) {
 if ($pcdeployed -eq 0){
 Write-Host -ForegroundColor Yellow  "
 Validating Subscription Readiness ..." 
-$quota = Test-AzVMWareLocationQuotaAvailability -Location $regionfordeployment -SubscriptionId $sub
+$quota = Test-AzVMWareLocationQuotaAvailability -Location $regionfordeployment -SubscriptionId $sub -ErrorAction Stop
 if ("Enabled" -eq $quota.Enabled)
 {
 
 Write-Host -ForegroundColor Green "
 Success: Quota is Enabled on Subscription"    
-
-Write-Host -ForegroundColor Green "
-Success: Resource Provider Enabled"    
 
 }
 
@@ -125,12 +137,11 @@ Exit
 
 }
 
-
 #######################################################################################
 # Define The Resource Group For AVS Deploy
 #######################################################################################
  
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Stop
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
