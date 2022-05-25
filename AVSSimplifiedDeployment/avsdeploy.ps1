@@ -559,7 +559,7 @@ if("Succeeded" -eq $currentprovisioningstate)
 #Connect AVS to vNet
 # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction:SilentlyContinue
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction Ignore
 # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed=1
@@ -585,7 +585,7 @@ AVS ExpressRoute Auth Key Generated"
 # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
-$status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
+$status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -ErrorAction Ignore
 # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
@@ -615,7 +615,7 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 #Create and Configure Route Server
 # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup
+$status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup  -ErrorAction Ignore
 # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($status.count -eq 1) {
@@ -696,7 +696,7 @@ $peerid = $myprivatecloud.CircuitExpressRouteId
 # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
-$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction "SilentlyContinue"
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction Ignore
 #############2222222222#############
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed = 1
@@ -728,7 +728,7 @@ AVS ExpressRoute Auth Key Generated"
 # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
-$status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
+$status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -ErrorAction Ignore
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
   $pcexrdeployed = 1
   write-Host -ForegroundColor Blue "
@@ -773,7 +773,7 @@ if ("ExpressRoute" -eq $AzureConnection) {
   azurelogin -subtoconnect $OnPremExRCircuitSub
   
   $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
-  $status = get-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit
+  $status = get-AzExpressRouteCircuitAuthorization -Name "For-$pcname" -ExpressRouteCircuit $OnPremExRCircuit -ErrorAction Ignore
   
       if ($status.count -eq 1) {
         $onpremexrauthkeydeployed = 1
@@ -805,7 +805,7 @@ Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
   azurelogin -subtoconnect $sub
   # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
-     $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+     $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
      if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
       $exrglobalreachdeployed = 1
       write-Host -ForegroundColor Blue "
@@ -872,7 +872,7 @@ else{
 azurelogin -subtoconnect $sub
 # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
-   $status = Get-AzVMwareAddon -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
+   $status = Get-AzVMwareAddon -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
    if ($status.name -eq "hcx") {
     $hcxdeployed = 1
     write-Host -ForegroundColor Blue "
