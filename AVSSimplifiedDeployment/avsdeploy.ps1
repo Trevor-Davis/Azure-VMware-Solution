@@ -492,7 +492,6 @@ azurelogin -subtoconnect $vnetgwsub
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction Ignore
 #############2222222222#############
 if ($status.count -eq 1) {
-  $avsexrauthkeydeployed = 1
   write-Host -ForegroundColor Blue "
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
@@ -500,7 +499,7 @@ ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 
 
 #############3333333333#############
-if ($avsexrauthkeydeployed -eq 0) {
+if ($status.count -eq 0) {
   
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
