@@ -6,6 +6,10 @@ $quickeditsettingatstartofscript.QuickEdit
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 
 Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
+
+###############################################
+#Read in the Variables
+###############################################
 . $env:TEMP\AVSDeploy\variables.ps1
 
 $pcdeployed = 0
@@ -21,16 +25,29 @@ $rsdeployed = 0
 $exrglobalreachdeployed = 0
 
 #######################################################################################
-#Testing, DO NOT MODIFY
-#######################################################################################
-$skiptheprecheck= "No"
-
-#######################################################################################
 #FUNCTIONS
 #######################################################################################
 
-#checkfilesize function
-function checkfilesize {
+$filename = "azureloginfunction.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
+-OutFile $env:TEMP\AVSDeploy\$filename
+Clear-Host
+Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+
+$filename = "checkavsvcentercommunicationfunction.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
+-OutFile $env:TEMP\AVSDeploy\$filename
+Clear-Host
+Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+
+$filename = "getfilesizefunction.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
+-OutFile $env:TEMP\AVSDeploy\$filename
+Clear-Host
+Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+
+<##getfilesize function
+function getfilesize {
 
   param (
       $filename
@@ -38,7 +55,9 @@ function checkfilesize {
   ((Get-Item $filename).Length/1gb)
   
   }
+#>
 
+<#
 #azure login function
 function azurelogin {
 
@@ -54,6 +73,8 @@ function azurelogin {
   if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
   }
 
+  #>
+<#
 #vCenter Communication Test
   function checkavsvcentercommunication {
 
@@ -70,11 +91,8 @@ Checking communication to AVS Private Cloud ... "
     $check = Test-Connection -IPv4 -TcpPort 443 $vCenterCloudIP
     $check | ConvertTo-Json
     }
-
+#>
  
-#######################################################################################
-# Create Temp Storage Location
-#######################################################################################
 Clear-Host
 
 #######################################################################################
@@ -916,7 +934,7 @@ $hcxactivationkey = $Selection
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
 
   $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-  $checkhcxfilesize = checkfilesize -filename $HCXApplianceOVA
+  $checkhcxfilesize = getfilesize -filename $HCXApplianceOVA
   $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
   if ($checkhcxfilesize -ne "3.0418777465820312")
