@@ -153,7 +153,7 @@ Please re-run the script from the PowerShell 7 command window"
 
   Clear-Host
   
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 
 Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
 Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
@@ -268,21 +268,21 @@ Write-Host -ForegroundColor Yellow "Checking for Azure CLI Installation ..."
 }
 }
 
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 #>
 
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 write-host -ForegroundColor Green "
 Azure Login Successful"
@@ -320,13 +320,13 @@ https://docs.microsoft.com/en-us/azure/azure-vmware/enable-azure-vmware-solution
 "
 
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 Exit
 
 }
 
 }
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 #######################################################################################
 # Define The Resource Group For AVS Deploy
@@ -472,12 +472,12 @@ if ("Site-to-Site VPN" -eq $AzureConnection) {
   
 
 #Create Expressroute gateway for AVS to use
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
 $provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 $currentprovisioningstate = $provisioningstate.ProvisioningState
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($currentprovisioningstate -eq "Succeeded") {
    
@@ -494,16 +494,16 @@ if ($exrgwforvpndeployed -eq 0)
 $ExrGatewayForAVS = "ExRGWfor-$pcname" #the new ExR GW name.
 $GWIPName = "ExRGWfor-$pcname-IP" #name of the public IP for ExR GW
 $GWIPconfName = "gwipconf" #
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
 $vnet
@@ -553,10 +553,10 @@ if("Succeeded" -eq $currentprovisioningstate)
 
 
 #Connect AVS to vNet
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction:SilentlyContinue
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed=1
   write-Host -ForegroundColor Blue "
@@ -578,11 +578,11 @@ AVS ExpressRoute Auth Key Generated"
 }
 
 #Connecting private cloud to ExR GW
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
   $pcexrdeployed = 1
@@ -609,10 +609,10 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 
 
 #Create and Configure Route Server
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 $status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($status.count -eq 1) {
   $rsdeployed = 1
@@ -656,9 +656,9 @@ Write-Host -ForegroundColor Green "
 Success: Azure RouteServer Created and Updated"
 }
 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 $vcentertest = checkavsvcentercommunication
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
 Success: Communication Between AVS and On-Premises Has Been Validated"
@@ -682,14 +682,14 @@ Exit
 
 #############11111111111#############
 if ("ExpressRoute" -eq $AzureConnection) {
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction "SilentlyContinue"
@@ -700,7 +700,7 @@ if ($status.count -eq 1) {
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
 #############2222222222#############
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 #############3333333333#############
 if ($avsexrauthkeydeployed -eq 0) {
@@ -708,9 +708,9 @@ if ($avsexrauthkeydeployed -eq 0) {
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExpressRoute Auth Key Failed"
@@ -721,7 +721,7 @@ AVS ExpressRoute Auth Key Generated"
 #############3333333333#############
 
 
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $vnetgwsub
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup
@@ -731,7 +731,7 @@ if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
 Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway, Skipping To Next Step..."
 }
 
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 
 if ($pcexrdeployed -eq 0) {
@@ -764,7 +764,7 @@ if ("ExpressRoute" -eq $AzureConnection) {
 
   #generate auth key on on-prem ExR circut
   
-  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
   azurelogin -subtoconnect $OnPremExRCircuitSub
   
   ################
@@ -790,16 +790,16 @@ Generating Auth Key for AVS Global Reach Connection ... "
 Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
     }
   
-    $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+    # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
       $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
       $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
       $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
       
     #Connect Global Reach
-    $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+    # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
   azurelogin -subtoconnect $sub
-  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
      $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
      if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
@@ -834,9 +834,9 @@ Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPre
         }
     }
     
-  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
   $vcentertest = checkavsvcentercommunication
-  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
   
   if ($vcentertest -eq "true"){
     write-Host -foregroundcolor Green "
@@ -864,9 +864,9 @@ if ($deployhcxyesorno -eq "No") {
 
 
 else{
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
    $status = Get-AzVMwareAddon -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment
    if ($status.name -eq "hcx") {
@@ -892,9 +892,9 @@ if ($hcxdeployed -eq 0) {
 #######################################################################################
 #Get HCX Cloud IP Address and Password
 #######################################################################################
-$ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
 azurelogin -subtoconnect $sub
-$ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
 #IP Address
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
@@ -930,9 +930,9 @@ $hcxactivationkey = $Selection
 
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
 
-  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
   $checkhcxfilesize = getfilesize -filename $HCXApplianceOVA
-  $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
   if ($checkhcxfilesize -ne "3.0418777465820312")
   {
@@ -1368,7 +1368,7 @@ If ($HCXOnPremRoleMapping -eq "") {
   }
 
   #testing service mesh
-  $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
   $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1" 
 #  $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
   $deploymentstatus = "Building"
@@ -1392,7 +1392,7 @@ while ($deploymentstatus -ne "Complete") {
     }
 
     }
-    $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+    # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
 
   ##########
   #Exit
