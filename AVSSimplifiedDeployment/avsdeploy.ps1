@@ -31,20 +31,17 @@ $exrglobalreachdeployed = 0
 $filename = "azureloginfunction.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
 -OutFile $env:TEMP\AVSDeploy\$filename
-Clear-Host
-Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+. $env:TEMP\AVSDeploy\$filename
 
 $filename = "checkavsvcentercommunicationfunction.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
 -OutFile $env:TEMP\AVSDeploy\$filename
-Clear-Host
-Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+. $env:TEMP\AVSDeploy\$filename
 
 $filename = "getfilesizefunction.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
 -OutFile $env:TEMP\AVSDeploy\$filename
-Clear-Host
-Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+. $env:TEMP\AVSDeploy\$filename
 
 <##getfilesize function
 function getfilesize {
