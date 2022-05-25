@@ -48,56 +48,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 Clear-Host
 . $env:TEMP\AVSDeploy\$filename
 
-$progressPreference = 'Continue'
 
-
-<##getfilesize function
-function getfilesize {
-
-  param (
-      $filename
-  )
-  ((Get-Item $filename).Length/1gb)
-  
-  }
-#>
-
-<#
-#azure login function
-function azurelogin {
-
-  param (
-      $subtoconnect
-  )
-  $sublist = @()
-  $sublist = Get-AzSubscription
-  $checksub = $sublist -match $subtoconnect
-  $getazcontext = Get-AzContext
-  If ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -eq $subtoconnect) {" "}
-  if ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -ne $subtoconnect) {Set-AzContext -SubscriptionId $subtoconnect}
-  if ($checksub.Count -eq 0) {Connect-AzAccount -Subscription $subtoconnect}
-  }
-
-  #>
-<#
-#vCenter Communication Test
-  function checkavsvcentercommunication {
-
-    param (
-    
-    )
-    Write-Host -ForegroundColor Yellow "
-Checking communication to AVS Private Cloud ... "
-    azurelogin -subtoconnect $sub
-    $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
-    $vcenterurl = $myprivatecloud.EndpointVcsa
-    $length = $vcenterurl.length 
-    $vCenterCloudIP = $vcenterurl.Substring(8,$length-9)
-    $check = Test-Connection -IPv4 -TcpPort 443 $vCenterCloudIP
-    $check | ConvertTo-Json
-    }
-#>
- 
 Clear-Host
 
 #######################################################################################
@@ -117,180 +68,19 @@ Exit
 if ($global:count -ne 0) {
   Exit
 }
-
-
-<#
-if ($skiptheprecheck -eq "No")
-{
-
-#PowerShell 7
-
-Write-Host -ForegroundColor Yellow "The following are required for this script to run properly.
-- PowerShell 7.x
-- Azure Powershell Modules
-- VMware PowerCLI Modules
-- Azure CLI"
-write-host -foregroundcolor white -nonewline "If these packages aren't already installed would you like this script to install them? (Y/N): "
-$installpackages = Read-Host
-
-if ($installpackages -eq "N") {
-write-Host -foregroundcolor red "This script requires these modules, if you do not install them the script will not properly run.  Please install the latest versions of all these modules offline and re-run this script."
-Exit
-}
-else {
-  
-#powershell
-if ($PSVersionTable.PSVersion.Major -lt 7){
-$PSVersion = $PSVersionTable.PSVersion.Major
-Write-Host -ForegroundColor Yellow "
-Your Powershell Version Is $PSVersion ... Upgrading to PowerShell 7"
-  
-  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-  $PowerShellDownloadURL = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.3/PowerShell-7.2.3-win-x64.msi"
-  $PowerShellDownloadFileName = "PowerShell-7.2.3-win-x64.msi"
-  Invoke-WebRequest -Uri $PowerShellDownloadURL -OutFile $env:TEMP\AVSDeploy\$PowerShellDownloadFileName
-  Start-Process -wait "$env:TEMP\AVSDeploy\$PowerShellDownloadFileName"
-  Clear-Host
-  Write-Host -ForegroundColor Green "
-Success: PowerShell Upgraded"
-  Write-Host -ForegroundColor Red "
-Please re-run the script from the PowerShell 7 command window"
-  Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-  Exit
-}
-
-  Clear-Host
-  
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-Write-Host -ForegroundColor Yellow "Checking for Azure Powershell Modules ..."
-  
-$check = Get-InstalledModule -Name Az -ErrorAction Ignore
-  if ($check.count -eq 0)
-  {
-    Write-Host -ForegroundColor Yellow "Installing Azure Powershell Modules ..."
-    start-sleep -Seconds 10 
-    Install-Module -Name Az -Repository PSGallery -Force -Verbose -AllowClobber
-    Write-Host -ForegroundColor Green "Success: Az Powershell Module Installed"
-
-  }
-  else
-  {
-    Write-Host -ForegroundColor Yellow "Updating Azure Powershell Modules ..."
-    start-sleep -Seconds 10 
-    Update-Module -Name Az -Force -Verbose 
-    Write-Host -ForegroundColor Green "Success: Az Powershell Module Updated"
-start-sleep -Seconds 5
-  }
-
-#az.vmware powershell module
-  Write-Host -ForegroundColor Yellow "Checking for Az.VMware Powershell Modules ..."
-  
-  $check = Get-InstalledModule -Name Az.VMware -ErrorAction Ignore
-  if ($check.count -eq 0)
-  {
-    Write-Host -ForegroundColor Yellow "Installing Az.VMware Powershell Modules ..."
-    start-sleep -Seconds 10 
-    Install-Module -Name Az.VMware -Repository PSGallery -Force -Verbose -AllowClobber
-    Write-Host -ForegroundColor Green "Success: Az.VMware Powershell Module Installed"
-
-  }
-  else
-  {
-    Write-Host -ForegroundColor Yellow "Updating Az.VMware Powershell Modules ..."
-    start-sleep -Seconds 10 
-    Update-Module -Name Az.VMware -Force -Verbose
-    Write-Host -ForegroundColor Green "Success: Az.VMware Powershell Module Updated"
-start-sleep -Seconds 5
-  }
-
-
-#VMware PowerCLI Modules
-
-#########################################################################
-
-Write-Host -ForegroundColor Yellow "Checking for VMware.PowerCLI Powershell Modules ..."
-  
-$vmwarepowerclicheck = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction Ignore
-if ("VMware.PowerCLI" -ne $vmwarepowerclicheck.Name) {
-  Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-  Write-Host -ForegroundColor Yellow "Installing VMware.PowerCLI Modules ..."
-    start-sleep -Seconds 10 
-    Install-Module -Name VMware.PowerCLI -Force -Verbose
-    Install-Module -Name VMware.VimAutomation.Hcx -Force -Verbose
-    Write-Host -ForegroundColor Green "Success: VMware.PowerCLI Modules Installed"
-
-  }
-
-  $vmwarepowerclicheck = Get-InstalledModule -Name VMware.PowerCLI -ErrorAction Ignore
-  if ("12.5" -ge $vmwarepowerclicheck.Version) {
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-    Write-Host -ForegroundColor Yellow "Installing VMware.PowerCLI Modules ..."
-      start-sleep -Seconds 10 
-      Update-Module -Name VMware.PowerCLI -Force -Verbose
-      Write-Host -ForegroundColor Green "Success: VMware.PowerCLI Modules Installed"
-  
-    }
-  ###########################################################
-  Write-Host -ForegroundColor Yellow "Checking for VMware.VimAutomation.Hcx Powershell Modules ..."
-  
-  $vmwarepowerclicheck = Get-InstalledModule -Name VMware.VimAutomation.Hcx -ErrorAction Ignore
-  if ("VMware.VimAutomation.Hcx" -ne $vmwarepowerclihcxcheck.Name ) {
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-    Write-Host -ForegroundColor Yellow "Downloading and Installing VMware.VimAutomation.Hcx PowerCLI Module ..."
-          start-sleep -Seconds 10 
-          Install-Module -Name VMware.VimAutomation.Hcx -Force -Verbose
-      Write-Host -ForegroundColor Green "Success: VMware.VimAutomation.Hcx Modules Installed"
-  
-    }
-  
-    $vmwarepowerclicheck = Get-InstalledModule -Name VMware.VimAutomation.Hcx -ErrorAction Ignore
-    if ("12.5" -ge $vmwarepowerclihcxcheck.Version) {
-      Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-      Write-Host -ForegroundColor Yellow "Downloading and Updating VMware.VimAutomation.Hcx PowerCLI Module ..."
-            start-sleep -Seconds 10 
-            Update-Module -Name VMware.VimAutomation.Hcx -Force -Verbose
-        Write-Host -ForegroundColor Green "Success: VMware.VimAutomation.Hcx Modules Installed"
-          }
-
-#Azure CLI
-Write-Host -ForegroundColor Yellow "Checking for Azure CLI Installation ..."
-
-  $programlist = @()
-  $programlist += Get-ItemProperty 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
-  $programlist  += Get-ItemProperty 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*' | ForEach-Object {(($_.DisplayName))}  
-  $checkazurecli = $programlist -match 'Microsoft Azure CLI'
-  If ($checkazurecli.Count -eq 0) {
-    Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-    $azureCLIDownloadURL = "https://aka.ms/installazurecliwindows"
-    $azureCLIDownloadFileName = "AzureCLI.msi"
-    Write-Host -ForegroundColor Yellow "Downloading Azure CLI ..."
-    Invoke-WebRequest -Uri $azureCLIDownloadURL -OutFile $env:TEMP\AVSDeploy\$azureCLIDownloadFileName 
-    Start-Process -wait "$env:TEMP\AVSDeploy\$azureCLIDownloadFileName"
-    Clear-Host
-    Write-Host -ForegroundColor Green "
-    Success: Azure CLI Installed"
-
-  }
-}
-}
-
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
-
-#>
+$progressPreference = 'Continue'
 
 #######################################################################################
 # Connect To Azure and Validate Sub Is Ready For AVS
 #######################################################################################
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
 
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 write-host -ForegroundColor Green "
 Azure Login Successful"
@@ -328,13 +118,13 @@ https://docs.microsoft.com/en-us/azure/azure-vmware/enable-azure-vmware-solution
 "
 
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstartofscript.QuickEdit
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 Exit
 
 }
 
 }
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 #######################################################################################
 # Define The Resource Group For AVS Deploy
@@ -480,12 +270,12 @@ if ("Site-to-Site VPN" -eq $AzureConnection) {
   
 
 #Create Expressroute gateway for AVS to use
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $vnetgwsub
 
 $provisioningstate = Get-AzVirtualNetworkGateway -Name $ExrGatewayForAVS -ResourceGroupName $ExrGWforAVSResourceGroup
 $currentprovisioningstate = $provisioningstate.ProvisioningState
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 if ($currentprovisioningstate -eq "Succeeded") {
    
@@ -502,16 +292,16 @@ if ($exrgwforvpndeployed -eq 0)
 $ExrGatewayForAVS = "ExRGWfor-$pcname" #the new ExR GW name.
 $GWIPName = "ExRGWfor-$pcname-IP" #name of the public IP for ExR GW
 $GWIPconfName = "gwipconf" #
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
 
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $vnetgwsub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 $vnet = Get-AzVirtualNetwork -Name $VpnGwVnetName -ResourceGroupName $ExrGWforAVSResourceGroup
 $vnet
@@ -561,10 +351,10 @@ if("Succeeded" -eq $currentprovisioningstate)
 
 
 #Connect AVS to vNet
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction Ignore
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 if ($status.count -eq 1) {
   $avsexrauthkeydeployed=1
   write-Host -ForegroundColor Blue "
@@ -586,11 +376,11 @@ AVS ExpressRoute Auth Key Generated"
 }
 
 #Connecting private cloud to ExR GW
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $vnetgwsub
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -ErrorAction Ignore
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
   $pcexrdeployed = 1
@@ -617,10 +407,10 @@ Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $E
 
 
 #Create and Configure Route Server
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $vnetgwsub
 $status = get-AzRouteServer -RouteServerName 'myRouteServer-VPN-To-ExR-For-AVS' -ResourceGroupName $ExrGWforAVSResourceGroup  -ErrorAction Ignore
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 if ($status.count -eq 1) {
   $rsdeployed = 1
@@ -664,9 +454,9 @@ Write-Host -ForegroundColor Green "
 Success: Azure RouteServer Created and Updated"
 }
 
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 $vcentertest = checkavsvcentercommunication
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 if ($vcentertest -eq "true"){write-Host -foregroundcolor Green "
 Success: Communication Between AVS and On-Premises Has Been Validated"
@@ -690,14 +480,14 @@ Exit
 
 #############11111111111#############
 if ("ExpressRoute" -eq $AzureConnection) {
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
   
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $vnetgwsub
 
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction Ignore
@@ -708,7 +498,7 @@ if ($status.count -eq 1) {
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
 #############2222222222#############
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 #############3333333333#############
 if ($avsexrauthkeydeployed -eq 0) {
@@ -716,9 +506,9 @@ if ($avsexrauthkeydeployed -eq 0) {
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExpressRoute Auth Key Failed"
@@ -729,7 +519,7 @@ AVS ExpressRoute Auth Key Generated"
 #############3333333333#############
 
 
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $vnetgwsub
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -ErrorAction Ignore
@@ -739,7 +529,7 @@ if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
 Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway, Skipping To Next Step..."
 }
 
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 
 if ($pcexrdeployed -eq 0) {
@@ -772,7 +562,7 @@ if ("ExpressRoute" -eq $AzureConnection) {
 
   #generate auth key on on-prem ExR circut
   
-  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  
 
   azurelogin -subtoconnect $OnPremExRCircuitSub
   
@@ -798,16 +588,16 @@ Generating Auth Key for AVS Global Reach Connection ... "
 Success: Auth Key Genereated for AVS On Express Route $NameOfOnPremExRCircuit"
     }
   
-    # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+    
   
       $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
       $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq "For-$pcname"}
       $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
       
     #Connect Global Reach
-    # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+    
   azurelogin -subtoconnect $sub
-  # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  
   
      $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
      if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
@@ -842,9 +632,9 @@ Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPre
         }
     }
     
-  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  
   $vcentertest = checkavsvcentercommunication
-  # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  
   
   if ($vcentertest -eq "true"){
     write-Host -foregroundcolor Green "
@@ -872,9 +662,9 @@ if ($deployhcxyesorno -eq "No") {
 
 
 else{
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
    $status = Get-AzVMwareAddon -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
    if ($status.name -eq "hcx") {
@@ -900,9 +690,9 @@ if ($hcxdeployed -eq 0) {
 #######################################################################################
 #Get HCX Cloud IP Address and Password
 #######################################################################################
-# $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+
 azurelogin -subtoconnect $sub
-# $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+
 
 #IP Address
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgfordeployment -Subscription $sub
@@ -938,9 +728,9 @@ $hcxactivationkey = $Selection
 
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
 
-  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  
   $checkhcxfilesize = getfilesize -filename $HCXApplianceOVA
-  # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+  
 
   if ($checkhcxfilesize -ne "3.0418777465820312")
   {
@@ -1376,7 +1166,7 @@ If ($HCXOnPremRoleMapping -eq "") {
   }
 
   #testing service mesh
-  # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
+  
   $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1" 
 #  $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
   $deploymentstatus = "Building"
@@ -1400,7 +1190,7 @@ while ($deploymentstatus -ne "Complete") {
     }
 
     }
-    # $ErrorActionPreference = "Continue"; $WarningPreference = "Continue"
+    
 
   ##########
   #Exit
