@@ -487,9 +487,9 @@ $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgf
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
 
-azurelogin -subtoconnect $vnetgwsub
+# azurelogin -subtoconnect $vnetgwsub
 
-$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $vnetgwsub -ErrorAction Ignore
+$status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction Ignore
 #############2222222222#############
 if ($status.count -eq 1) {
   write-Host -ForegroundColor Blue "
@@ -504,9 +504,7 @@ if ($status.count -eq 0) {
 Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
-
 azurelogin -subtoconnect $sub
-
 
 $exrauthkey = New-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub
 if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExpressRoute Auth Key Failed"
@@ -516,8 +514,6 @@ AVS ExpressRoute Auth Key Generated"
 }
 #############3333333333#############
 
-
-
 azurelogin -subtoconnect $vnetgwsub
 
 $status = Get-AzVirtualNetworkGatewayConnection -Name "From--$pcname" -ResourceGroupName $ExrGWforAVSResourceGroup -ErrorAction Ignore
@@ -526,8 +522,6 @@ if ($status.count -eq 1 -and $status.ProvisioningState -eq "Succeeded") {
   write-Host -ForegroundColor Blue "
 Azure VMware Solution Private Cloud Already Connected to Virtual Network Gateway, Skipping To Next Step..."
 }
-
-
 
 
 if ($pcexrdeployed -eq 0) {
