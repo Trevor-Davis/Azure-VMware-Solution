@@ -356,13 +356,12 @@ azurelogin -subtoconnect $sub
 $status = get-AzVMWareAuthorization -Name "to-ExpressRouteGateway" -PrivateCloudName $pcname -ResourceGroupName $rgfordeployment -SubscriptionId $sub -ErrorAction Ignore
 
 if ($status.count -eq 1) {
-  $avsexrauthkeydeployed=1
-  write-Host -ForegroundColor Blue "
+write-Host -ForegroundColor Blue "
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
 
 
-if ($avsexrauthkeydeployed -eq 0) {
+if ($status.count -eq 0) {
 
 Write-Host -ForegroundColor Green "
 Generating AVS ExpressRoute Auth Key..."
