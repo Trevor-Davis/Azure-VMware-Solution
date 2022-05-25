@@ -359,7 +359,7 @@ if ($status.count -eq 1) {
 write-Host -ForegroundColor Blue "
 ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
 }
-
+ 
 
 if ($status.count -eq 0) {
 
