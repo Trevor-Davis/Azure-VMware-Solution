@@ -769,8 +769,7 @@ if ("ExpressRoute" -eq $AzureConnection) {
   #generate auth key on on-prem ExR circut
   
   # $ErrorActionPreference = "SilentlyContinue"; $WarningPreference = "SilentlyContinue"
-  write-host "press any key to continue"
-  read-host
+
   azurelogin -subtoconnect $OnPremExRCircuitSub
   
   $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
