@@ -28,6 +28,7 @@ $exrglobalreachdeployed = 0
 #FUNCTIONS
 #######################################################################################
 
+$progressPreference = 'silentlyContinue'
 
 $filename = "azureloginfunction.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
@@ -46,6 +47,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 -OutFile $env:TEMP\AVSDeploy\$filename
 Clear-Host
 . $env:TEMP\AVSDeploy\$filename
+
+$progressPreference = 'Continue'
+
 
 <##getfilesize function
 function getfilesize {
