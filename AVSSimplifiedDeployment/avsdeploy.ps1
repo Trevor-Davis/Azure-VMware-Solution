@@ -85,7 +85,7 @@ azurelogin -subtoconnect $sub
 #######################################################################################
 azurelogin -subtoconnect $sub
 
-$status = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction Stop
+$status = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction SilentlyContinue
 
 if ($status.RegistrationState -eq "NotRegistered") {
   Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
@@ -102,7 +102,7 @@ Microsoft.AVS Resource Provider Is Already Registered, Skipping To Next Step..."
 #######################################################################################
 azurelogin -subtoconnect $sub
 
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Stop
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction 
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
