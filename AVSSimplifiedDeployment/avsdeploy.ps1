@@ -102,7 +102,7 @@ Microsoft.AVS Resource Provider Is Already Registered, Skipping To Next Step..."
 #######################################################################################
 azurelogin -subtoconnect $sub
 
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction 
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction SilentlyContinue
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
