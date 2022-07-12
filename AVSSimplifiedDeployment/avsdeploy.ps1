@@ -141,7 +141,7 @@ Exit
 # Define The Resource Group For AVS Deploy
 #######################################################################################
  
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Stop
+$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction SilentlyContinue
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
