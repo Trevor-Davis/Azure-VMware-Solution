@@ -73,8 +73,6 @@ $progressPreference = 'Continue'
 #######################################################################################
 # Connect To Azure 
 #######################################################################################
-
-
 write-host -ForegroundColor Yellow "
 Connecting to your Azure Subscription $sub"
 
@@ -89,23 +87,14 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 Clear-Host
 Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
 
-<#
-$status = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction SilentlyContinue
-
-if ($status.RegistrationState -eq "NotRegistered") {
-  Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
-}
-
-if ($status.RegistrationState -eq "Registered") {
-  write-Host -ForegroundColor Blue "
-Microsoft.AVS Resource Provider Is Already Registered, Skipping To Next Step..."
-}
-#>
-
-
 #######################################################################################
 # Check for Quota
 #######################################################################################
+$filename = "checkavsquota.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
+Clear-Host
+Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+
 azurelogin -subtoconnect $sub
 
 $testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction SilentlyContinue
