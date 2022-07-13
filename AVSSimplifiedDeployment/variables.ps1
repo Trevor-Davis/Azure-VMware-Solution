@@ -172,3 +172,7 @@ $global:HCXOnPremUserID = "admin"
      $global:hcxServiceMeshName = "AVS-ServiceMesh"
 $global:hcxfilename = "VMware-HCX-Connector-4.3.1.0-19373134.ova"
 
+
+##Anything being done here is because the variable name needs to exist for other scripts being pulled in.
+$global:resourcegroupname = $global:rgfordeployment
+$global:region = $global:regionfordeployment
