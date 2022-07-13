@@ -5,7 +5,7 @@ function azurelogin {
       $subtoconnect
   )
   $sublist = @()
-  $sublist = Get-AzSubscription
+  $sublist = Get-AzSubscription -ErrorAction SilentlyContinue
   $checksub = $sublist -match $subtoconnect
   $getazcontext = Get-AzContext
   If ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -eq $subtoconnect) {" "}
