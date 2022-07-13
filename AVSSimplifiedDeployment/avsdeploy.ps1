@@ -31,8 +31,7 @@ $exrglobalreachdeployed = 0
 $progressPreference = 'silentlyContinue'
 
 $filename = "azureloginfunction.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
--OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
 Clear-Host
 . $env:TEMP\AVSDeploy\$filename
 
@@ -56,16 +55,17 @@ Clear-Host
 #######################################################################################
 
 $filename = "checkprereqs.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" `
--OutFile $env:TEMP\AVSDeploy\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
 Clear-Host
 Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
 
 if ($global:powershell7 -eq "no") {
+Write-Host -ForegroundColor Red "Please Run The Script Using PowerShell 7"
 Exit
 }
 
 if ($global:count -ne 0) {
+  Write-Host -ForegroundColor Red "Please Run The Script Using PowerShell 7"
   Exit
 }
 $progressPreference = 'Continue'
@@ -83,8 +83,13 @@ azurelogin -subtoconnect $sub
 #######################################################################################
 # Register Resource Provider
 #######################################################################################
-azurelogin -subtoconnect $sub
 
+$filename = "registeravsresourceprovider.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
+Clear-Host
+Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+
+<#
 $status = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction SilentlyContinue
 
 if ($status.RegistrationState -eq "NotRegistered") {
@@ -95,6 +100,7 @@ if ($status.RegistrationState -eq "Registered") {
   write-Host -ForegroundColor Blue "
 Microsoft.AVS Resource Provider Is Already Registered, Skipping To Next Step..."
 }
+#>
 
 
 #######################################################################################
