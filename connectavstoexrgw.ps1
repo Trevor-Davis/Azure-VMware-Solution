@@ -18,6 +18,10 @@ if ($buildhol_ps1 -notmatch "Yes" -and $avsdeploy_ps1 -notmatch "Yes"){
 }
 
   azurelogin -subtoconnect $exrgwsub
+
+  Write-host -ForegroundColor Yellow "
+Connecting AVS Private Cloud $pcname to $exrgwname"
+
   
 $exrgwtouse = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $exrgwrg
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $pcresourcegroup -SubscriptionId $pcsub

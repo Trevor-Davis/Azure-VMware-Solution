@@ -13,6 +13,7 @@ if ($buildhol_ps1 -notmatch "Yes" -and $avsdeploy_ps1 -notmatch "Yes"){
   $exrcircuitauthname = ""
   $pcname = ""
   $pcresourcegroup = ""
+  $grconnectionname = ""
 }
 
 $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
@@ -31,12 +32,16 @@ On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next S
     }
 
     else {
+
         Write-Host -ForegroundColor Yellow "
 Generating Auth Key for AVS Global Reach Connection ... "
-        $command=Add-AzExpressRouteCircuitAuthorization -Name $exrcircuitauthname -ExpressRouteCircuit $OnPremExRCircuit
+$command = Add-AzExpressRouteCircuitAuthorization -Name $exrcircuitauthname -ExpressRouteCircuit $OnPremExRCircuit
         if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the On-Prem Authorization Key Failed"
     $failed = "Yes"
         Exit}
+
+        Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
+
   
     Write-Host -ForegroundColor Green "
 Success: Auth Key Generated for AVS On Express Route $NameOfOnPremExRCircuit"
@@ -46,14 +51,14 @@ Success: Auth Key Generated for AVS On Express Route $NameOfOnPremExRCircuit"
 # Connect on-prem Circuit
 #######################################################################################
 
-# ????????????? Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
 
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to On-Premises via Global Reach... " 
 
-  $OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq $exrcircuitauthname}
+$OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit
+$OnPremCircuitAuthDetails = Get-AzExpressRouteCircuitAuthorization -ExpressRouteCircuit $OnPremExRCircuit | Where-Object {$_.Name -eq $exrcircuitauthname}
   $OnPremCircuitAuth = $OnPremCircuitAuthDetails.AuthorizationKey
-  $command=New-AzVMwareGlobalReachConnection -Name $NameOfOnPremExRCircuit -PrivateCloudName $pcname -ResourceGroupName $pcresourcegroup -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
+  $command = New-AzVMwareGlobalReachConnection -Name $grconnectionname -PrivateCloudName $pcname -ResourceGroupName $pcresourcegroup -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
   if ($command.ProvisioningState -eq "Failed"){Write-Host -ForegroundColor Red "Creation of the AVS Global Reach Connection Failed"
   $failed = "Yes"        
   Exit}
