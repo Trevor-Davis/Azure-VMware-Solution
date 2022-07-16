@@ -21,19 +21,17 @@ if ($buildhol_ps1 -notmatch "Yes" -and $avsdeploy_ps1 -notmatch "Yes"){
 #######################################################################################
 # Generate Auth Key in on prem ExR Circuit
 #######################################################################################
-#azurelogin -subtoconnect $OnPremExRCircuitSub
 az login 
 az account set --subscription $OnPremExRCircuitSub
 
-#$status = get-AzExpressRouteCircuitAuthorization -Name $exrcircuitauthname -ExpressRouteCircuit $OnPremExRCircuit -ErrorAction Ignore
 $status = az network express-route auth show --resource-group $RGofOnPremExRCircuit --circuit-name $NameOfOnPremExRCircuit --name $exrcircuitauthname --query 'name'
+
 if ($status.count -eq 1) {write-Host -ForegroundColor Blue "
 On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
     }
   
     else {
 
-        az login 
         az account set --subscription $OnPremExRCircuitSub
         az network express-route auth create --circuit-name $NameOfOnPremExRCircuit --resource-group $RGofOnPremExRCircuit --name $exrcircuitauthname
         
