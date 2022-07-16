@@ -504,7 +504,7 @@ $hcxactivationkey = $Selection
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
 
   
-  $checkhcxfilesize = getfilesize -filename $HCXApplianceOVA
+  $checkhcxfilesize = getfilesize -filename $HCXApplianceOVA -ErrorAction silentlyContinue
   
 
   if ($checkhcxfilesize -ne "3.0418777465820312")
@@ -527,8 +527,7 @@ $hcxactivationkey = $Selection
   $VMHost = Get-Cluster $OnPremCluster | Get-VMHost
   $VMHost = $VMHost.Name.Get(0)
   
-  # Fill out the OVF/OVA configuration parameters
-  
+
   # vSphere Portgroup Network Mapping
   $ovfconfig.NetworkMapping.VSMgmt.value = $VMNetwork
   
@@ -561,7 +560,7 @@ $hcxactivationkey = $Selection
   $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremPassword
   
   # Deploy the OVF/OVA with the config parameters
-  Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ..."
+  Write-Host -ForegroundColor Yellow "Deploying HCX Connector OVA ... This could take a bit ... You should be able to see the progress of the OVA being imported into your on-prem vCenter"
  
   $requestvcenter = Invoke-WebRequest -Uri "https://$($OnPremVIServerIP):443" -Method GET -SkipCertificateCheck -TimeoutSec 5
   if ($requestvcenter.StatusCode -ne 200) {
