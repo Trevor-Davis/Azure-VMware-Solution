@@ -1,5 +1,6 @@
 $global:avsdeploy_ps1 = "Yes"
 
+Connect-AzAccount -Subscription -$sub
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
