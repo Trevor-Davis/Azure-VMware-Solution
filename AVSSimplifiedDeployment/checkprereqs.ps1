@@ -1,4 +1,4 @@
-Clear-Host
+
 
 Write-Host -ForegroundColor Blue "
 Checking Pre-Requisites ... "

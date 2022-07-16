@@ -1,7 +1,7 @@
 $filename = "azurelogin-function.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" `
 -OutFile $env:TEMP\AVSDeploy\$filename
-Clear-Host
+
 . $env:TEMP\AVSDeploy\$filename
 
 if ($buildhol_ps1 -notmatch "Yes" -and $avsdeploy_ps1 -notmatch "Yes"){
