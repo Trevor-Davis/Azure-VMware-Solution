@@ -40,7 +40,7 @@ Creating RouteServer ... this could take 30-40 minutes ..."
 
 $command = New-AzRouteServer -RouteServerName $RouteServerName -ResourceGroupName $ResourceGroupForRouteServer -Location $regionforrouteserver -hostedsubnet $mysubnetforrouteserver.id -PublicIpAddress $publicIp
 $command | ConvertTo-Json
-if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of Azure RouteServer Failed"
+if ($command.ProvisioningState -notlike "Succeeded"){Write-Host -ForegroundColor Red "Creation of Azure RouteServer Failed"
 $failed = "Yes"
 Exit}
 

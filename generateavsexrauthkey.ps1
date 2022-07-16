@@ -17,7 +17,7 @@ Write-Host -ForegroundColor Yellow "
 Generating AVS ExpressRoute Auth Key..."
 
 $exrauthkey = New-AzVMWareAuthorization -Name $authkeyname -PrivateCloudName $pcname -ResourceGroupName $pcresourcegroup -SubscriptionId $sub
-if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExR Auth Key Failed"
+if ($exrauthkey.ProvisioningState -notlike "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS ExR Auth Key Failed"
 $failed = "Yes"
 Exit
 }

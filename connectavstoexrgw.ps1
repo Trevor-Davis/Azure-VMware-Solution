@@ -5,7 +5,6 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScri
 . $env:TEMP\AVSDeploy\$filename
 
 if ($buildhol_ps1 -notmatch "Yes" -and $avsdeploy_ps1 -notmatch "Yes"){
-  Write-Host "No"
   $exrgwsub ="" #this is the sub where the ExR GW is.
   $pcsub = "" #sub of the private cloud
   $exrgwname = ""
@@ -29,9 +28,11 @@ $peerid = $myprivatecloud.CircuitExpressRouteId
 $exrauthkey = Get-AzVMWareAuthorization -Name $exrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $pcresourcegroup -SubscriptionId $pcsub -ErrorAction Ignore
 
 $command = New-AzVirtualNetworkGatewayConnection -Name $exrgwconnectionname -ResourceGroupName $exrgwrg -Location $exrgwregion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key
-if ($command.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS Virtual Network Connection Failed"
-Exit
+
+if ($command.ProvisioningState -notlike "Succeeded")
+{Write-Host -ForegroundColor Red "Creation of the AVS Virtual Network Connection Failed"
 $failed = "Yes"
+Exit
 }
 
 Write-host -ForegroundColor Green "
