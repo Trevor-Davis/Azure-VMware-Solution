@@ -59,7 +59,7 @@ Success: Auth Key Generated for AVS On Express Route $NameOfOnPremExRCircuit"
 Write-Host -ForegroundColor Yellow "
 Connecting the $pcname Private Cloud to On-Premises via Global Reach... " 
 
-  $OnPremCircuitAuth = az network express-route auth show --resource-group $RGofOnPremExRCircuit --circuit-name $NameOfOnPremExRCircuit --name 'myauth' --query 'authorizationKey'
+  $OnPremCircuitAuth = az network express-route auth show --resource-group $RGofOnPremExRCircuit --circuit-name $NameOfOnPremExRCircuit --name $exrcircuitauthname --query 'authorizationKey'
 
   $command = New-AzVMwareGlobalReachConnection -Name $grconnectionname -PrivateCloudName $pcname -ResourceGroupName $pcresourcegroup -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
   if ($command.ProvisioningState -eq "Failed"){Write-Host -ForegroundColor Red "Creation of the AVS Global Reach Connection Failed"
