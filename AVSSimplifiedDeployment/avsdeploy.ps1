@@ -507,7 +507,7 @@ $hcxactivationkey = $Selection
   
   $checkhcxfilesize = getfilesize -filename $HCXApplianceOVA -ErrorAction silentlyContinue
   
-
+  
   if ($checkhcxfilesize -ne "3.0418777465820312")
   {
     write-Host -foregroundcolor Yellow "Downloading VMware HCX Connector ... "
