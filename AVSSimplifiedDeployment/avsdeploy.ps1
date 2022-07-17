@@ -500,6 +500,7 @@ $hcxactivationkey = $Selection
   
   #download the HCX OVA
 
+  $global:hcxfilename = "VMware-HCX-Connector-4.4.0.0-20113476.ova"
 
   $HCXApplianceOVA = "$env:TEMP\AVSDeploy\$hcxfilename"
 
@@ -574,9 +575,9 @@ write-Host -ForegroundColor Red "The machine this script is running from cannot 
 Exit
   }
 
-
   Import-VApp -Source $HCXApplianceOVA -OvfConfiguration $ovfconfig -Name $HCXManagerVMName -VMHost $vmhost -Datastore $datastore -DiskStorageFormat thin
-  Write-Host -ForegroundColor Green "Success: HCX Connector Deployed to On-Premises Cluster"
+  Write-Host -ForegroundColor Green "
+  Success: HCX Connector Deployed to On-Premises Cluster"
 
   
   #########################
@@ -591,7 +592,7 @@ Exit
   # Waiting for HCX Connector to initialize
   while(1) {
       try {
-          if($PSVersionTable.PSEdition -eq "Core") {
+          if($PSVersionTable.PSEdition -notlike "blahblahCore") {
               $requests = Invoke-WebRequest -Uri "https://$($HCXVMIP):9443" -Method GET -SkipCertificateCheck -TimeoutSec 5
           } else {
               $requests = Invoke-WebRequest -Uri "https://$($HCXVMIP):9443" -Method GET -TimeoutSec 5
@@ -848,13 +849,13 @@ If ($HCXOnPremRoleMapping -eq "") {
 ######################
     $command = New-HCXSitePairing -Url https://$($HCXCloudIP) -Username $HCXCloudUserID -Password $HCXCloudPassword -Server $HCXVMIP
     $command | ConvertTo-Json
-  
+    $command
 
   ######################
   # Create vMotion Network Profile
   ######################
   
-  $vmotionnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name $vmotionportgroup 
+  $vmotionnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name "$vmotionportgroup" 
   
   $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $vmotionnetworkprofilename -GatewayAddress $vmotionprofilegateway -IPPool $vmotionippool -Network $vmotionnetworkbacking -PrefixLength $vmotionnetworkmask
   $command | ConvertTo-Json
@@ -898,9 +899,9 @@ If ($HCXOnPremRoleMapping -eq "") {
   
   ###############
   #Service Mesh
-  ##########
+  ###############
     
-  $hcxDestinationSite = Get-HCXSite -Destination 
+  $hcxDestinationSite = Get-HCXSite -Destination -ErrorAction Stop
   $hcxDestinationSite
   $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName -Server $HCXVMIP
   $hcxLocalComputeProfile
@@ -939,8 +940,20 @@ If ($HCXOnPremRoleMapping -eq "") {
   
   }
 
-  #testing service mesh
+
+
+  <#testing service mesh
   
+while ("Succeeded" -ne $currentprovisioningstate)
+{
+$timeStamp = Get-Date -Format "hh:mm"
+write-host -foregroundcolor yellow "$timestamp - Current Status: $currentprovisioningstate - Next Update In 10 Minutes"
+Start-Sleep -Seconds 600
+$provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment
+$currentprovisioningstate = $provisioningstate.ProvisioningState
+}
+
+
   $testhcxservicemeshIXI1 = get-hcxappliance -name "$hcxServiceMeshName-IX-I1" 
 #  $testhcxservicemeshIXR1 = get-hcxappliance -name "$hcxServiceMeshName-IX-R1"
   $deploymentstatus = "Building"
@@ -964,7 +977,7 @@ while ($deploymentstatus -ne "Complete") {
     }
 
     }
-    
+    #>
 
   ##########
   #Exit
