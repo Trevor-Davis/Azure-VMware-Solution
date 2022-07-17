@@ -994,3 +994,5 @@ while ($deploymentstatus -ne "Complete") {
   "
   $Selection = Read-Host
   Start-Process "https://$OnPremVIServerIP"  
+
+  #7/17/22
