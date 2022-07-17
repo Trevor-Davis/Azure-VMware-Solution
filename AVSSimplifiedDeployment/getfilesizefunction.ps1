@@ -3,6 +3,6 @@ function getfilesize {
     param (
         $filename
     )
-    ((Get-Item $filename).Length/1gb)
-    
+    ((Get-Item $filename -ErrorAction SilentlyContinue).Length/1gb) 
+        
     }
