@@ -11,7 +11,7 @@ Start-Transcript -Path $env:TEMP\AVSDeploy\avsdeploy.log -Append
 
 ###############################################
 #Read in the Variables
-###############################################
+############################################# 
 . $env:TEMP\AVSDeploy\variables.ps1
 
 $pcdeployed = 0
@@ -43,11 +43,9 @@ foreach ($filename in $array){
 #######################################################################################
 # Check for Installs
 #######################################################################################
-
 $filename = "checkprereqs.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename 
-
-Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
+. $env:TEMP\AVSDeploy\$filename
 
 if ($global:powershell7 -eq "no") {
 Write-Host -ForegroundColor Red "Please Run The Script Using PowerShell 7"
@@ -73,25 +71,29 @@ azurelogin -subtoconnect $sub
 
 $filename = "registeravsresourceprovider.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
-Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+. $env:TEMP\AVSDeploy\$filename
 
 #######################################################################################
 # Check for Quota
 #######################################################################################
 $filename = "checkavsquota.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVSSimplifiedDeployment/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
-Invoke-Expression -Command $env:TEMP\AVSDeploy\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
+. $env:TEMP\AVSDeploy\$filename
 
 #######################################################################################
 # Define The Resource Group For AVS Deploy
 #######################################################################################
  
 $testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction SilentlyContinue
+<#
+
 if ($testforpc.count -eq 1) {
   $pcdeployed=1
 }
 
-if($pcdeployed -eq 0){
+#>
+
+if($testforpc.count -eq 0){
 
 if ( "Existing" -eq $RGNewOrExisting )
 {
@@ -160,14 +162,13 @@ The Passwords Which Were Entered Do Not Match"
 #######################################################################################
 
 $testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgfordeployment -ErrorAction Ignore
+
 if ($testforpc.count -eq 1) {
-  $pcdeployed=1
   write-Host -ForegroundColor Blue "
 Azure VMware Solution Private Cloud $pcname Is Already Deployed, Skipping To Next Step..."
 }
 
- 
-if ($pcdeployed -eq 0) {
+if ($testforpc.count -eq 0) {
 
 Write-Host -ForegroundColor Green "
 Success: The Azure VMware Solution Private Cloud Deployment Has Begun"
