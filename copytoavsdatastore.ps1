@@ -1,16 +1,16 @@
-$onpremvcenter = "10.34.0.10"
-$onpremvcenterusername = "administrator@virtualworkloads.local"
-$onpremvcenterpassword = "Microsoft.123!"
-$avsvcenter = "192.168.0.2"
-$avsvcenterusername = "cloudadmin@vsphere.local"
-$avsvcenterpassword = "N-v9r2gR0%l8"
-$filename = "test.iso" #this is the file you are copying.
-$onpremdatacenter = "Nested-DC" #this is the name of the Datacenter in vCenter, on-prem.
-$avsdatacenter = "SDDC-Datacenter" #this is the name of the DAtacenter in vCenter, within AVS.
-$onpremdatastore = "nested-iscsi" #name of the on-prem datastore where the file exists.
-$avsdatastore = "vsanDatastore" #name of the AVS datastore where tthe file will be copied.
-$onpremdatastorefolder = "ISOs" #the folder where the source file exists, on-prem. 
-$vsanpathid = "e673cd60-7432-69bf-62f0-1c34da50ce20"
+$onpremvcenter = ""
+$onpremvcenterusername = ""
+$onpremvcenterpassword = ""
+$avsvcenter = ""
+$avsvcenterusername = ""
+$avsvcenterpassword = ""
+$filename = "" #this is the file you are copying.
+$onpremdatacenter = "" #this is the name of the Datacenter in vCenter, on-prem.
+$avsdatacenter = "" #this is the name of the DAtacenter in vCenter, within AVS.
+$onpremdatastore = "" #name of the on-prem datastore where the file exists.
+$avsdatastore = "" #name of the AVS datastore where tthe file will be copied.
+$onpremdatastorefolder = "" #the folder where the source file exists, on-prem. 
+$vsanpathid = ""
 #########################################################################################################
 
 Connect-VIServer -Server $onpremvcenter -User $onpremvcenterusername -Password $onpremvcenterpassword
