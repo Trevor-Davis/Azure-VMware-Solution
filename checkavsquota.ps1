@@ -41,11 +41,3 @@ Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstarto
 Exit
 
 }
-
-
-
-
-
-
-
-
