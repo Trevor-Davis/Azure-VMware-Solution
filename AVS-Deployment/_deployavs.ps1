@@ -3,7 +3,13 @@
 $global:sub = "3988f2d0-8066-42fa-84f2-5d72f80901da" #SubscriptionID
 $global:directory = "AVS-Depoyment" #This is where all the files will be downloaded to which will be used to deploy AVS
 $global:regionfordeployment = "Australia East"
-$global:rgname = "VirtualWorkloads-AVSPrivateCloud" #The REsource Group To Deploy AVS, Can be New or Existing
+$global:rgname = "VirtualWorkloads-AVSPrivateCloud-RG" #The REsource Group To Deploy AVS, Can be New or Existing
+$global:pcname = "VirtualWorkloads-AVSPrivateCloud" #The name of the AVS Private Cloud
+$global:addressblock = "192.168.0.0/22" #The /22 Network Block for AVS Infra
+$global:skus = "AV36" #The AVS SKU Type to Deploy
+$global:numberofhosts = "3" #This should be left at 3
+$global:internet = "Enbabled"
+
 
 
 ################################################################
@@ -47,7 +53,15 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 $filename = "createresourcegroup.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
-. $env:TEMP\$directory\$filename -ErrorAction Ignore
+. $env:TEMP\$directory\$filename 
+
+##################################
+#Create Resource Group
+##################################
+$filename = "kickoffpcbuild.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
+. $env:TEMP\$directory\$filename 
 
 
 <#
