@@ -8,7 +8,7 @@ $global:pcname = "VirtualWorkloads-AVSPrivateCloud" #The name of the AVS Private
 $global:addressblock = "192.168.0.0/22" #The /22 Network Block for AVS Infra
 $global:skus = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
-$global:internet = "Enbabled"
+$global:internet = "Enabled"
 
 
 
