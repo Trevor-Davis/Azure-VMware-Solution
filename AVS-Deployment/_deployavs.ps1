@@ -25,7 +25,6 @@ mkdir $env:TEMP\$directory -ErrorAction:Ignore
 ##################################
 Start-Transcript -Path $env:TEMP\$directory\avsdeploy.log -Append
 
-
 ##################################
 #Connect To Azure
 ##################################
@@ -38,6 +37,14 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 #Register Resource Provider
 ##################################
 $filename = "registeravsresourceprovider.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
+. $env:TEMP\$directory\$filename
+
+##################################
+#Create Resource Group
+##################################
+$filename = "createresourcegroup.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
 . $env:TEMP\$directory\$filename
