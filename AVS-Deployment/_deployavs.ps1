@@ -13,7 +13,7 @@ $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name 
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
-
+$ProgressPreference = 'SilentlyContinue'
 
 ##################################
 #Create Directory
@@ -47,7 +47,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 $filename = "createresourcegroup.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
-. $env:TEMP\$directory\$filename
+. $env:TEMP\$directory\$filename -ErrorAction Ignore
 
 
 <#
