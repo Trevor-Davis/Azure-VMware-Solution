@@ -1,23 +1,25 @@
 #Variables
 $global:sub = "3988f2d0-8066-42fa-84f2-5d72f80901da" #SubscriptionID
+$global:directory = "AVS-Depoyment" #This is where all the files will be downloaded to which will be used to deploy AVS
+$global:regionfordeployment = "Australia East"
 
 
+#Create Directory
+mkdir $env:TEMP\$directory -ErrorAction:Ignore
 
+##########Download and Execete Files###################
 
+#Connect To Azure
 $filename = "ConnectToAzure.ps1"
-write-host "Downloading " $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AVS-Deployment/main/Functions/$filename" -OutFile $env:TEMP\AVSDeploy\$filename
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
+. $env:TEMP\$directory\$filename
 
-
-
-
-
-
-
-
-. $env:TEMP\AVSDeploy\$filename
-
-
+#Register Resource Provider
+$filename = "registeravsresourceprovider.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$directory\$filename
+. $env:TEMP\$directory\$filename
 
 
 <#
