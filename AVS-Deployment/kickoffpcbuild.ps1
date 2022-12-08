@@ -23,11 +23,9 @@ The status of the deployment will begin to update in 5 minutes."
 
 Start-Sleep -Seconds 300
 
-
 $provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgname
 $currentprovisioningstate = $provisioningstate.ProvisioningState
 $timeStamp = Get-Date -Format "hh:mm"
-
 
 while ("Succeeded" -ne $currentprovisioningstate)
 {

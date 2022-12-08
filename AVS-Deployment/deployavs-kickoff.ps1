@@ -39,7 +39,7 @@ Start-Transcript -Path $env:TEMP\$folder\avsdeploy.log -Append
 ##################################
 #Begin
 ##################################
-$filename = "deployavs-master.ps1"
+$filename = "deployavs.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
