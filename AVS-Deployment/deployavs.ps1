@@ -30,6 +30,13 @@ write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename 
 
+##################################
+#Create vNet
+##################################
+$filename = "kickoffpcbuild.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
+. $env:TEMP\$folder\$filename 
 
 <#
 #Variables

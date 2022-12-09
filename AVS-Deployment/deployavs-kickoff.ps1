@@ -6,7 +6,9 @@ $global:pcname = "VirtualWorkloads-AVSPrivateCloud" #The name of the AVS Private
 $global:addressblock = "192.168.0.0/22" #The /22 Network Block for AVS Infra
 $global:skus = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
-$global:internet = "Enabled"
+$global:internet = "Enabled" 
+$global:vnetname = "VirtualWorkloads-AVSPrivateCloud-vnet" #The vNet where the AVS ExpressRoute will connect, can be a new or existing vNet
+$global:vnetaddressspace = "10.0.0.0/16" #the address space to use for the vnet (item above), will be ignored if the vnet already exists.
 
 $folder = "AVS-Deployment" #This is where all the files will be downloaded to which will be used to deploy AVS
 

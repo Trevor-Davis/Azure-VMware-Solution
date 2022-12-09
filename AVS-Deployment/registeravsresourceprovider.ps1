@@ -7,5 +7,5 @@ if ($status.RegistrationState -eq "NotRegistered") {
 
 if ($status.RegistrationState -eq "Registered") {
   write-Host -ForegroundColor Blue "
-Microsoft.AVS Resource Provider Is Already Registered, Skipping To Next Step..."
+Microsoft.AVS Resource Provider Is Already Registered"
 }
