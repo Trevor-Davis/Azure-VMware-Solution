@@ -50,7 +50,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 #Variables
 $global:regionfordeployment = "West US"
 $global:pcname = "Prod_Private_Cloud"
-$global:skus = "AV36"
+$global:avssku = "AV36"
 $global:addressblock = "192.168.4.0/22"
 $global:ExrGatewayForAVS = "THIS WILL NEED TO BEPOPULATED BY SCRIPT" ##this only gets filled in for ExpressRoute connected on-prem sites.
 $global:VWanHUBNameWithExRGW = "VirtualWorkloads-vWANHub" ##NEW
