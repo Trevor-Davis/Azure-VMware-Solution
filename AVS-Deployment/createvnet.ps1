@@ -1,14 +1,13 @@
-$testforvnet = Get-AzVirtualNetwork -Name $vnetname -ResourceGroupName $rgname -ErrorAction:Ignore
-
+$testforvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname -ErrorAction:Ignore
 
 if ($testforvnet.count -eq 1) {
     write-Host -ForegroundColor Blue "
-vNet $vnetname Is Already Deployed"
+vNet $exrvnetname Is Already Deployed"
   }
   
   if ($testforvnet.count -eq 0) {
   $vnet = @{
-    Name = $vnetname
+    Name = $exrvnetname
     ResourceGroupName = $rgname
     Location = $regionfordeployment
     AddressPrefix = $vnetaddressspace
@@ -16,5 +15,9 @@ vNet $vnetname Is Already Deployed"
 
 $command = New-AzVirtualNetwork @vnet 
 $command
+
+$getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname 
+Add-AzVirtualNetworkSubnetConfig -Name "Default" -VirtualNetwork $getexpressroutegatewayvnet -AddressPrefix $defaultvnetsubnet
+Set-AzVirtualNetwork -VirtualNetwork $getexpressroutegatewayvnet 
 
 }
