@@ -3,19 +3,30 @@ $global:sub = "3988f2d0-8066-42fa-84f2-5d72f80901da" #SubscriptionID
 $global:regionfordeployment = "Australia East"
 $global:rgname = "VirtualWorkloads-AVSPrivateCloud-RG" #The REsource Group To Deploy AVS, Can be New or Existing
 $global:pcname = "VirtualWorkloads-AVSPrivateCloud" #The name of the AVS Private Cloud
-$global:addressblock = "192.168.0.0/22" #The /22 Network Block for AVS Infra
+$global:avsaddressblock = "192.168.0.0/22" #The /22 Network Block for AVS Infra
 $global:skus = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
-$global:vnetname = "VirtualWorkloads-AVSPrivateCloud-vnet" #The vNet where the AVS ExpressRoute will connect, can be a new or existing vNet
-$global:vnetaddressspace = "10.0.0.0/16" #the address space to use for the vnet (item above), will be ignored if the vnet already exists.
+$global:exrgwname = "VirtualWorkloads-AVSPrivateCloud-ExRGW" #the exr gw where AVS will connect, if you are connecting to an existing expressroute put the name into this variable, if you are creating a new ExR gateway, put the name in which you want it to be called.
+$global:exrvnetname = "VirtualWorkloads-AVSPrivateCloud-vnet" #The vNet where either the ExpressRoute Gateway exists or the vnet where the expressroute gateway will be created.
 
-$folder = "AVS-Deployment" #This is where all the files will be downloaded to which will be used to deploy AVS
+##################################################################################################
+#The following only modify if there is a need to create a new expressroute gateway, 
+#if using an existing expressroute gateway do not modify these variables, as they will be ignored
+##################################################################################################
+$global:vnetaddressspace = "10.0.0.0/16" #the address space to use for the vnet (item above), if the vnet already exists this variable will be ignored.
+$global:defaultvnetsubnet = "10.0.1.0/24" #if the vNet where the ExpressRoute Gateway will be created already exists, just ignore this variable, do not modify, it will be ignored.
+$global:gatewaysubnetaddressspace = "10.0.1.0/24" #this is the subnet for the expressroute gateway, must be a subnet within the vnet addressspace if you are creating a new expressroute gateway, if you are using an existing expressroute gateway, this variable will be ignored.
+$global:gatewaysubnetname = "GatewaySubnet" #DO NOT MODIFY
+$global:exrgwipname = "$exrgwname-PIP" #DO NOT MODIFY
+##################################################################################################
+
 
 
 ################################################################
-#Misc
+#DO NOT MODIFY
 ################################################################
+$global:folder = "AVS-Deployment" #This is where all the files will be downloaded to which will be used to deploy AVS
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit
 Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit 0
 $quickeditsettingatstartofscript.QuickEdit
@@ -53,7 +64,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 $global:regionfordeployment = "West US"
 $global:pcname = "Prod_Private_Cloud"
 $global:skus = "AV36"
-$global:addressblock = "192.168.4.0/22"
+$global:avsaddressblock = "192.168.4.0/22"
 $global:ExrGatewayForAVS = "THIS WILL NEED TO BEPOPULATED BY SCRIPT" ##this only gets filled in for ExpressRoute connected on-prem sites.
 $global:VWanHUBNameWithExRGW = "VirtualWorkloads-vWANHub" ##NEW
 $global:deployhcxyesorno = "No"
