@@ -43,9 +43,8 @@ $command = New-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $vnet
 $command | ConvertTo-Json
 
 
-
 $test = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $rgname -ErrorAction Ignore
-If(test.count -eq 0){
+If($test.count -eq 0){
 Write-Host -ForegroundColor Red "
 ExpressRoute Gateway $exrgwname Failed to Create"
 Exit
