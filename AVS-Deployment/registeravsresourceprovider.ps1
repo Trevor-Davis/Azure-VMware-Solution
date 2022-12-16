@@ -1,4 +1,3 @@
-
 $test = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction SilentlyContinue
 
 if ($test.RegistrationState -eq "Registered") {
@@ -19,6 +18,6 @@ Exit
 }
 else {
   write-Host -ForegroundColor Green "
-  Microsoft.AVS Resource Provider Successfully Registered ... Skipping to Next Step"
+Microsoft.AVS Resource Provider Successfully Registered"
   }
 }

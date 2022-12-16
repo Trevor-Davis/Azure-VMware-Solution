@@ -1,3 +1,4 @@
+    $sub = "79003cad-e368-4304-acbf-3d3aa80978e3"
     $sublist = @()
     $sublist = Get-AzSubscription -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
     $checksub = $sublist -match $sub
@@ -5,12 +6,12 @@
     
 If ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -eq $sub) {
 Write-host -foregroundcolor Blue "
-$sub Already Connected ... Skipping to Next Step"}
+$sub Connected ... Skipping to Next Step"}
 
 if ($checksub.Count -eq 1 -and $getazcontext.Subscription.Id -ne $sub) {
 Set-AzContext -SubscriptionId $sub -WarningAction SilentlyContinue
 write-host -foregroundcolor Blue "
-$sub Already Connected ... Skipping to Next Step"}
+$sub Connected ... Skipping to Next Step"}
 
 if ($checksub.Count -eq 0) {
 write-host -ForegroundColor Green "

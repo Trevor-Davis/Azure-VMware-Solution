@@ -1,36 +1,73 @@
- #   $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgname -SubscriptionId $sub 
-#    $peerid = $myprivatecloud.CircuitExpressRouteId
+##############################################
+#Generate Auth Key
+##############################################
 
-#######################################################################################
-# Generate Auth Key
-#######################################################################################
+$test = Get-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $rgname -SubscriptionId $sub
 
-$exrauthkey = New-AzVMWareAuthorization -Name $exrgwconnectionname -PrivateCloudName $pcname -ResourceGroupName $rgname -SubscriptionId $sub
 
-if ($exrauthkey.ProvisioningState -ne "Succeeded"){Write-Host -ForegroundColor Red "
-Creation of the AVS ExpressRoute Auth Key Failed"
-Exit}
+if ($test.count -eq 1) {
+write-Host -ForegroundColor Blue "
+$avsexrauthkeyname Auth Key Already Exists ... Skipping to Next Step"   
+}
+  
+if ($test.count -eq 0) {
+write-host -foregroundcolor Yellow "
+Creating AVS Auth Key $avsexrauthkeyname"
+$command = New-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $rgname -SubscriptionId $sub
+$command | ConvertTo-Json
 
-Write-Host -ForegroundColor Green "
-AVS ExpressRoute Auth Key Generated"
+$test = Get-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $rgname -SubscriptionId $sub
+If(test.count -eq 0){
+Write-Host -ForegroundColor Red "
+AVS Auth Key $avsexrauthkeyname Failed to Create"
+Exit
+}
+else {
+  write-Host -ForegroundColor Green "
+AVS Auth Key $avsexrauthkeyname  Successfully Created"
+  }
+}
 
-#######################################################################################
+
+######################################################################################
 # Connect AVS to ExR GW
 #######################################################################################
 
-Write-host -ForegroundColor Yellow "
-Connecting AVS Private Cloud $pcname to $exrgwname"
+$avsexrauthkeyname = "CMK-vsphere7-ARM"
+$rgname = "HCL-Retest3"
+$pcname = "CMK-vsphere7-ARM"
+$sub = "79003cad-e368-4304-acbf-3d3aa80978e3"
+$exrgwname = "sddc-vnettest-vnet-gateway"
+$avsexrgwconnectionname = "CMK-vsphere7-ARM"
+$exrgwname = "sddc-vnettest-vnet-gateway"
+
+$test = Get-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -ResourceGroupName $rgname
+
+
+
+if ($test.count -eq 1) {
+write-Host -ForegroundColor Blue "
+$exrgwname Already Connected ... Skipping to Next Step"   
+}
   
+if ($test.count -eq 0) {
+write-host -foregroundcolor Yellow "
+Connecting AVS to $ergwname"
 $exrgwtouse = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $rgname
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgname -SubscriptionId $sub
 $peerid = $myprivatecloud.CircuitExpressRouteId
 
-$command = New-AzVirtualNetworkGatewayConnection -Name $exrgwconnectionname -ResourceGroupName $rgname -Location $regionfordeployment -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key
+$command = New-AzVirtualNetworkGatewayConnection -Name $avsexrauthkeyname -ResourceGroupName $rgname -Location $regionfordeployment -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $exrauthkey.Key
+$command | ConvertTo-Json
 
-if ($command.ProvisioningState -notlike "Succeeded")
-{Write-Host -ForegroundColor Red "Creation of the AVS Virtual Network Connection Failed"
+$test = Get-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -ResourceGroupName $rgname
+If(test.count -eq 0){
+Write-Host -ForegroundColor Red "
+Connecting AVS to $ergwname Failed"
 Exit
 }
-
-Write-host -ForegroundColor Green "
-Success: $pcname Private Cloud is Now Connected to to Virtual Network Gateway $exrgwname"
+else {
+  write-Host -ForegroundColor Green "
+AVS Connected to $ergwname Successfully"
+  }
+}
