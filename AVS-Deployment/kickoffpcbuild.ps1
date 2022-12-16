@@ -1,5 +1,5 @@
 
-$testforpc = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $rgname -ErrorAction:Ignore
+$testforpc = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $rgname -ErrorAction:Ignore
 
 if ($testforpc.count -eq 1) {
   write-Host -ForegroundColor Blue "

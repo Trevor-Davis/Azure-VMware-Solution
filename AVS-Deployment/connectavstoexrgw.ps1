@@ -28,22 +28,11 @@ AVS Auth Key $avsexrauthkeyname  Successfully Created"
   }
 }
 
-
 ######################################################################################
 # Connect AVS to ExR GW
 #######################################################################################
 
-$avsexrauthkeyname = "CMK-vsphere7-ARM"
-$rgname = "HCL-Retest3"
-$pcname = "CMK-vsphere7-ARM"
-$sub = "79003cad-e368-4304-acbf-3d3aa80978e3"
-$exrgwname = "sddc-vnettest-vnet-gateway"
-$avsexrgwconnectionname = "CMK-vsphere7-ARM"
-$exrgwname = "sddc-vnettest-vnet-gateway"
-
 $test = Get-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -ResourceGroupName $rgname
-
-
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "

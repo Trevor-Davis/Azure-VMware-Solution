@@ -22,8 +22,6 @@ $global:gatewaysubnetaddressspace = "10.0.2.0/24" #this is the subnet for the ex
 $global:gatewaysubnetname = "GatewaySubnet" #DO NOT MODIFY
 $global:exrgwipname = "$exrgwname-PIP" #DO NOT MODIFY
 
-
-
 #DO NOT MODIFY BELOW THIS LINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 $quickeditsettingatstartofscript = Get-ItemProperty -Path "HKCU:\Console" -Name Quickedit

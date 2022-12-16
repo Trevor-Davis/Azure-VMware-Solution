@@ -9,9 +9,12 @@ if ($test.count -eq 0) {
 write-host -foregroundcolor Yellow "
 Creating ExpressRoute Gateway $exrgwname"
  #Create Gateway Subnet
- $getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname 
- Add-AzVirtualNetworkSubnetConfig -Name $gatewaysubnetname -VirtualNetwork $getexpressroutegatewayvnet -AddressPrefix $gatewaysubnetaddressspace
- Set-AzVirtualNetwork -VirtualNetwork $getexpressroutegatewayvnet 
+ $getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname -ErrorAction Ignore
+ 
+if($getexpressroutegatewayvnet.count -eq 0){
+Add-AzVirtualNetworkSubnetConfig -Name $gatewaysubnetname -VirtualNetwork $getexpressroutegatewayvnet -AddressPrefix $gatewaysubnetaddressspace
+}
+Set-AzVirtualNetwork -VirtualNetwork $getexpressroutegatewayvnet 
 
 #get some info   
  $vnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname
@@ -34,10 +37,10 @@ Creating ExpressRoute Gateway $exrgwname"
  
  #create the gateway
 
- Write-Host -ForegroundColor Yellow "
- Creating a ExpressRoute Gateway ... this could take 30-40 minutes ..."
- $command = New-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $vnet.ResourceGroupName -Location $vnet.Location -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard
- $command | ConvertTo-Json
+Write-Host -ForegroundColor Yellow "
+Creating a ExpressRoute Gateway ... this could take 30-40 minutes ..."
+$command = New-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $vnet.ResourceGroupName -Location $vnet.Location -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard
+$command | ConvertTo-Json
 
 
 
@@ -52,7 +55,3 @@ else {
 ExpressRoute Gateway $exrgwname Successfully Created"
   }
 }
-
-
-
-

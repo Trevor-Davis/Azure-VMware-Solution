@@ -1,4 +1,3 @@
-    $sub = "79003cad-e368-4304-acbf-3d3aa80978e3"
     $sublist = @()
     $sublist = Get-AzSubscription -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
     $checksub = $sublist -match $sub
