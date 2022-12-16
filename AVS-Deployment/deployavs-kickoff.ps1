@@ -9,6 +9,7 @@ $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
 $global:exrgwname = "VirtualWorkloads-AVSPrivateCloud-ExRGW" #the exr gw where AVS will connect, if you are connecting to an existing expressroute put the name into this variable, if you are creating a new ExR gateway, put the name in which you want it to be called.
 $global:exrvnetname = "VirtualWorkloads-AVSPrivateCloud-vnet" #The vNet where either the ExpressRoute Gateway exists or the vnet where the expressroute gateway will be created.
+$global:exrgwconnectionname = "to-ExpressRouteGateway"
 
 ##################################################################################################
 #The following only modify if there is a need to create a new expressroute gateway, 
