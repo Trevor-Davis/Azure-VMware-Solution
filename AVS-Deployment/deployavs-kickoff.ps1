@@ -11,6 +11,9 @@ $global:exrgwname = "VirtualWorkloads-AVSPrivateCloud-ExRGW" #the exr gw where A
 $global:exrvnetname = "VirtualWorkloads-AVSPrivateCloud-vnet" #The vNet where either the ExpressRoute Gateway exists or the vnet where the expressroute gateway will be created.
 $global:avsexrauthkeyname = "to-ExpressRouteGateway-$exrgwname"
 $global:avsexrgwconnectionname = "from-AVSPrivateCloud-$pcname"
+$global:nameofonpremexrcircuit = "expressroute"
+$global:rgnameonpremexrcircuit = "VirtualWorkloads-AVSPrivateCloud-RG"
+$global:nameofavsglobalreachconnection = "to-$nameofonpremexrcircuit"
 
 ##################################################################################################
 #The following only modify if there is a need to create a new expressroute gateway, 
