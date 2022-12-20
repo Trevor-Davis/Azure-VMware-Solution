@@ -1,4 +1,7 @@
-$test = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $regionfordeployment -ErrorAction SilentlyContinue
+
+azurelogin -subtoconnect $avssub
+
+$test = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $avsregion -ErrorAction SilentlyContinue
 
 if ($test.RegistrationState -eq "Registered") {
 write-Host -ForegroundColor Blue "

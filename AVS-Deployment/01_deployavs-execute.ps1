@@ -1,17 +1,19 @@
 ##################################
 #Functions to Load
 ################################## 
-$filename = "ConnectToAzure.ps1"
+$filename = "Function-azurelogin.ps1"
 write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
 
-##################################
-#Connect To Azure
-################################## 
-$filename = "ConnectToAzure.ps1"
+$filename = "Function-createresourcegroup.ps1"
 write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+. $env:TEMP\$folder\$filename
+
+$filename = "Function-createvnetforexpressroutegateway.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
 
 ##################################
@@ -25,10 +27,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##################################  
 #Create Resource Group
 ##################################
-$filename = "createresourcegroup.ps1"
-write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
-. $env:TEMP\$folder\$filename 
+createresourcegroup -resourcegroup $avsrgname -region $avsregion -sub $avssub
 
 ##################################
 #Kickoff Private Cloud Build

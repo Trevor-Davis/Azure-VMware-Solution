@@ -1,23 +1,34 @@
-##############################################
-#Generate Auth Key
-##############################################
+azurelogin -subtoconnect $exrgwsub
 
-$test = Get-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $avsrgname -SubscriptionId $avssub -ErrorAction Ignore
+If ($exrgwneworexisting -eq "New")
+{
+createexrgateway -vnet $exrgwvnet -resourcegroup $exrgwrg -sub $exrgwsub -region $exrgwregion -exrgwname $exrgwname
+if ($success -eq 0) {Write-Host -ForegroundColor Red "
+Creation of ExpressRoute Gateway $exrgwname Failed"}
 
-
-if ($test.count -eq 1) {
-write-Host -ForegroundColor Blue "
-$avsexrauthkeyname Auth Key Already Exists ... Skipping to Next Step"   
 }
 
 
-$avsexrauthkeyname = "testtest"  
+##############################################
+#Generate Auth Key
+##############################################
+azurelogin -subtoconnect $avssub
+
+$test = Get-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $avsrgname -SubscriptionId $avssub -ErrorAction Ignore
+
+if ($test.count -eq 1) {
+write-Host -ForegroundColor Blue "
+$avsexrauthkeyname Auth Key Already Exists ... Skipping to Next Step"
+$avsexrauthkey = $test.Key
+   
+}
 
 if ($test.count -eq 0) {
 write-host -foregroundcolor Yellow "
 Creating AVS Auth Key $avsexrauthkeyname"
 $command = New-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $avsrgname -SubscriptionId $avssub
 $command | ConvertTo-Json
+$avsexrauthkey = $command.Key
 
 $test = Get-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pcname -ResourceGroupName $avsrgname -SubscriptionId $avssub -ErrorAction Ignore
 If($test.count -eq 0){
@@ -31,12 +42,10 @@ AVS Auth Key $avsexrauthkeyname  Successfully Created"
   }
 }
 
-$avsexrauthkey = $command.Key
-
-
 ######################################################################################
 # Connect AVS to ExR GW
 #######################################################################################
+azurelogin -subtoconnect $exrgwsub
 
 $test = Get-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -ResourceGroupName $exrgwrg -ErrorAction Ignore
 
