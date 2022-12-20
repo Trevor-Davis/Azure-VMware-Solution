@@ -1,6 +1,6 @@
 ##Generate Auth Key on On-Prem ExR
 
-$status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgname -ErrorAction Ignore
+$status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $avsrgname -ErrorAction Ignore
 if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
 write-Host -ForegroundColor Blue "
 ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..."
@@ -8,7 +8,7 @@ ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..
 else
 {
     
-$Circuit = Get-AzExpressRouteCircuit -Name $nameofonpremexrcircuit -ResourceGroupName $rgnameonpremexrcircuit
+$Circuit = Get-AzExpressRouteCircuit -Name $nameofonpremexrcircuit -ResourceGroupName $rgofonpremexrcircuit
 $command = Add-AzExpressRouteCircuitAuthorization -Name "for-AVS-Private-Cloud-$pcname" -ExpressRouteCircuit $Circuit
 $command = Set-AzExpressRouteCircuit -ExpressRouteCircuit $Circuit
 $onpremexrauthkey = $command.Authorizations.AuthorizationKey
@@ -27,7 +27,7 @@ Exit
 }
 
 #Connects to On-Prem Circuit
-$command = New-AzVMwareGlobalReachConnection -Name $nameofavsglobalreachconnection -PrivateCloudName $pcname -ResourceGroupName $rgname -AuthorizationKey $onpremexrauthkey -PeerExpressRouteResourceId $onpremexrid
+$command = New-AzVMwareGlobalReachConnection -Name $nameofavsglobalreachconnection -PrivateCloudName $pcname -ResourceGroupName $avsrgname -AuthorizationKey $onpremexrauthkey -PeerExpressRouteResourceId $onpremexrid
   
 if ($command.ProvisioningState -notlike "Succeeded"){Write-Host -ForegroundColor Red "
 Creation of the AVS Global Reach Connection Failed"

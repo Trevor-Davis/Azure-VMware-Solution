@@ -1,4 +1,4 @@
-$test = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname -ErrorAction:Ignore
+$test = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $avsvnetgwrgname -ErrorAction:Ignore
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
@@ -11,7 +11,7 @@ Creating Virtual Network $exrvnetname"
 {
   $vnet = @{
     Name = $exrvnetname
-    ResourceGroupName = $rgname
+    ResourceGroupName = $avsvnetgwrgname
     Location = $regionfordeployment
     AddressPrefix = $vnetaddressspace
 }
@@ -19,13 +19,13 @@ Creating Virtual Network $exrvnetname"
 $command = New-AzVirtualNetwork @vnet 
 $command
 
-$getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname 
+$getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $avsvnetgwrgname 
 Add-AzVirtualNetworkSubnetConfig -Name "Default" -VirtualNetwork $getexpressroutegatewayvnet -AddressPrefix $defaultvnetsubnet
 Set-AzVirtualNetwork -VirtualNetwork $getexpressroutegatewayvnet 
 
 }
 
-$test = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname -ErrorAction:Ignore
+$test = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $avsvnetgwrgname -ErrorAction:Ignore
 If(test.count -eq 0){
 Write-Host -ForegroundColor Red "
 Virtual Network $exrvnetname Failed to Create"

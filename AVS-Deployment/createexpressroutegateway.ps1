@@ -1,4 +1,4 @@
-$test = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $rgname -ErrorAction Ignore
+$test = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $avsvnetgwrgname -ErrorAction Ignore
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
@@ -9,7 +9,7 @@ if ($test.count -eq 0) {
 write-host -foregroundcolor Yellow "
 Creating ExpressRoute Gateway $exrgwname"
  #Create Gateway Subnet
- $getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname -ErrorAction Ignore
+ $getexpressroutegatewayvnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $avsvnetrgname -ErrorAction Ignore
  
 if($getexpressroutegatewayvnet.count -eq 0){
 Add-AzVirtualNetworkSubnetConfig -Name $gatewaysubnetname -VirtualNetwork $getexpressroutegatewayvnet -AddressPrefix $gatewaysubnetaddressspace
@@ -17,7 +17,7 @@ Add-AzVirtualNetworkSubnetConfig -Name $gatewaysubnetname -VirtualNetwork $getex
 Set-AzVirtualNetwork -VirtualNetwork $getexpressroutegatewayvnet 
 
 #get some info   
- $vnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $rgname
+ $vnet = Get-AzVirtualNetwork -Name $exrvnetname -ResourceGroupName $avsvnetrgname
  $vnet
  
 ##  $vnet = Set-AzVirtualNetwork -VirtualNetwork $vnet

@@ -1,26 +1,26 @@
 
-$test = Get-AzResourceGroup -Name $rgname -ErrorAction:Ignore
+$test = Get-AzResourceGroup -Name $avsrgname -ErrorAction:Ignore
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
-$rgname Already Exists ... Skipping to Next Step"   
+$avsrgname Already Exists ... Skipping to Next Step"   
 }
   
 if ($test.count -eq 0) {
 write-host -foregroundcolor Yellow "
-Creating Resource Group $rgname"
-$command = New-AzResourceGroup -Name $rgname -Location $regionfordeployment
+Creating Resource Group $avsrgname"
+$command = New-AzResourceGroup -Name $avsrgname -Location $regionfordeployment
 $command | ConvertTo-Json
 
-$test = Get-AzResourceGroup -Name $rgname -ErrorAction:Ignore
+$test = Get-AzResourceGroup -Name $avsrgname -ErrorAction:Ignore
 If(test.count -eq 0){
 Write-Host -ForegroundColor Red "
-Resource Group $rgname Failed to Create"
+Resource Group $avsrgname Failed to Create"
 Exit
 }
 else {
   write-Host -ForegroundColor Green "
-Resource Group $rgname Successfully Created"
+Resource Group $avsrgname Successfully Created"
   }
 }
 
