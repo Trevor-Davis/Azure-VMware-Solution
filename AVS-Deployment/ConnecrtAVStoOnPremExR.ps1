@@ -1,4 +1,5 @@
 ##Generate Auth Key on On-Prem ExR
+azurelogin -subtoconnect $avssub
 
 $status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $avsrgname -ErrorAction Ignore
 if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
@@ -7,7 +8,9 @@ ExpressRoute GlobalReach Connection Established Already, Skipping To Next Step..
 }
 else
 {
-    
+
+azurelogin -subtoconnect $OnPremExRCircuitSub
+
 $Circuit = Get-AzExpressRouteCircuit -Name $nameofonpremexrcircuit -ResourceGroupName $rgofonpremexrcircuit
 $command = Add-AzExpressRouteCircuitAuthorization -Name "for-AVS-Private-Cloud-$pcname" -ExpressRouteCircuit $Circuit
 $command = Set-AzExpressRouteCircuit -ExpressRouteCircuit $Circuit
@@ -27,6 +30,7 @@ Exit
 }
 
 #Connects to On-Prem Circuit
+azurelogin -subtoconnect $avssub
 $command = New-AzVMwareGlobalReachConnection -Name $nameofavsglobalreachconnection -PrivateCloudName $pcname -ResourceGroupName $avsrgname -AuthorizationKey $onpremexrauthkey -PeerExpressRouteResourceId $onpremexrid
   
 if ($command.ProvisioningState -notlike "Succeeded"){Write-Host -ForegroundColor Red "

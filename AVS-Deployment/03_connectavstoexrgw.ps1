@@ -1,16 +1,5 @@
-azurelogin -subtoconnect $exrgwsub
-
-If ($exrgwneworexisting -eq "New")
-{
-createexrgateway -vnet $exrgwvnet -resourcegroup $exrgwrg -sub $exrgwsub -region $exrgwregion -exrgwname $exrgwname
-if ($success -eq 0) {Write-Host -ForegroundColor Red "
-Creation of ExpressRoute Gateway $exrgwname Failed"}
-
-}
-
-
 ##############################################
-#Generate Auth Key
+#Generate Auth Key on AVS ExR
 ##############################################
 azurelogin -subtoconnect $avssub
 
@@ -18,7 +7,7 @@ $test = Get-AzVMWareAuthorization -Name $avsexrauthkeyname -PrivateCloudName $pc
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
-$avsexrauthkeyname Auth Key Already Exists ... Skipping to Next Step"
+$avsexrauthkeyname Auth Key Already Exists"
 $avsexrauthkey = $test.Key
    
 }
@@ -37,7 +26,7 @@ AVS Auth Key $avsexrauthkeyname Failed to Create"
 Exit
 }
 else {
-  write-Host -ForegroundColor Green "
+write-Host -ForegroundColor Green "
 AVS Auth Key $avsexrauthkeyname  Successfully Created"
   }
 }
@@ -51,12 +40,12 @@ $test = Get-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -Res
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
-$exrgwname Already Connected ... Skipping to Next Step"   
+$pcname Already Connect to $exrgwname"   
 }
   
 if ($test.count -eq 0) {
 write-host -foregroundcolor Yellow "
-Connecting AVS to $exrgwname"
+Connecting $pcname to $exrgwname"
 $exrgwtouse = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $exrgwrg
 $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $avsrgname -SubscriptionId $avssub
 $peerid = $myprivatecloud.CircuitExpressRouteId

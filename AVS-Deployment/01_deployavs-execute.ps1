@@ -11,7 +11,7 @@ write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
 
-$filename = "Function-createvnetforexpressroutegateway.ps1"
+$filename = "Function-createreexpressroutegateway.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
@@ -25,9 +25,17 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 . $env:TEMP\$folder\$filename
 
 ##################################  
-#Create Resource Group
+#Create Resource Group (Function)
 ##################################
-createresourcegroup -resourcegroup $avsrgname -region $avsregion -sub $avssub
+azurelogin -subtoconnect $avssub
+$test = Get-AzResourceGroup -Name $avsrgname -Location $avsregion
+
+if ($test.count -eq 1){Write-Host -ForegroundColor Blue "
+Resource Group $avsrgname Already Exists"
+}
+if ($test.count -eq 0){
+createresourcegroup -resourcegroup $avsrgname -region $avsregion
+}
 
 ##################################
 #Kickoff Private Cloud Build
@@ -38,20 +46,17 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 . $env:TEMP\$folder\$filename 
 
 ##################################
-#Create vNet
+#Create ExpressRoute Gateway (Function)
 ##################################
-$filename = "createvnet.ps1"
-write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
-. $env:TEMP\$folder\$filename 
+azurelogin -subtoconnect $exrgwsub
+$test = Get-AzVirtualNetworkGateway -ResourceGroupName $exrgwrg -Name $exrgwname
 
-##################################
-#Create ExpressRoute Gateway
-##################################
-$filename = "createexpressroutegateway.ps1"
-write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
-. $env:TEMP\$folder\$filename 
+if ($test.count -eq 1){Write-Host -ForegroundColor Blue "
+ExpressRoute Gateway $exrgwname Already Exists"
+}
+if ($test.count -eq 0){
+createexrgateway -vnet $exrgwvnet -resourcegroup $exrgwrg -region $exrgwregion -exrgwname $exrgwname
+}
 
 ##################################
 #Connect AVS to ExR GW
