@@ -72,6 +72,9 @@ $quickeditsettingatstartofscript.QuickEdit
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 $ProgressPreference = 'SilentlyContinue'
 
+#Testing
+$testing = 1
+
 
 #Create Directory
 $global:folder = "AVS-Deployment" #This is where all the files will be downloaded to which will be used to deploy AVS
@@ -84,8 +87,10 @@ if (Test-Path -Path $env:TEMP\$folder ) {
 #Start Logging
 Start-Transcript -Path $env:TEMP\$folder\avsdeploy.log -Append
 
+if ($testing -eq 0) {
 #Begin
-$filename = "deployavs.ps1"
+$filename = "deployazurevmwaresolution.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
+}
