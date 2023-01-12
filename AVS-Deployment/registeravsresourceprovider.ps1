@@ -1,13 +1,6 @@
 
 #variables
-$avssub = $global:avssub
-$pcname = $global:pcname
-$avsrgname = $global:avsrgname
-$avsaddressblock = $global:avsaddressblock
-$avssku = $global:avssku
 $avsregion = $global:regionfordeployment
-$numberofhosts = $global:numberofhosts
-$internet = $global:internet
 
 #Functions to Load
 $filename = "Function-azurelogin.ps1"
