@@ -32,7 +32,7 @@ $command = New-AzResourceGroup -Name $rgname -Location $regionfordeployment
 $command | ConvertTo-Json
 
 $test = Get-AzResourceGroup -Name $rgname -ErrorAction:Ignore
-If(test.count -eq 0){
+If($test.count -eq 0){
 Write-Host -ForegroundColor Red "
 Resource Group $rgname Failed to Create"
 Exit
