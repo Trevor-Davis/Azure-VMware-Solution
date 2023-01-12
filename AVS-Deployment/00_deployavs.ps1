@@ -69,10 +69,11 @@ if (Test-Path -Path $env:TEMP\$folder ) {
 #Start Logging
 Start-Transcript -Path $env:TEMP\$folder\avsdeploy.log -Append
 
-if ($testing -eq 0) {
+
 #Begin
 $filename = "01_deployazurevmwaresolution.ps1"
 write-host "Downloading" $filename
+if ($testing -eq 0) {
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$folder\$filename
 }
