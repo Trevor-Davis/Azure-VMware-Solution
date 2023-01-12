@@ -2,6 +2,10 @@
 #variables
 $avsregion = $global:regionfordeployment
 
+#variables
+$avssub = $global:avssub
+
+
 #Functions to Load
 $filename = "Function-azurelogin.ps1"
 write-host "Downloading" $filename
