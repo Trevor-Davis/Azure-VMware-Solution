@@ -23,7 +23,7 @@ $test = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $avsre
 
 if ($test.RegistrationState -eq "Registered") {
 write-Host -ForegroundColor Blue "
-Microsoft.AVS Resource Provider Is Already Registered ... Skipping to Next Step"
+Microsoft.AVS Resource Provider Is Already Registered"
   }
   
 if ($test.RegistrationState -eq "NotRegistered") {
