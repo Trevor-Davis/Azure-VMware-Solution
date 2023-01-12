@@ -25,15 +25,10 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##################################  
 #Create Resource Group (Function)
 ##################################
-azurelogin -subtoconnect $avssub
-$test = Get-AzResourceGroup -Name $avsrgname -Location $avsregion
-
-if ($test.count -eq 1){Write-Host -ForegroundColor Blue "
-Resource Group $avsrgname Already Exists"
-}
-if ($test.count -eq 0){
-createresourcegroup -resourcegroup $avsrgname -region $avsregion
-}
+$filename = "createresourcegroup.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
+. $env:TEMP\$folder\$filename
 
 ##################################
 #Kickoff Private Cloud Build

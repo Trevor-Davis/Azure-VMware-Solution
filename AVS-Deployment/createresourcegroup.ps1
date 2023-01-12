@@ -22,7 +22,7 @@ $test = Get-AzResourceGroup -Name $rgname -ErrorAction:Ignore
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
-$rgname Already Exists ... Skipping to Next Step"   
+Resource Group $rgname Already Exists"   
 }
   
 if ($test.count -eq 0) {
