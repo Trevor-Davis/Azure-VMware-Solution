@@ -9,7 +9,6 @@ $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
 
 #Azure Backbone Network Connectivity
-#Azure VMware Solution connects to the Azure Backbone via an internal ExpressRoute, to accomodate this an existing ExpressRoute Gateway needs to be identified or one will need to be created.
 $global:exrgwneworexisting = "New" # Set to 'New' if you are creating a new ExpressRoute Gateway for AVS, Set to 'Existing' if an existing ExpressRoute Gateway will be used.
 $global:exrvnetname = "VirtualWorkloads-AVS-vNet" #The vNet where either the ExpressRoute Gateway exists or the vnet where the expressroute gateway will be created.
 
