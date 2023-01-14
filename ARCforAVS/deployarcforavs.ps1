@@ -27,7 +27,7 @@ Register-AzProviderPreviewFeature -Name AzureArcForAVS -ProviderNamespace Micros
 $filename = "ArcOnAVS.zip"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/ARCforAVS/$filename" -OutFile $env:TEMP\$folder\$filename
-Expand-Archive -Path $env:TEMP\$folder\$filename -DestinationPath $env:TEMP\$folder\
+Expand-Archive -Path $env:TEMP\$folder\$filename -DestinationPath $env:TEMP\$folder\ -Force
 
 $payload = @{
     "subscriptionId" = $global:avssub
