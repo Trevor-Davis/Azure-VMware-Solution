@@ -7,6 +7,8 @@ $global:avsaddressblock = "10.0.4.0/22" #The /22 Network Block for AVS Infra
 $global:avssku = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
+$global:networkCIDRForApplianceVM = "192.168.200.1/24" #input the network gateway in this format, this is the network which will be created 10.1.1.1/24
+$global:networkForApplianceVM = "ARCforAVS-Segment" #this is NSX segment name which will be created for ARC
 
 #Azure Backbone Network Connectivity
 $global:exrgwneworexisting = "New" # Set to 'New' if you are creating a new ExpressRoute Gateway for AVS, Set to 'Existing' if an existing ExpressRoute Gateway will be used.
