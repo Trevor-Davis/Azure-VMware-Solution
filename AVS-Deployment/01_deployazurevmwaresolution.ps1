@@ -25,10 +25,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##################################  
 #Create Resource Group (Function)
 ##################################
-$filename = "createresourcegroup.ps1"
-write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folder\$filename
-. $env:TEMP\$folder\$filename
+azurelogin -subtoconnect $exrgwsub
+
+createresourcegroup -resourcegroup $avsrgname -region $regionfordeployment
 
 ##################################
 #Kickoff Private Cloud Build
@@ -42,14 +41,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 #Create ExpressRoute Gateway (Function)
 ##################################
 azurelogin -subtoconnect $exrgwsub
-$test = Get-AzVirtualNetworkGateway -ResourceGroupName $exrgwrg -Name $exrgwname
 
-if ($test.count -eq 1){Write-Host -ForegroundColor Blue "
-ExpressRoute Gateway $exrgwname Already Exists"
-}
-if ($test.count -eq 0){
 createexrgateway -vnet $exrgwvnet -resourcegroup $exrgwrg -region $exrgwregion -exrgwname $exrgwname
-}
+
 <#
 ##################################
 #Connect AVS to ExR GW
