@@ -1,8 +1,8 @@
 #Variables
 $global:avssub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #Sub Where to Deploy AVS
-$global:regionfordeployment = "Central US" #The region where AVS should be deployed
-$global:avsrgname = "VirtualWorkloads-AVS-PC02" #The REsource Group To Deploy AVS, Can be New or Existing
-$global:pcname = "VirtualWorkloads-AVS-PC02" #The name of the AVS Private Cloud
+$global:regionfordeployment = "Australia East" #The region where AVS should be deployed
+$global:avsrgname = "VirtualWorkloads-AVS-PC01" #The REsource Group To Deploy AVS, Can be New or Existing
+$global:pcname = "VirtualWorkloads-AVS-PC01" #The name of the AVS Private Cloud
 $global:avsaddressblock = "10.0.4.0/22" #The /22 Network Block for AVS Infra
 $global:avssku = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
