@@ -3,7 +3,6 @@
 #################################
 
 $global:avssub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #Sub Where to Deploy AVS
-$global:avsdeploymentfolder = "AVS-Deployment"
 $global:regionfordeployment = "Australia East" #The region where AVS should be deployed
 $global:avsrgname = "VirtualWorkloads-AVS-PC01" #The REsource Group To Deploy AVS, Can be New or Existing
 $global:pcname = "VirtualWorkloads-AVS-PC01" #The name of the AVS Private Cloud
@@ -48,18 +47,44 @@ $global:rgofonpremexrcircuit = "VirtualWorkloads-AVSPrivateCloud-RG"
 
 #DO NOT MODIFY BELOW THIS LINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-#Testing
+
+#Variables Do Not Modify
 $testing = 0
+$global:nameofavsglobalreachconnection = "to-$nameofonpremexrcircuit"
+$global:avsexrauthkeyname = "to-ExpressRouteGateway-$exrgwname"
+$global:avsexrgwconnectionname = "from-AVSPrivateCloud-$pcname"
+$global:gatewaysubnetname = "GatewaySubnet" #DO NOT MODIFY
+$global:exrgwipname = "$exrgwname-PIP" #DO NOT MODIFY
+$global:folderforstaging = "AVS-Deployment" #DO NOT MODIFY
+$global:logfilename = "avs-deploy"
+
+#Create Staging Directory
+$test = Test-Path -Path $env:TEMP\$folderforstaging
+    
+if ($test -eq "True"){
+Write-Host -ForegroundColor Blue "Folder $env:TEMP\$folderforstaging Already Exists"}
+
+else {
+
+mkdir $env:TEMP\$folderforstaging
+}
+
+#Start Logging
+Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
+
+
+
 
 #Functions to Load
 
 $functions = @(
-'Function-CreateDirectoryAndLog.ps1'
-)
-
+  'Function-createresourcegroup.ps1',
+  'Function-createreexpressroutegateway.ps1'
+  )
+$functiondirectory = "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/"
 foreach ($function in $functions) {
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$function" -OutFile $env:TEMP\$function 
-. $env:TEMP\$function
+Invoke-WebRequest -uri $functiondirectory\$function -OutFile $env:TEMP\$folderforstaging\$function 
+. $env:TEMP\$folderforstaging\$function 
 }
 
 
@@ -71,12 +96,16 @@ $quickeditsettingatstartofscript.QuickEdit
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 $ProgressPreference = 'SilentlyContinue'
 
-#Variables Do Not Modify
-$global:nameofavsglobalreachconnection = "to-$nameofonpremexrcircuit"
-$global:avsexrauthkeyname = "to-ExpressRouteGateway-$exrgwname"
-$global:avsexrgwconnectionname = "from-AVSPrivateCloud-$pcname"
-$global:gatewaysubnetname = "GatewaySubnet" #DO NOT MODIFY
-$global:exrgwipname = "$exrgwname-PIP" #DO NOT MODIFY
+
 
 #Execution
-createdirectoryandlog -folder $env:TEMP -foldername $global:avsdeploymentfolder
+
+##Creates Director and Log File (Function)
+createdirectoryandlog -folder $env:TEMP -foldername $global:avsdeploymentfolder -logfilename "avsdeploy"
+
+##Register Resource Provider
+$filename = "registeravsresourceprovider.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+. $env:TEMP\$folderforstaging\$filename
+
