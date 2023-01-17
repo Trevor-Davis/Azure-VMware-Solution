@@ -54,13 +54,12 @@ $testing = 0
 #Functions to Load
 
 $functions = @(
-'CreateDirectoryAndLog.ps1'
+'Function-CreateDirectoryAndLog.ps1'
 )
 
 foreach ($function in $functions) {
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$function" -OutFile $env:TEMP\$function 
 . $env:TEMP\$function
-
 }
 
 
