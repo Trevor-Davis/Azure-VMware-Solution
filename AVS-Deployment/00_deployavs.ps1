@@ -45,7 +45,8 @@ $global:rgofonpremexrcircuit = "VirtualWorkloads-AVSPrivateCloud-RG"
 
 
 
-#DO NOT MODIFY BELOW THIS LINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#DO NOT MODIFY BELOW THIS LINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 
 #Variables Do Not Modify
@@ -72,9 +73,6 @@ mkdir $env:TEMP\$folderforstaging
 #Start Logging
 Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
 
-
-
-
 #Functions to Load
 
 $functions = @(
@@ -99,9 +97,6 @@ $ProgressPreference = 'SilentlyContinue'
 
 
 #Execution
-
-##Creates Director and Log File (Function)
-createdirectoryandlog -folder $env:TEMP -foldername $global:avsdeploymentfolder -logfilename "avsdeploy"
 
 ##Register Resource Provider
 $filename = "registeravsresourceprovider.ps1"

@@ -9,7 +9,7 @@ write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$avsstagingfolder\$filename
 . $env:TEMP\$folder\$filename
 
-#########################################################################################
+#DO NOT MODIFY BELOW THIS LINE#########################################################################################
 
 azurelogin -subtoconnect $avssub
 
