@@ -1,17 +1,13 @@
 #Variables
-$rgname = 'testrg'
-$regionfordeployment = 'East US'
-$sub = "16b3c013-d300-468d-ac64-7eda0820b6d3"
-$tenanttoconnect = "18a2b74f-c926-44a5-8bd2-0feac45377bd"
-
-#$rgname = $global:avsrgname
-#$regionfordeployment = $global:regionfordeployment
-#$sub = $global:avssub
+$rgname = $global:avsrgname
+$regionfordeployment = $global:regionfordeployment
+$sub = $global:avssub
+$tenant = ""
 
 
-######################################################################################
+#DO NOT MODIFY BELOW THIS LINE #################################################
 
-#Functions
+#Azure Login
 
 $filename = "Function-azurelogin.ps1"
 write-host "Downloading" $filename
@@ -19,12 +15,13 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScri
 . $env:TEMP\$filename
 
 if ($tenanttoconnect -ne "") {
-  azurelogin -subtoconnect $sub -tenanttoconnect $tenanttoconnect
+  azurelogin -subtoconnect $sub -tenanttoconnect $tenant
 }
 else {
   azurelogin -subtoconnect $sub 
 }
 
+#Execution
 $test = Get-AzResourceGroup -Name $rgname -ErrorAction:Ignore
 
 if ($test.count -eq 1) {

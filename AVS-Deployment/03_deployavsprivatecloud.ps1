@@ -8,18 +8,23 @@ $avsregion = $global:regionfordeployment
 $numberofhosts = $global:numberofhosts
 $internet = $global:internet
 
-#Functions to Load
+#DO NOT MODIFY BELOW THIS LINE #################################################
+
+#Azure Login
+
 $filename = "Function-azurelogin.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
-. $env:TEMP\$folder\$filename
+. $env:TEMP\$filename
 
+if ($tenanttoconnect -ne "") {
+  azurelogin -subtoconnect $sub -tenanttoconnect $tenant
+}
+else {
+  azurelogin -subtoconnect $sub 
+}
 
-
-#########################################################################################
-
-
-azurelogin -subtoconnect $avssub
+#Execution
 
 $test = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $avsrgname -ErrorAction:Ignore
 

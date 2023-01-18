@@ -2,16 +2,25 @@
 #variables
 $avsregion = $global:regionfordeployment
 $avssub = $global:avssub
+$tenant = ""
 
-#Functions to Load
+#DO NOT MODIFY BELOW THIS LINE #################################################
+
+#Azure Login
+
 $filename = "Function-azurelogin.ps1"
 write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$avsstagingfolder\$filename
-. $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+. $env:TEMP\$filename
 
-#DO NOT MODIFY BELOW THIS LINE#########################################################################################
+if ($tenanttoconnect -ne "") {
+  azurelogin -subtoconnect $sub -tenanttoconnect $tenant
+}
+else {
+  azurelogin -subtoconnect $sub 
+}
 
-azurelogin -subtoconnect $avssub
+#Execution
 
 $test = Get-AzResourceProvider -ProviderNamespace Microsoft.AVS -Location $avsregion -ErrorAction SilentlyContinue
 
