@@ -32,7 +32,7 @@ If($exrgwneworexisting -eq "New"){
   $global:exrgwname = "For-$pcname" #The name of the ExpressRoute Gateway, only modify if you don't want this to be the name.
   $global:exrgwrg = "VirtualWorkloads-AVS-Networking" #The resource group where the ExR Gateway should be deployed
   $global:exrgwregion = "Australia East" #the region where the ExpressRoute Gateway should be deployed.
-  $global:gatewaysubnetaddressspace = "10.20.254.0/24" #this is the subnet for the GatewaySubnet subnet which is needed for the ExpressRoute Gateway
+  $global:gatewaysubnetaddressspace = "10.20.1.0/24" #this is the subnet for the GatewaySubnet subnet which is needed for the ExpressRoute Gateway
   
   }
   
@@ -99,8 +99,25 @@ $ProgressPreference = 'SilentlyContinue'
 #Execution
 
 ##Register Resource Provider
-$filename = "registeravsresourceprovider.ps1"
+$filename = "01_registeravsresourceprovider.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename
 
+#Create Resource Group
+$filename = "02_createresourcegroup.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+. $env:TEMP\$folderforstaging\$filename
+
+#Deploy Private Cloud
+$filename = "03_deployavsprivatecloud.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+. $env:TEMP\$folderforstaging\$filename 
+
+#Create ExpressRoute Gateway
+$filename = "04_createexpressroutegateway.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+. $env:TEMP\$folderforstaging\$filename 
