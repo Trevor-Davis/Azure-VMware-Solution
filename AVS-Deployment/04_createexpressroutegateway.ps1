@@ -37,7 +37,6 @@ if ($test.count -eq 0) {
 Add-AzVirtualNetworkSubnetConfig -Name "GatewaySubnet" -VirtualNetwork $vnetforgateway -AddressPrefix $gatewaysubnetaddressspace
 $vnetforgateway | Set-AzVirtualNetwork
 }
-
 $subnet = Get-AzVirtualNetworkSubnetConfig -Name "GatewaySubnet" -VirtualNetwork $vnetforgateway -ErrorAction:Ignore
 $subnet | ConvertTo-Json
 
@@ -45,11 +44,10 @@ $subnet | ConvertTo-Json
 
 $test = Get-AzPublicIpAddress -Name $exrgwipname -ResourceGroupName $resourcegroup -ErrorAction:Ignore
 if ($test.count -eq 0) {
-
 $pip = New-AzPublicIpAddress -Name $exrgwipname -ResourceGroupName $resourcegroup -Location $region -AllocationMethod Dynamic -ErrorAction:Ignore
 $pip | ConvertTo-Json
 
-$ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -Subnet $subnet -PublicIpAddress $pip -ErrorAction:Ignore
+$ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -SubnetId $subnet.Id -PublicIpAddressId $pip.Id -ErrorAction:Ignore
 $ipconf | ConvertTo-Json
 }
 
@@ -66,6 +64,7 @@ if ($test.count -eq 0){
 
 Write-Host -ForegroundColor Yellow "
 Creating a ExpressRoute Gateway ... this could take 30-40 minutes ..."
+
 $command = New-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $resourcegroup -Location $region -IpConfigurations $ipconf -GatewayType Expressroute -GatewaySku Standard
 $command | ConvertTo-Json
 
