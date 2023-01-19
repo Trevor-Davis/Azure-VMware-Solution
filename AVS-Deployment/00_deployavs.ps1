@@ -3,10 +3,10 @@
 #################################
 
 $global:avssub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #Sub Where to Deploy AVS
-$global:regionfordeployment = "Australia East" #The region where AVS should be deployed
-$global:avsrgname = "VirtualWorkloads-AVS-PC01" #The REsource Group To Deploy AVS, Can be New or Existing
-$global:pcname = "VirtualWorkloads-AVS-PC01" #The name of the AVS Private Cloud
-$global:avsaddressblock = "10.0.0.0/22" #The /22 Network Block for AVS Infra
+$global:regionfordeployment = "Central US" #The region where AVS should be deployed
+$global:avsrgname = "VirtualWorkloads-AVS-PC02" #The REsource Group To Deploy AVS, Can be New or Existing
+$global:pcname = "VirtualWorkloads-AVS-PC02" #The name of the AVS Private Cloud
+$global:avsaddressblock = "10.0.4.0/22" #The /22 Network Block for AVS Infra
 $global:avssku = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
@@ -28,11 +28,11 @@ If($exrgwneworexisting -eq "Existing"){
 #Only Use these variables if there is a need to create a new expressroute gateway to connect AVS 
 If($exrgwneworexisting -eq "New"){
 
-  $global:exrvnetname = "VirtualWorkloads-AVS-vNet" #The name of the vNet where the expressroute gateway will be created.
+  $global:exrvnetname = "VirtualWorkloads-AVS-vNet-Central-US" #The name of the vNet where the expressroute gateway will be created.
   $global:exrgwname = "For-$pcname" #The name of the ExpressRoute Gateway, only modify if you don't want this to be the name.
-  $global:exrgwrg = "VirtualWorkloads-AVS-Networking" #The resource group where the ExR Gateway should be deployed
-  $global:exrgwregion = "Australia East" #the region where the ExpressRoute Gateway should be deployed.
-  $global:gatewaysubnetaddressspace = "10.20.1.0/24" #this is the subnet for the GatewaySubnet subnet which is needed for the ExpressRoute Gateway
+  $global:exrgwrg = "VirtualWorkloads-AVS-Networking-Central-US" #The resource group where the ExR Gateway should be deployed
+  $global:exrgwregion = "Central US" #the region where the ExpressRoute Gateway should be deployed.
+  $global:gatewaysubnetaddressspace = "10.30.1.0/24" #this is the subnet for the GatewaySubnet subnet which is needed for the ExpressRoute Gateway
   
   }
   
