@@ -50,6 +50,10 @@ $pip | ConvertTo-Json
 $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -SubnetId $subnet.Id -PublicIpAddressId $pip.Id -ErrorAction:Ignore
 $ipconf | ConvertTo-Json
 }
+else {
+  $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -SubnetId $subnet.Id -PublicIpAddressId $pip.Id -ErrorAction:Ignore
+  $ipconf | ConvertTo-Json
+}
 
 #test to see if ExR GW exists
 $test = Get-AzVirtualNetworkGateway -ResourceGroupName $resourcegroup -Name $exrgwname -ErrorAction:Ignore
