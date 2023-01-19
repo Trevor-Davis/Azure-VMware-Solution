@@ -73,6 +73,7 @@ mkdir $env:TEMP\$folderforstaging
 #Start Logging
 Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
 
+<#
 #Functions to Load
 
 $functions = @(
@@ -94,9 +95,10 @@ $quickeditsettingatstartofscript.QuickEdit
 Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
 $ProgressPreference = 'SilentlyContinue'
 
-
+#>
 
 #Execution
+
 
 ##Register Resource Provider
 $filename = "01_registeravsresourceprovider.ps1"
@@ -118,6 +120,12 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 
 #Create ExpressRoute Gateway
 $filename = "04_createexpressroutegateway.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+. $env:TEMP\$folderforstaging\$filename 
+
+#Connect AVS to ExR GW
+$filename = "05_connectavstoexrgw.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename 
