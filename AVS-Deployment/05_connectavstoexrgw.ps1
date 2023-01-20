@@ -86,5 +86,5 @@ Connecting AVS to $exrgwname Failed"
   }
   else {
     write-Host -ForegroundColor Green "
-AVS Connected to $exrgwname Successfully"
+$pcname Connected to $exrgwname ExpressRoute Gateway Successfully"
     }}
