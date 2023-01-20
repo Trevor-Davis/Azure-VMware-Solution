@@ -101,7 +101,7 @@ $ProgressPreference = 'SilentlyContinue'
 
 
 ##Register Resource Provider
-$filename = "01_registeravsresourceprovider.ps1"
+$filename = "01_RegisterAVSResourceProvider.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename
