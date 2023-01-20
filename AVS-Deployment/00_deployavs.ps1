@@ -107,7 +107,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 . $env:TEMP\$folderforstaging\$filename
 
 #Create Resource Group
-$filename = "02_createresourcegroup.ps1"
+$filename = "02_CreateResourceGroup.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename
