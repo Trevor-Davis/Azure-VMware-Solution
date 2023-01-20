@@ -68,7 +68,7 @@ $pcname Already Connected to $exrgwname"
 }
 else {
   write-host -foregroundcolor Yellow "
-Connecting $pcname to $exrgwname"
+Connecting $pcname to $exrgwname ExpressRoute Gateway"
   $exrgwtouse = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $exrgwrg
   $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgname -SubscriptionId $sub
   $peerid = $myprivatecloud.CircuitExpressRouteId
