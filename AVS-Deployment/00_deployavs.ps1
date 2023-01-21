@@ -76,36 +76,42 @@ Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
 
 
 ##Register Resource Provider
+Write-Host -ForegroundColor Yellow "Registering Resource Provider"
 $filename = "01_RegisterAVSResourceProvider.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename
 
 #Create Resource Group
+Write-Host -ForegroundColor Yellow "Creating Resource Group"
 $filename = "02_CreateResourceGroup.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename
 
 #Deploy Private Cloud
+Write-Host -ForegroundColor Yellow "Deploying Private Cloud"
 $filename = "03_deployavsprivatecloud.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename 
 
 #Create ExpressRoute Gateway
+Write-Host -ForegroundColor Yellow "Creating ExpressRoute Gateway"
 $filename = "04_createexpressroutegateway.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename 
 
 #Connect AVS to ExR GW
+Write-Host -ForegroundColor Yellow "Connect AVS to ExpressRoute Gateway"
 $filename = "05_connectavstoexrgw.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename 
 
 #Connect AVS to On-Prem ExR
+Write-Host -ForegroundColor Yellow "Connecting AVS to On-Prem ExpressRoute"
 $filename = "06_ConnecrtAVStoOnPremExR.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
