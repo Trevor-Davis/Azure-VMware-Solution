@@ -1,5 +1,6 @@
 #variables
-$avssub = $global:avssub
+$sub = $global:avssub
+$tenant = ""
 $pcname = $global:pcname
 $avsrgname = $global:avsrgname
 $avsaddressblock = $global:avsaddressblock

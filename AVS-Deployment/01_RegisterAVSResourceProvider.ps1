@@ -14,7 +14,7 @@ write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
 . $env:TEMP\$filename
 
-if ($tenanttoconnect -ne "") {
+if ($tenant -ne "") {
   azurelogin -subtoconnect $sub -tenanttoconnect $tenant
 }
 else {
