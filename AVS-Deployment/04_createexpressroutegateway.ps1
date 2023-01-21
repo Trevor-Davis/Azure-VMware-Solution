@@ -36,6 +36,8 @@ $test = Get-AzVirtualNetworkSubnetConfig -Name "GatewaySubnet" -VirtualNetwork $
 if ($test.count -eq 0) {
 Add-AzVirtualNetworkSubnetConfig -Name "GatewaySubnet" -VirtualNetwork $vnetforgateway -AddressPrefix $gatewaysubnetaddressspace
 $vnetforgateway | Set-AzVirtualNetwork
+$vnetforgateway = Get-AzVirtualNetwork -Name $vnet -ResourceGroupName $resourcegroup -ErrorAction:Ignore
+
 }
 $subnet = Get-AzVirtualNetworkSubnetConfig -Name "GatewaySubnet" -VirtualNetwork $vnetforgateway -ErrorAction:Ignore
 $subnet | ConvertTo-Json
