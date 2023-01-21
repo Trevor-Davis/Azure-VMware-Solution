@@ -1,64 +1,85 @@
-$filename = "azurelogin-function.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" `
--OutFile $env:TEMP\AVSDeploy\$filename
+#variables
+$pcname = $global:pcname
+$rgname = $global:avsrgname
+$OnPremExpressRouteCircuitSub = $global:OnPremExpressRouteCircuitSub
+$nameofonpremexrcircuit = $global:nameofonpremexrcircuit
+$rgofonpremexrcircuit = $global:rgofonpremexrcircuit 
+$sub = $global:avssub
+$nameofavsglobalreachconnection = $global:nameofavsglobalreachconnection
 
-. $env:TEMP\AVSDeploy\$filename
 
+#DO NOT MODIFY BELOW THIS LINE #################################################
+Update-AzConfig -DisplayBreakingChangeWarning $false
+#Azure Login
 
-if ($buildhol_ps1 -notmatch "Yes" -and $avsdeploy_ps1 -notmatch "Yes"){
+$filename = "Function-azurelogin.ps1"
+write-host "Downloading" $filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$filename
+. $env:TEMP\$filename
 
-  $OnPremExRCircuitSub = ""
-  $NameOfOnPremExRCircuit = ""
-  $RGofOnPremExRCircuit = ""
-  $exrcircuitauthname = ""
-  $pcname = ""
-  $pcresourcegroup = ""
-  $grconnectionname = ""
+if ($tenanttoconnect -ne "") {
+  azurelogin -subtoconnect $sub -tenanttoconnect $tenant
+}
+else {
+  azurelogin -subtoconnect $sub 
 }
 
-# $OnPremExRCircuit = Get-AzExpressRouteCircuit -Name $NameOfOnPremExRCircuit -ResourceGroupName $RGofOnPremExRCircuit
+#Execution
 
-#######################################################################################
-# Generate Auth Key in on prem ExR Circuit
-#######################################################################################
-az login 
-az account set --subscription $OnPremExRCircuitSub
-
-$status = az network express-route auth show --resource-group $RGofOnPremExRCircuit --circuit-name $NameOfOnPremExRCircuit --name $exrcircuitauthname --query 'name'
-
-if ($status.count -eq 1) {write-Host -ForegroundColor Blue "
-On-Premises ExpressRoute Authorization Key Already Generated, Skipping To Next Step..."
-    }
-  
-    else {
-
-        az account set --subscription $OnPremExRCircuitSub
-        az network express-route auth create --circuit-name $NameOfOnPremExRCircuit --resource-group $RGofOnPremExRCircuit --name $exrcircuitauthname
-        
-    }
-
-      #  Set-AzExpressRouteCircuit -ExpressRouteCircuit $OnPremExRCircuit
-
-  
-    Write-Host -ForegroundColor Green "
-Success: Auth Key Generated for AVS On Express Route $NameOfOnPremExRCircuit"
-
-
-#######################################################################################
-# Connect on-prem Circuit
-#######################################################################################
-Write-Host -ForegroundColor Yellow "
-Connecting the $pcname Private Cloud to On-Premises via Global Reach... " 
-
-  $OnPremCircuitAuth = az network express-route auth show --resource-group $RGofOnPremExRCircuit --circuit-name $NameOfOnPremExRCircuit --name $exrcircuitauthname --query 'authorizationKey'
-  $OnPremCircuitAuth = $OnPremCircuitAuth -replace '"',""
-
-  $command = New-AzVMwareGlobalReachConnection -Name $grconnectionname -PrivateCloudName $pcname -ResourceGroupName $pcresourcegroup -AuthorizationKey $OnPremCircuitAuth -PeerExpressRouteResourceId $OnPremExRCircuit.Id
-  
-  if ($command.ProvisioningState -notlike "Succeeded"){Write-Host -ForegroundColor Red "Creation of the AVS Global Reach Connection Failed"
-  $failed = "Yes"        
-  Exit
+$status = Get-AzVMwareGlobalReachConnection -PrivateCloudName $pcname -ResourceGroupName $rgname -ErrorAction Ignore
+if ($status.count -eq 1 -and $status.CircuitConnectionStatus -eq "Connected") {
+write-Host -ForegroundColor Blue "
+AVS On-Premises Connection Already Established."
+Exit
 }
-    
-  Write-Host -ForegroundColor Green "
-  Success: AVS Private Cloud $pcname is Connected via Global Reach to $NameOfOnPremExRCircuit"
+else
+{
+
+azurelogin -subtoconnect $OnPremExpressRouteCircuitSub
+
+$Circuit = Get-AzExpressRouteCircuit -Name $nameofonpremexrcircuit -ResourceGroupName $rgofonpremexrcircuit
+
+$test = Get-AzExpressRouteCircuitAuthorization -Name "for-AVS-Private-Cloud-$pcname" -ExpressRouteCircuit $Circuit -ErrorAction:Ignore
+
+if ($test.ProvisioningState -ne "Succeeded") {
+    $command = Add-AzExpressRouteCircuitAuthorization -Name "for-AVS-Private-Cloud-$pcname" -ExpressRouteCircuit $Circuit
+    $command = Set-AzExpressRouteCircuit -ExpressRouteCircuit $Circuit
+    $onpremexrauthkey = $command.Authorizations.AuthorizationKey
+    $onpremexrid = $command.id
+    if ($command.count -eq 1){
+        Write-Host -ForegroundColor Green "
+Auth Key Generated for AVS On Express Route $nameofonpremexrcircuit"
+        }
+        else {
+          
+        Write-Host -ForegroundColor Red "
+On-Prem ExpressRoute Authorization Key Failed to Generate"
+        Exit
+        }
+}
+else {
+    Write-Host -ForegroundColor Blue "
+Auth Key Already Exists for AVS On Express Route $nameofonpremexrcircuit"
+    $onpremexrauthkey = $test.AuthorizationKey
+    $command = Set-AzExpressRouteCircuit -ExpressRouteCircuit $Circuit
+    $onpremexrid = $command.id
+}
+
+
+
+}
+
+#Connects to On-Prem Circuit
+azurelogin -subtoconnect $avssub
+
+$command = New-AzVMwareGlobalReachConnection -Name $nameofavsglobalreachconnection -PrivateCloudName $pcname -ResourceGroupName $rgname -AuthorizationKey $onpremexrauthkey -PeerExpressRouteResourceId $onpremexrid
+  
+if ($command.ProvisioningState -notlike "Succeeded"){Write-Host -ForegroundColor Red "
+Creation of the AVS Global Reach Connection Failed"
+Exit
+}
+
+if ($command.ProvisioningState -eq "Succeeded"){Write-Host -ForegroundColor Green "
+AVS Private Cloud $pcname is Connected via Global Reach to $nameofonpremexrcircuit"
+
+}

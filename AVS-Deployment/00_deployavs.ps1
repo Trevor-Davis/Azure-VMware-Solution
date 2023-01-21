@@ -12,9 +12,18 @@ $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
 $global:networkCIDRForApplianceVM = "192.168.200.1/24" #input the network gateway in this format, this is the network which will be created 10.1.1.1/24
 $global:networkForApplianceVM = "ARCforAVS-Segment" #this is NSX segment name which will be created for ARC
+$global:OnPremConnectivity = "ExpressRoute" #Options are ExpressRoute, VPN, None
+
 
 #Azure Backbone Network Connectivity
 $global:exrgwneworexisting = "New" # Set to 'New' if you are creating a new ExpressRoute Gateway for AVS, Set to 'Existing' if an existing ExpressRoute Gateway will be used.
+
+#On Prem Connectivity - Only Modify these variables if you are connecting AVS to on-prem via an on-prem ExpressRoute.
+$global:OnPremExpressRouteCircuitSub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
+$global:nameofonpremexrcircuit = "VirtualWorkloads-ExpressRoute-Central-US" #The name of the on-premises ExpressRoute Circuit.
+$global:rgofonpremexrcircuit = "VirtualWorkloads-AVS-Networking-Central-US" #The resource group where the on-prem expressroute circuit exists.
+
+
 
 #Only Use these variables if you are using an existing ExpressRoute Gateway to connect AVS
 If($exrgwneworexisting -eq "Existing"){
