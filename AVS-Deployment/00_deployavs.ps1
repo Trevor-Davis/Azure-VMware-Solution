@@ -74,6 +74,8 @@ Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
 
 #Execution
 
+Clear-Host
+Write-Host -ForegroundColor Magenta "Deploying Private Cloud $pcname"
 
 ##Register Resource Provider
 Write-Host -ForegroundColor Yellow "Registering Resource Provider"
@@ -111,8 +113,10 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 . $env:TEMP\$folderforstaging\$filename 
 
 #Connect AVS to On-Prem ExR
-Write-Host -ForegroundColor Yellow "Connecting AVS to On-Prem ExpressRoute"
-$filename = "06_ConnecrtAVStoOnPremExR.ps1"
-write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
-. $env:TEMP\$folderforstaging\$filename 
+if ($OnPremConnectivity -eq "ExpressRoute") {
+  Write-Host -ForegroundColor Yellow "Connecting AVS to On-Prem ExpressRoute"
+  $filename = "06_ConnecrtAVStoOnPremExR.ps1"
+  write-host "Downloading" $filename
+  Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+  . $env:TEMP\$folderforstaging\$filename 
+}
