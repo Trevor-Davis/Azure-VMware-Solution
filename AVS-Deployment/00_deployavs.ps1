@@ -22,9 +22,7 @@ $global:OnPremExpressRouteCircuitSub = "1178f22f-6ce4-45e3-bd92-ba89930be5be"
 $global:nameofonpremexrcircuit = "VirtualWorkloads-ExpressRoute-Central-US" #The name of the on-premises ExpressRoute Circuit.
 $global:rgofonpremexrcircuit = "VirtualWorkloads-AVS-Networking-Central-US" #The resource group where the on-prem expressroute circuit exists.
 
-
-
-#Only Use these variables if you are using an existing ExpressRoute Gateway to connect AVS
+#Only Use these variables if you are using an EXISTING ExpressRoute Gateway to connect AVS
 If($exrgwneworexisting -eq "Existing"){
 
   $global:exrvnetname = "" #The name of the vNet where the expressroute gateway already exists.
@@ -33,7 +31,7 @@ If($exrgwneworexisting -eq "Existing"){
   $global:exrgwregion = "Australia East" #the region where the ExpressRoute Gateway is located
   }
 
-#Only Use these variables if there is a need to create a new expressroute gateway to connect AVS 
+#Only Use these variables if there is a need to create a NEW expressroute gateway to connect AVS 
 If($exrgwneworexisting -eq "New"){
 
   $global:exrvnetname = "VirtualWorkloads-AVS-vNet-Australia-East" #The name of the vNet where the expressroute gateway will be created.
