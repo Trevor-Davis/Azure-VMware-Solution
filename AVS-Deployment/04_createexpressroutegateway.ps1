@@ -53,7 +53,7 @@ $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -SubnetId $subn
 $ipconf | ConvertTo-Json
 }
 else {
-  $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -SubnetId $subnet.Id -PublicIpAddressId $pip.Id -ErrorAction:Ignore
+  $ipconf = New-AzVirtualNetworkGatewayIpConfig -Name $exrgwipname -SubnetId $subnet.Id -PublicIpAddressId $test.Id -ErrorAction:Ignore
   $ipconf | ConvertTo-Json
 }
 

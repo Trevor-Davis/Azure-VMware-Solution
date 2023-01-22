@@ -39,7 +39,7 @@ If($exrgwneworexisting -eq "New"){
   $global:exrvnetname = "VirtualWorkloads-AVS-vNet-Australia-East" #The name of the vNet where the expressroute gateway will be created.
   $global:exrgwname = "For-$pcname" #The name of the ExpressRoute Gateway, only modify if you don't want this to be the name.
   $global:exrgwrg = "VirtualWorkloads-AVS-Networking-Australia-East" #The resource group where the ExR Gateway should be deployed
-  $global:exrgwregion = "Central US" #the region where the ExpressRoute Gateway should be deployed.
+  $global:exrgwregion = "Australia East" #the region where the ExpressRoute Gateway should be deployed.
   $global:gatewaysubnetaddressspace = "10.20.1.0/24" #this is the subnet for the GatewaySubnet subnet which is needed for the ExpressRoute Gateway
   
   }
