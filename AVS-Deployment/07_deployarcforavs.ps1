@@ -31,7 +31,7 @@ else {
 #Execution
 
 azurelogin -subtoconnect $sub
-<#
+
 Write-Host -ForegroundColor Yellow "Registering ARC for AVS Resource Providers"
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.ConnectedVMwarevSphere 
@@ -40,7 +40,7 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 Register-AzResourceProvider -ProviderNamespace Microsoft.ResourceConnector 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
 Register-AzProviderPreviewFeature -Name AzureArcForAVS -ProviderNamespace Microsoft.AVS
-#>
+
 #Download Zip
 $filename = "v2.0.14.zip"
 write-host "Downloading" $filename
