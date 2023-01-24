@@ -7,14 +7,11 @@ $rgname = $global:avsrgname
 $exrgwname = $global:exrgwname
 $exrgwrg = $global:exrgwrg
 
-$global:avsexrgwconnectionname
-
 #DO NOT MODIFY BELOW THIS LINE #################################################
 
 #Azure Login
 
 $filename = "Function-azurelogin.ps1"
-write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$filename
 . $env:TEMP\$filename
 
