@@ -1,7 +1,7 @@
 
 #variables
 $avsregion = $global:regionfordeployment
-$avssub = $global:avssub
+$sub = $global:avssub
 $tenant = ""
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
