@@ -11,6 +11,10 @@ $global:avssku = "AV36" #The AVS SKU Type to Deploy
 $global:numberofhosts = "3" #This should be left at 3
 $global:internet = "Enabled" 
 $global:networkCIDRForApplianceVM = "192.168.200.1/28" #input the network gateway in this format, this is the network which will be created 10.1.1.1/24
+$global:applianceControlPlaneIpAddress = "192.168.200.2"
+$global:k8sNodeIPPoolStart = "192.168.200.20"
+$global:k8sNodeIPPoolEnd = "192.168.200.30"
+$global:gatewayIPAddress = "192.168.200.1"
 $global:networkForApplianceVM = "ARCforAVS-Segment" #this is NSX segment name which will be created for ARC
 $global:OnPremConnectivity = "None" #Options are ExpressRoute, VPN, None
 

@@ -53,10 +53,11 @@ checkfileanddelete -filetodelete $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\con
 $payload = @{
     "subscriptionId" = $global:avssub
     "resourceGroup" = $global:avsrgname
+    "applianceControlPlaneIpAddress" = $global:applianceControlPlaneIpAddress
     "privateCloud" = $global:pcname
     "isStatic" = $true
   }
-$data = @{"networkForApplianceVM" = $networkforappliancevm;"networkCIDRForApplianceVM" = $networkCIDRForApplianceVM;}
+$data = @{"networkForApplianceVM" = $networkforappliancevm;"networkCIDRForApplianceVM" = $networkCIDRForApplianceVM;"k8sNodeIPPoolStart" = $global:k8sNodeIPPoolStart;"k8sNodeIPPoolEnd" = $global:k8sNodeIPPoolEnd;"gatewayIPAddress" = $global:gatewayIPAddress}
 
 $payload.Add("staticIpNetworkDetails",$data)
 $payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
@@ -67,3 +68,17 @@ Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
 
 # 
 
+{
+  "subscriptionId": "",
+  "resourceGroup": "",
+  "applianceControlPlaneIpAddress": "",
+  "privateCloud": "",
+  "isStatic": true,
+  "staticIpNetworkDetails": {
+   "networkForApplianceVM": "",
+   "networkCIDRForApplianceVM": "",
+   "k8sNodeIPPoolStart": "",
+   "k8sNodeIPPoolEnd": "",
+   "gatewayIPAddress": ""
+  }
+}
