@@ -65,20 +65,3 @@ $payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
 Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
 .\run.ps1 -Operation onboard -FilePath "$env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src\config_avs.json"
-
-# 
-
-{
-  "subscriptionId": "",
-  "resourceGroup": "",
-  "applianceControlPlaneIpAddress": "",
-  "privateCloud": "",
-  "isStatic": true,
-  "staticIpNetworkDetails": {
-   "networkForApplianceVM": "",
-   "networkCIDRForApplianceVM": "",
-   "k8sNodeIPPoolStart": "",
-   "k8sNodeIPPoolEnd": "",
-   "gatewayIPAddress": ""
-  }
-}
