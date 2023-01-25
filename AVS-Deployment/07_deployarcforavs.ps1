@@ -40,6 +40,8 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
 Register-AzResourceProvider -ProviderNamespace Microsoft.ResourceConnector 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
 Register-AzProviderPreviewFeature -Name AzureArcForAVS -ProviderNamespace Microsoft.AVS
+Register-AzProviderPreviewFeature -Name earlyAccess -ProviderNamespace Microsoft.AVS
+
 
 #Download Zip
 $filename = "v2.0.14.zip"
