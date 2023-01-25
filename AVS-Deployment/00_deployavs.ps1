@@ -45,6 +45,7 @@ If($exrgwneworexisting -eq "New"){
 
 #DO NOT MODIFY BELOW THIS LINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 $ProgressPreference = 'SilentlyContinue'
+$ErrorActionPreference = 'SilentlyContinue'
 
 #Variables Do Not Modify
 $testing = 0
