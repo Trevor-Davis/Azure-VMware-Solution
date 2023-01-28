@@ -1,5 +1,5 @@
 #variables
-$sub = $global:avssub
+$sub = $global:exrgwsub
 $tenant = ""
 $authkeyname = $global:avsexrauthkeyname
 $pcname = $global:pcname
