@@ -52,6 +52,25 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 
 checkfileanddelete -filetodelete $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
 
+# Create JSON
+Set-Content -Encoding unicode $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value '{'
+$filelinearray = `
+('"subscriptionId"'+":"+" "+'"'+$global:avssub+'"'), `
+('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'),`
+('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'),`
+('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'),`
+('"isStatic"'+":"+" true"),`
+('"staticIpNetworkDetails"'+":"+' {'),`
+('"networkForApplianceVM"'+":"+" "+'"'+$global:networkforappliancevm+'"'),`
+('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM+'"'),`
+('"k8sNodeIPPoolStart"'+":"+" "+'"'+$global:k8sNodeIPPoolStart+'"'),`
+('"k8sNodeIPPoolEnd"'+":"+" "+'"'+$global:k8sNodeIPPoolEnd+'"'),`
+('"gatewayIPAddress"'+":"+" "+'"'+$global:gatewayIPAddress+'"'),`
+('}'),`
+('}')
+foreach ($line in $filelinearray)
+{Add-Content -Encoding unicode $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value $line}
+<#
 $payload = @{
     "subscriptionId" = $global:avssub
     "resourceGroup" = $global:avsrgname
@@ -63,6 +82,7 @@ $data = @{"networkForApplianceVM" = $networkforappliancevm;"networkCIDRForApplia
 
 $payload.Add("staticIpNetworkDetails",$data)
 $payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
+#>
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
 Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
