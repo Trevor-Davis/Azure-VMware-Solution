@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills 7"
+write-host "Go Bills 8"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -8,7 +8,6 @@ $tenant = ""
 
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
-Update-AzConfig -DisplayBreakingChangeWarning $false
 
 #Functions To Load
 
