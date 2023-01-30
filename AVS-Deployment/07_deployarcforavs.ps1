@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills 11"
+write-host "Go Bills 12"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -73,6 +73,10 @@ $filelinearray = `
 foreach ($line in $filelinearray)
 {Add-Content -Encoding utf8 $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value $line}
 #{Add-Content -Encoding unicode c:\temp\config_avs.json -Value $line}
+
+$convertfile = Get-Content $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json | ConvertTo-Json
+Set-Content -Value $convertfile -Encoding utf8 -Path $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
+
 
 
 <#
