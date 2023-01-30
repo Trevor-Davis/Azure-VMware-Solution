@@ -6,6 +6,7 @@ $pcname = $global:pcname
 $rgname = $global:avsrgname
 $exrgwname = $global:exrgwname
 $exrgwrg = $global:exrgwrg
+$exrgwsub = $global:exrgwsub
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 
