@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills 6"
+write-host "Go Bills 7"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -58,16 +58,16 @@ New-Item -ItemType File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.j
 #New-Item -ItemType File c:\temp\config_avs.json 
 $filelinearray = `
 ('{'), `
-('"'+'subscriptionId'+'"'+":"+" "+'"'+$global:avssub+'"'), `
-('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'),`
-('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'),`
-('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'),`
-('"isStatic"'+":"+" true"),`
+('"'+'subscriptionId'+'"'+":"+" "+'"'+$global:avssub+'"'+","), `
+('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'+","),`
+('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'+","),`
+('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'+","),`
+('"isStatic"'+":"+" true"+","),`
 ('"staticIpNetworkDetails"'+":"+' {'),`
-('"networkForApplianceVM"'+":"+" "+'"'+$global:networkforappliancevm+'"'),`
-('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM+'"'),`
-('"k8sNodeIPPoolStart"'+":"+" "+'"'+$global:k8sNodeIPPoolStart+'"'),`
-('"k8sNodeIPPoolEnd"'+":"+" "+'"'+$global:k8sNodeIPPoolEnd+'"'),`
+('"networkForApplianceVM"'+":"+" "+'"'+$global:networkforappliancevm+'"'+","),`
+('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM+'"'+","),`
+('"k8sNodeIPPoolStart"'+":"+" "+'"'+$global:k8sNodeIPPoolStart+'"'+","),`
+('"k8sNodeIPPoolEnd"'+":"+" "+'"'+$global:k8sNodeIPPoolEnd+'"'+","),`
 ('"gatewayIPAddress"'+":"+" "+'"'+$global:gatewayIPAddress+'"'),`
 ('}'),`
 ('}')
