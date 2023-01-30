@@ -4,7 +4,7 @@ $resourcegroup = $global:exrgwrg
 $exrgwipname = $global:exrgwipname
 $region = $global:exrgwregion
 $exrgwname = $global:exrgwname
-$sub = $global:avssub
+$sub = $global:exrgwsub
 $tenant = ""
 $gatewaysubnetaddressspace = $global:gatewaysubnetaddressspace
 

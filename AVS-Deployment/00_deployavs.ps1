@@ -29,6 +29,7 @@ $global:rgofonpremexrcircuit = "VirtualWorkloads-AVS-Networking-Central-US" #The
 #Only Use these variables if you are using an EXISTING ExpressRoute Gateway to connect AVS
 If($exrgwneworexisting -eq "Existing"){
 
+  $global:exrgwsub = "Same" #This could be the same or different Sub ID than the private cloud.
   $global:exrvnetname = "" #The name of the vNet where the expressroute gateway already exists.
   $global:exrgwname = "" #The name of the ExpressRoute Gateway
   $global:exrgwrg = "VirtualWorkloads-AVS-Networking-Australia-East" #The resource group of the ExpressRoute Gateway
@@ -38,6 +39,7 @@ If($exrgwneworexisting -eq "Existing"){
 #Only Use these variables if there is a need to create a NEW expressroute gateway to connect AVS 
 If($exrgwneworexisting -eq "New"){
 
+  $global:exrgwsub = "Same" #This could be the same or different Sub ID than the private cloud.
   $global:exrvnetname = "VirtualWorkloads-AVS-vNet-Australia-East" #The name of the vNet where the expressroute gateway will be created.
   $global:exrgwname = "For-$pcname" #The name of the ExpressRoute Gateway, only modify if you don't want this to be the name.
   $global:exrgwrg = "VirtualWorkloads-AVS-Networking-Australia-East" #The resource group where the ExR Gateway should be deployed
