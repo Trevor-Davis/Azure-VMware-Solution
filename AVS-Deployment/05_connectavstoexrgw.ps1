@@ -72,7 +72,7 @@ Connecting $pcname to $exrgwname ExpressRoute Gateway"
 
   azurelogin -subtoconnect $avssub
 
-  $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgname -SubscriptionId $sub
+  $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgname -SubscriptionId $avssub
   $peerid = $myprivatecloud.CircuitExpressRouteId
   
   azurelogin -subtoconnect $sub
