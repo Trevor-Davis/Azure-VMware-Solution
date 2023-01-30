@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills4"
+write-host "Go Bills5"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -56,7 +56,7 @@ checkfileanddelete -filetodelete $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\con
 # Create JSON
 Set-Content -Encoding unicode $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value "{"
 $filelinearray = `
-('""""subscriptionId""""'+":"+" "+'""""'+$global:avssub+'""""'), `
+('"'+'subscriptionId'+'"'+":"+" "+'"'+$global:avssub+'"'), `
 ('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'),`
 ('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'),`
 ('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'),`
