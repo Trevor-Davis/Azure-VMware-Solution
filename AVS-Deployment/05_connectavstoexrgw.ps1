@@ -69,11 +69,14 @@ else {
   write-host -foregroundcolor Yellow "
 Connecting $pcname to $exrgwname ExpressRoute Gateway"
   $exrgwtouse = Get-AzVirtualNetworkGateway -Name $exrgwname -ResourceGroupName $exrgwrg
+
+  azurelogin -subtoconnect $avssub
+
   $myprivatecloud = Get-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $rgname -SubscriptionId $sub
   $peerid = $myprivatecloud.CircuitExpressRouteId
   
-  $test = Get-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -ResourceGroupName $exrgwrg -ErrorAction Ignore
-  
+  azurelogin -subtoconnect $sub
+
   $command = New-AzVirtualNetworkGatewayConnection -Name $avsexrgwconnectionname -ResourceGroupName $exrgwrg -Location $exrgwregion -VirtualNetworkGateway1 $exrgwtouse -PeerId $peerid -ConnectionType ExpressRoute -AuthorizationKey $avsexrauthkey
   $command | ConvertTo-Json
   
