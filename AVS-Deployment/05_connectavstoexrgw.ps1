@@ -1,5 +1,6 @@
 #variables
 $sub = $global:exrgwsub
+$avssub = $global:avssub
 $tenant = ""
 $authkeyname = $global:avsexrauthkeyname
 $pcname = $global:pcname
@@ -28,7 +29,7 @@ else {
 #Generate Auth Key on AVS ExR
 azurelogin -subtoconnect $sub
 
-$test = Get-AzVMWareAuthorization -Name $authkeyname -PrivateCloudName $pcname -ResourceGroupName $rgname -SubscriptionId $sub -ErrorAction Ignore
+$test = Get-AzVMWareAuthorization -Name $authkeyname -PrivateCloudName $pcname -ResourceGroupName $rgname -SubscriptionId $avssub -ErrorAction Ignore
 
 if ($test.count -eq 1) {
 write-Host -ForegroundColor Blue "
