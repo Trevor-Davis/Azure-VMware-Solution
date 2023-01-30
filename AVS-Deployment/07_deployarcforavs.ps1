@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills2"
+write-host "Go Bills3"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -54,7 +54,7 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 checkfileanddelete -filetodelete $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
 
 # Create JSON
-Set-Content -Encoding unicode $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value '{'
+Set-Content -Encoding unicode $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value "{"
 $filelinearray = `
 ('""""subscriptionId""""'+":"+" "+'""""'+$global:avssub+'""""'), `
 ('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'),`
@@ -71,9 +71,6 @@ $filelinearray = `
 ('}')
 foreach ($line in $filelinearray)
 {Add-Content -Encoding unicode $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value $line}
-
-
-ConvertTo-Json -InputObject $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json 
 
 
 <#
