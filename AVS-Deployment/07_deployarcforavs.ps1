@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills 8"
+write-host "Go Bills 9"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -62,7 +62,7 @@ $filelinearray = `
 ('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'+","),`
 ('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'+","),`
 ('"isStatic"'+":"+" true"+","),`
-('"staticIpNetworkDetails"'+":"+' {'),`
+('"staticIpNetworkDetails"'+":"+" "+"{"),`
 ('"networkForApplianceVM"'+":"+" "+'"'+$global:networkforappliancevm+'"'+","),`
 ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM+'"'+","),`
 ('"k8sNodeIPPoolStart"'+":"+" "+'"'+$global:k8sNodeIPPoolStart+'"'+","),`
