@@ -1,0 +1,14 @@
+{
+    "subscriptionId": "96b825a1-dfdd-45bd-add8-e69988486e28",
+    "resourceGroup": "VirtualWorkloads-AVS-PC03",
+    "applianceControlPlaneIpAddress": "192.168.100.2",
+    "privateCloud": "VirtualWorkloads-AVS-PC03",
+    "isStatic": true,
+        "staticIpNetworkDetails": {
+        "k8sNodeIPPoolEnd": "192.168.100.10",
+        "gatewayIPAddress": "192.168.100.1",
+        "networkCIDRForApplianceVM": "192.168.100.1/28",
+        "networkForApplianceVM": "ARCforAVS-Segment",
+        "k8sNodeIPPoolStart": "192.168.100.3"
+      }
+    }

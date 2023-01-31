@@ -52,14 +52,20 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 
 checkfileanddelete -filetodelete $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
 
-# Create JSON
+
+
 <#
+# Create JSON
+
 #Out-File -FilePath $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
 Out-File -FilePath c:\temp\config_avs.json -Encoding utf8
 $filelinearray = "{`n
-"subscriptionId" = $global:avssub`n
-resourceGroup: $global:avsrgname`n
+""""subscriptionId"""" + " = "+ $global:avssub `n
+'"resourceGroup"' =  $global:avsrgname `n
 }"
+$jason = $filelinearray | ConvertTo-Json
+Set-Content -Value $jason -Encoding utf8 -Path c:\temp\config_avs.json
+
 <#
 +'"'+","),`
 ('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'+","),`
@@ -82,7 +88,9 @@ resourceGroup: $global:avsrgname`n
 # Set-Content -Value $convertfile -Encoding utf8 -Path $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
 $jason = $filelinearray | ConvertTo-Json
 Set-Content -Value $jason -Encoding utf8 -Path c:\temp\config_avs.json
-#>
+
+
+param($subscriptionId,$resourceGroup,$applianceControlPlaneIpAddress,$privateCloud,$isStatic)
 
 $payload = @{
     "subscriptionId" = $global:avssub
@@ -97,7 +105,7 @@ $payload.Add("staticIpNetworkDetails",$data)
 $payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
 
 
-<#
+
 $payload = @{
     "subscriptionId" = $global:avssub
     "resourceGroup" = $global:avsrgname
@@ -111,6 +119,9 @@ $payload.Add("staticIpNetworkDetails",$data)
 $payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
 #>
 
+
+
+
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
 Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-.\run.ps1 -Operation onboard -FilePath "$env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src\config_avs.json"
+.\run.ps1 -Operation onboard -FilePath . $env:TEMP\$folderforstaging\$filename\config_avs.json
