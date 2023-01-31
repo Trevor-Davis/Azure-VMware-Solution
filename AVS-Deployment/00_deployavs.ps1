@@ -53,6 +53,12 @@ If($exrgwneworexisting -eq "New"){
 $ProgressPreference = 'SilentlyContinue'
 $ErrorActionPreference = 'SilentlyContinue'
 
+#ID Path where this script is running
+$myjsonpath = $MyInvocation.MyCommand.Path 
+$myjsonpath = split-path $mypath -Parent
+$global:myjsonpath = $mypath+"\config_avs.json"
+
+
 #Variables Do Not Modify
 $testing = 0
 $global:nameofavsglobalreachconnection = "to-$nameofonpremexrcircuit"
