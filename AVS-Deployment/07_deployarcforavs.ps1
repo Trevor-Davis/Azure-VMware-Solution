@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills 13"
+write-host "Go Bills 20"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -50,8 +50,11 @@ Invoke-WebRequest -uri "https://github.com/Azure/ArcOnAVS/archive/refs/tags/$fil
 mkdir $env:TEMP\"ARCForAVS" -ErrorAction:Ignore
 Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" -Force
 
-checkfileanddelete -filetodelete $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
+# checkfileanddelete -filetodelete $env:TEMP\$folderforstaging\config_avs.json
 
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
+Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
+.\run.ps1 -Operation onboard -FilePath .\$env:TEMP\$folderforstaging\config_avs.json
 
 
 <#
@@ -119,9 +122,3 @@ $payload.Add("staticIpNetworkDetails",$data)
 $payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
 #>
 
-
-
-
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
-Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-.\run.ps1 -Operation onboard -FilePath . $env:TEMP\$folderforstaging\$filename\config_avs.json
