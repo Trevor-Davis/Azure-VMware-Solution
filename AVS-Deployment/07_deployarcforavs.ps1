@@ -54,7 +54,7 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
 Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-.\run.ps1 -Operation onboard -FilePath .\$global:myjsonpath
+.\run.ps1 -Operation onboard -FilePath $global:myjsonpath
 
 
 <#
