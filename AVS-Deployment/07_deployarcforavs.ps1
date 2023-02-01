@@ -1,5 +1,5 @@
 #variables
-write-host "Go Bills 20"
+write-host "Go Bills 21"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC

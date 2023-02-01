@@ -54,9 +54,9 @@ $ProgressPreference = 'SilentlyContinue'
 $ErrorActionPreference = 'SilentlyContinue'
 
 #ID Path where this script is running
-$myjsonpath = $MyInvocation.MyCommand.Path 
-$myjsonpath = split-path $mypath -Parent
-$global:myjsonpath = $mypath+"\config_avs.json"
+$global:myjsonpath = $MyInvocation.MyCommand.Path 
+$global:myjsonpath = split-path $myjsonpath -Parent
+$global:myjsonpath = $myjsonpath+"\config_avs.json"
 
 
 #Variables Do Not Modify
