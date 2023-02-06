@@ -47,7 +47,3 @@ Resource Group $rgname Successfully Created"
   }
 }
 
-Remove-Item $env:TEMP\$filename
-
-
-

@@ -1,6 +1,6 @@
 #variables
 $vnet = $global:exrvnetname
-$resourcegroup = $global:exrgwrg
+$resourcegroup = $global:exrgwrg #will create teh resource group if it dosen't exist.
 $exrgwipname = $global:exrgwipname
 $region = $global:exrgwregion
 $exrgwname = $global:exrgwname
@@ -25,10 +25,36 @@ else {
 
 #Execution
 
-#get some info   
-$vnetforgateway = Get-AzVirtualNetwork -Name $vnet -ResourceGroupName $resourcegroup -ErrorAction:Ignore
-$vnetforgateway | ConvertTo-Json
+#Test to see if RG is there, if not create it.
+$test = Get-AzResourceGroup -Name $resourcegroup -ErrorAction:Ignore
+  
+if ($test.count -eq 0) {
+write-host -foregroundcolor Yellow "
+Creating Resource Group $resourcegroup"
+$command = New-AzResourceGroup -Name $resourcegroup -Location $region
+$command | ConvertTo-Json
 
+$test = Get-AzResourceGroup -Name $resourcegroup -ErrorAction:Ignore
+If($test.count -eq 0){
+Write-Host -ForegroundColor Red "
+Resource Group $resourcegroup Failed to Create"
+Exit
+}
+else {
+  write-Host -ForegroundColor Green "
+Resource Group $resourcegroup Successfully Created"
+  }
+}
+
+
+#Get vNet Info   
+$vnetforgateway = Get-AzVirtualNetwork -Name $vnet -ResourceGroupName $resourcegroup -ErrorAction:Ignore
+If($vnetforgateway.count -eq 0){
+  Write-Host -ForegroundColor Red "
+  The vNet $vnet does not exist, please create it then re-run the script"
+  Exit
+  }
+ 
 #Create GatewaySubnet
 
 $test = Get-AzVirtualNetworkSubnetConfig -Name "GatewaySubnet" -VirtualNetwork $vnetforgateway -ErrorAction:Ignore
