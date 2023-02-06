@@ -1,5 +1,4 @@
 #variables
-write-host "Go Bills 21"
 $sub = $global:avssub
 $folder = $global:folder
 $networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
@@ -52,73 +51,26 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 
 # checkfileanddelete -filetodelete $env:TEMP\$folderforstaging\config_avs.json
 
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
-Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-.\run.ps1 -Operation onboard -FilePath $global:myjsonpath
-
-
-<#
 # Create JSON
 
 #Out-File -FilePath $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
-Out-File -FilePath c:\temp\config_avs.json -Encoding utf8
-$filelinearray = "{`n
-""""subscriptionId"""" + " = "+ $global:avssub `n
-'"resourceGroup"' =  $global:avsrgname `n
-}"
-$jason = $filelinearray | ConvertTo-Json
-Set-Content -Value $jason -Encoding utf8 -Path c:\temp\config_avs.json
+Out-File -FilePath $env:TEMP\config_avs.json -Encoding utf8
+$myjsonfile = "$env:TEMP\config_avs.json"
 
-<#
-+'"'+","),`
-('"applianceControlPlaneIpAddress"'+":"+" "+'"'+$global:applianceControlPlaneIpAddress+'"'+","),`
-('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'+","),`
-('"isStatic"'+":"+" true"+","),`
-('"staticIpNetworkDetails"'+":"+" "+"{"),`
-('"networkForApplianceVM"'+":"+" "+'"'+$global:networkforappliancevm+'"'+","),`
-('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM+'"'+","),`
-('"k8sNodeIPPoolStart"'+":"+" "+'"'+$global:k8sNodeIPPoolStart+'"'+","),`
-('"k8sNodeIPPoolEnd"'+":"+" "+'"'+$global:k8sNodeIPPoolEnd+'"'+","),`
-('"gatewayIPAddress"'+":"+" "+'"'+$global:gatewayIPAddress+'"'),`
-('}'),`
-('}')
+#$jason = $filelinearray | ConvertTo-Json
 
-#foreach ($line in $filelinearray)
-#{Add-Content -Encoding utf8 $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Value $line}
-#{Add-Content -Encoding unicode c:\temp\config_avs.json -Value $line}
+Add-Content -Value ("{") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"subscriptionId"'+":"+" "+'"'+$global:avssub+'"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"isStatic": true,') -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"staticIpNetworkDetails": {') -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"networkForApplianceVM"'+":"+" "+'"ARCForAVSSegment"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM:+'"') -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
 
-# $convertfile = Get-Content $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json | ConvertTo-Json
-# Set-Content -Value $convertfile -Encoding utf8 -Path $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
-$jason = $filelinearray | ConvertTo-Json
-Set-Content -Value $jason -Encoding utf8 -Path c:\temp\config_avs.json
-
-
-param($subscriptionId,$resourceGroup,$applianceControlPlaneIpAddress,$privateCloud,$isStatic)
-
-$payload = @{
-    "subscriptionId" = $global:avssub
-    "resourceGroup" = $global:avsrgname
-    "applianceControlPlaneIpAddress" = $global:applianceControlPlaneIpAddress
-    "privateCloud" = $global:pcname
-    "isStatic" = $true
-  }
-$data = @{"networkForApplianceVM" = $networkforappliancevm;"networkCIDRForApplianceVM" = $networkCIDRForApplianceVM;"k8sNodeIPPoolStart" = $global:k8sNodeIPPoolStart;"k8sNodeIPPoolEnd" = $global:k8sNodeIPPoolEnd;"gatewayIPAddress" = $global:gatewayIPAddress}
-
-$payload.Add("staticIpNetworkDetails",$data)
-$payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
-
-
-
-$payload = @{
-    "subscriptionId" = $global:avssub
-    "resourceGroup" = $global:avsrgname
-    "applianceControlPlaneIpAddress" = $global:applianceControlPlaneIpAddress
-    "privateCloud" = $global:pcname
-    "isStatic" = $true
-  }
-$data = @{"networkForApplianceVM" = $networkforappliancevm;"networkCIDRForApplianceVM" = $networkCIDRForApplianceVM;"k8sNodeIPPoolStart" = $global:k8sNodeIPPoolStart;"k8sNodeIPPoolEnd" = $global:k8sNodeIPPoolEnd;"gatewayIPAddress" = $global:gatewayIPAddress}
-
-$payload.Add("staticIpNetworkDetails",$data)
-$payload | ConvertTo-Json | Out-File $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json
-#>
+#Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
+#Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
+#.\run.ps1 -Operation onboard -FilePath $global:myjsonfile
 

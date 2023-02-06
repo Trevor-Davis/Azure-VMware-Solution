@@ -155,7 +155,7 @@ mkdir $env:TEMP\$folderforstaging
 Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
 
 #Execution
-
+<#
 Clear-Host
 Write-Host -ForegroundColor Magenta "Deploying Private Cloud $pcname"
 
@@ -209,4 +209,5 @@ $filename = "07_deployarcforavs.ps1"
 write-host "Downloading" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename 
+#>
 #>

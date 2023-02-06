@@ -134,7 +134,8 @@ $files = `
 "03_deployavsprivatecloud.ps1",`
 "04_createexpressroutegateway.ps1",`
 "05_connectavstoexrgw.ps1",`
-"06_ConnectAVStoOnPremExR.ps1"
+"06_ConnectAVStoOnPremExR.ps1",`
+"07_deployarcforavs.ps1"
 
 foreach ($filename in $files)
 {
@@ -143,7 +144,7 @@ foreach ($filename in $files)
 }
 Write-Host ""
 
-
+<#
 ##Register Resource Provider
 Write-Host -ForegroundColor Yellow "Registering Resource Provider"
 $filename = "01_RegisterAVSResourceProvider.ps1"
@@ -176,11 +177,8 @@ if ($OnPremConnectivity -eq "ExpressRoute") {
   . $env:TEMP\$folderforstaging\$filename 
 }
 
-<#
+#>
 #Deploy ARC for AVS
 Write-Host -ForegroundColor Yellow "Connect AVS to ExpressRoute Gateway"
 $filename = "07_deployarcforavs.ps1"
-write-host "Downloading" $filename
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 . $env:TEMP\$folderforstaging\$filename 
-#>
