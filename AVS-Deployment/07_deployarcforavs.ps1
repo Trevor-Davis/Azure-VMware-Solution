@@ -72,7 +72,7 @@ Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApp
 Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
 Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
 
-#Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
-#Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-#.\run.ps1 -Operation onboard -FilePath $global:myjsonfile
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
+Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
+.\run.ps1 -Operation onboard -FilePath $global:myjsonfile
 
