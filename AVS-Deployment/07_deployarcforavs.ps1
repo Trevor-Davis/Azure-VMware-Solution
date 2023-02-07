@@ -57,7 +57,7 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 
 #Out-File -FilePath $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
 Out-File -FilePath $env:TEMP\config_avs.json -Encoding utf8
-$myjsonfile = "$env:TEMP\config_avs.json"
+$myjsonfile = '$env:TEMP\ARCForAVS\config_avs.json'
 
 #$jason = $filelinearray | ConvertTo-Json
 
@@ -74,5 +74,5 @@ Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
 Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-.\run.ps1 -Operation onboard -FilePath $global:myjsonfile
+.\run.ps1 -Operation onboard -FilePath $myjsonfile
 
