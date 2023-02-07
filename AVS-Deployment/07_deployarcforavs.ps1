@@ -56,21 +56,21 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 # Create JSON
 
 #Out-File -FilePath $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
-Out-File -FilePath $env:TEMP\config_avs.json -Encoding utf8
-$myjsonfile = '$env:TEMP\ARCForAVS\config_avs.json'
+Out-File -FilePath $env:TEMP\config_avs.json -Encoding:utf8
+$myjsonfile = $env:TEMP+'\ARCForAVS\config_avs.json'
 
 #$jason = $filelinearray | ConvertTo-Json
 
-Add-Content -Value ("{") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"subscriptionId"'+":"+" "+'"'+$avssub+'"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"resourceGroup"'+":"+" "+'"'+$avsrg+'"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"privateCloud"'+":"+" "+'"'+$pcname+'"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"isStatic": true,') -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"staticIpNetworkDetails": {') -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"networkForApplianceVM"'+":"+" "+'"ARCForAVSSegment"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"') -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ("{") -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"subscriptionId"'+":"+" "+'"'+$avssub+'"'+",") -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"resourceGroup"'+":"+" "+'"'+$avsrg+'"'+",")  -Path $myjsonfile -Encoding:utf8
+Add-Content -Value ('"privateCloud"'+":"+" "+'"'+$pcname+'"'+",") -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"isStatic": true,') -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"staticIpNetworkDetails": {') -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"networkForApplianceVM"'+":"+" "+'"ARCForAVSSegment"'+",") -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"') -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8 
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
 Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
