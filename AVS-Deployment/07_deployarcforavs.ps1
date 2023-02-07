@@ -62,15 +62,16 @@ $myjsonfile = $env:TEMP+'\ARCForAVS\config_avs.json'
 Add-Content -Value ("{") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"subscriptionId"'+":"+" "+'"'+$avssub+'"'+",") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"resourceGroup"'+":"+" "+'"'+$avsrg+'"'+",")  -Path $myjsonfile -Encoding:utf8
-Add-Content -Value ('"applianceControlPlaneIpAddress"'+":"+" "+'"192.168.88.2"'+",")  -Path $myjsonfile -Encoding:utf8
+#Add-Content -Value ('"applianceControlPlaneIpAddress"'+":"+" "+'"192.168.88.2"'+",")  -Path $myjsonfile -Encoding:utf8
 Add-Content -Value ('"privateCloud"'+":"+" "+'"'+$pcname+'"'+",") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"isStatic": true,') -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"staticIpNetworkDetails": {') -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"networkForApplianceVM"'+":"+" "+'"ARCForAVSSegment"'+",") -Path $myjsonfile -Encoding:utf8 
+#Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"'+",") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"'+",") -Path $myjsonfile -Encoding:utf8 
-Add-Content -Value ('"k8sNodeIPPoolStart"'+":"+" "+'"192.168.88.3"'+",") -Path $myjsonfile -Encoding:utf8 
-Add-Content -Value ('"k8sNodeIPPoolEnd"'+":"+" "+'"192.168.88.10"'+",") -Path $myjsonfile -Encoding:utf8 
-Add-Content -Value ('"gatewayIPAddress"'+":"+" "+'"192.168.88.1"') -Path $myjsonfile -Encoding:utf8 
+#Add-Content -Value ('"k8sNodeIPPoolStart"'+":"+" "+'"192.168.88.3"'+",") -Path $myjsonfile -Encoding:utf8 
+#Add-Content -Value ('"k8sNodeIPPoolEnd"'+":"+" "+'"192.168.88.10"'+",") -Path $myjsonfile -Encoding:utf8 
+#Add-Content -Value ('"gatewayIPAddress"'+":"+" "+'"192.168.88.1"') -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8
 
