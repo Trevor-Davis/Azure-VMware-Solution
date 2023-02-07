@@ -130,26 +130,41 @@ mkdir $env:TEMP\$folderforstaging
 #Start Logging
 Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
 
-#Execution
+#Execution #######################################
 
 Clear-Host
 Write-Host -ForegroundColor Magenta "Deploying Private Cloud $pcname
 "
-$files = `
-"01_RegisterAVSResourceProvider.ps1",`
-"02_CreateResourceGroup.ps1",`
-"03_deployavsprivatecloud.ps1",`
-"04_createexpressroutegateway.ps1",`
-"05_connectavstoexrgw.ps1",`
-"06_ConnectAVStoOnPremExR.ps1",`
-"07_deployarcforavs.ps1"
 
-foreach ($filename in $files)
-{
-  Write-Host "Downloading $filename"
-  Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
-}
-Write-Host ""
+#Download the Files
+
+$filename = "01_RegisterAVSResourceProvider.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+
+$filename = "02_CreateResourceGroup.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+
+$filename = "03_deployavsprivatecloud.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+
+$filename = "04_createexpressroutegateway.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+
+$filename = "05_connectavstoexrgw.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+
+$filename = "06_ConnectAVStoOnPremExR.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+
+$filename = "07_deployarcforavs.ps1"
+Write-Host "Downloading $filename"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
 
 
 ##Register Resource Provider
@@ -188,4 +203,4 @@ if ($OnPremConnectivity -eq "ExpressRoute") {
 #Deploy ARC for AVS
 Write-Host -ForegroundColor Yellow "Deploy ARC for AVS"
 $filename = "07_deployarcforavs.ps1"
-. $env:TEMP\$folderforstaging\$filename 
+. $env:TEMP\$folderforstaging\$filename
