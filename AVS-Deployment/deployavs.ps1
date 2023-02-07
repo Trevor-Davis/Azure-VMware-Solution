@@ -151,7 +151,7 @@ foreach ($filename in $files)
 }
 Write-Host ""
 
-<#
+
 ##Register Resource Provider
 Write-Host -ForegroundColor Yellow "Registering Resource Provider"
 $filename = "01_RegisterAVSResourceProvider.ps1"
@@ -184,8 +184,8 @@ if ($OnPremConnectivity -eq "ExpressRoute") {
   . $env:TEMP\$folderforstaging\$filename 
 }
 
-#>
+
 #Deploy ARC for AVS
-Write-Host -ForegroundColor Yellow "Connect AVS to ExpressRoute Gateway"
+Write-Host -ForegroundColor Yellow "Deploy ARC for AVS"
 $filename = "07_deployarcforavs.ps1"
 . $env:TEMP\$folderforstaging\$filename 
