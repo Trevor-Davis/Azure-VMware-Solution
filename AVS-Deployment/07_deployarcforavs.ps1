@@ -1,9 +1,11 @@
 #variables
-$sub = $global:avssub
+$avssub = $global:avssub
+$avsrg = $global:avsrgname
 $folder = $global:folder
-$networkForApplianceVM = $global:networkForApplianceVM #this is NSX segment name which will be created for ARC
+$pcname = $global:pcname
 $networkCIDRForApplianceVM = $global:networkCIDRForApplianceVM #input the network gateway in this format, this is the network which will be created 10.1.1.1/24
 $tenant = ""
+
 
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
@@ -60,13 +62,13 @@ $myjsonfile = "$env:TEMP\config_avs.json"
 #$jason = $filelinearray | ConvertTo-Json
 
 Add-Content -Value ("{") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"subscriptionId"'+":"+" "+'"'+$global:avssub+'"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"resourceGroup"'+":"+" "+'"'+$global:avsrgname+'"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"privateCloud"'+":"+" "+'"'+$global:pcname+'"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"subscriptionId"'+":"+" "+'"'+$avssub+'"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"resourceGroup"'+":"+" "+'"'+$avsrg+'"'+",") -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"privateCloud"'+":"+" "+'"'+$pcname+'"'+",") -Encoding utf8 -Path $myjsonfile
 Add-Content -Value ('"isStatic": true,') -Encoding utf8 -Path $myjsonfile
 Add-Content -Value ('"staticIpNetworkDetails": {') -Encoding utf8 -Path $myjsonfile
 Add-Content -Value ('"networkForApplianceVM"'+":"+" "+'"ARCForAVSSegment"'+",") -Encoding utf8 -Path $myjsonfile
-Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$global:networkCIDRForApplianceVM:+'"') -Encoding utf8 -Path $myjsonfile
+Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"') -Encoding utf8 -Path $myjsonfile
 Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
 Add-Content -Value ("}") -Encoding utf8 -Path $myjsonfile
 

@@ -82,6 +82,13 @@ If($exrgwneworexisting -eq "New"){
   }
 
 
+$global:deployarc = $sheet.Cells.Item(18,2).Text
+If($global:deployarc -eq "Yes")
+{
+$global:networkCIDRForApplianceVM = $sheet.Cells.Item(19,2).Text
+}
+
+
   $global:numberofhosts = "3" #This should be left at 3
   $global:internet = "Enabled" 
   
