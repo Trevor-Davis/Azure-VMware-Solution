@@ -138,33 +138,83 @@ Write-Host -ForegroundColor Magenta "Deploying Private Cloud $pcname
 
 #Download the Files
 
+
 $filename = "01_RegisterAVSResourceProvider.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename"  
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 $filename = "02_CreateResourceGroup.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" 
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 $filename = "03_deployavsprivatecloud.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" 
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 $filename = "04_createexpressroutegateway.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" 
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 $filename = "05_connectavstoexrgw.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" 
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 $filename = "06_ConnectAVStoOnPremExR.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" 
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 $filename = "07_deployarcforavs.ps1"
+Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
 Write-Host "Downloading $filename"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" -OutFile $env:TEMP\$folderforstaging\$filename
+$download = 0
+While ($download.StatusCode -ne 200) {
+  # Do Something
+  $download = Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Deployment/$filename" 
+}
+Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename -Encoding utf8
+
 
 
 ##Register Resource Provider
@@ -198,7 +248,6 @@ if ($OnPremConnectivity -eq "ExpressRoute") {
   $filename = "06_ConnecrtAVStoOnPremExR.ps1"
   . $env:TEMP\$folderforstaging\$filename 
 }
-
 
 #Deploy ARC for AVS
 Write-Host -ForegroundColor Yellow "Deploy ARC for AVS"
