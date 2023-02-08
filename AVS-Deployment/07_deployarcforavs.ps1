@@ -68,14 +68,14 @@ Add-Content -Value ('"isStatic": true,') -Path $myjsonfile -Encoding:utf8
 Add-Content -Value ('"staticIpNetworkDetails": {') -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ('"networkForApplianceVM"'+":"+" "+'"ARCForAVSSegment"'+",") -Path $myjsonfile -Encoding:utf8 
 #Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"'+",") -Path $myjsonfile -Encoding:utf8 
-Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"'+",") -Path $myjsonfile -Encoding:utf8 
+Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApplianceVM+'"') -Path $myjsonfile -Encoding:utf8 
 #Add-Content -Value ('"k8sNodeIPPoolStart"'+":"+" "+'"192.168.88.3"'+",") -Path $myjsonfile -Encoding:utf8 
 #Add-Content -Value ('"k8sNodeIPPoolEnd"'+":"+" "+'"192.168.88.10"'+",") -Path $myjsonfile -Encoding:utf8 
 #Add-Content -Value ('"gatewayIPAddress"'+":"+" "+'"192.168.88.1"') -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8
 
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
-Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-.\run.ps1 -Operation onboard -FilePath $myjsonfile
+#Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
+#Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
+#.\run.ps1 -Operation onboard -FilePath $myjsonfile
 
