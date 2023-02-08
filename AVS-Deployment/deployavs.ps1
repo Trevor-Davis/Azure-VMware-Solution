@@ -248,8 +248,9 @@ if ($OnPremConnectivity -eq "ExpressRoute") {
   $filename = "06_ConnecrtAVStoOnPremExR.ps1"
   . $env:TEMP\$folderforstaging\$filename 
 }
-
+<#
 #Deploy ARC for AVS
 Write-Host -ForegroundColor Yellow "Deploy ARC for AVS"
 $filename = "07_deployarcforavs.ps1"
 . $env:TEMP\$folderforstaging\$filename
+#>
