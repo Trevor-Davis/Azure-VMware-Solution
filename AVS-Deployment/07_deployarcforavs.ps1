@@ -53,9 +53,9 @@ Expand-Archive -Path $env:TEMP\$filename -DestinationPath $env:TEMP\"ARCForAVS" 
 
 # Create JSON
 
-#Out-File -FilePath $env:TEMP\"ARCForAVS"\"ArcOnAVS-2.0.14"\src\config_avs.json -Encoding utf8
-Out-File -FilePath $env:TEMP\ARCForAVS\config_avs.json -Encoding:utf8
-$myjsonfile = $env:TEMP+'\ARCForAVS\config_avs.json'
+Out-File -FilePath $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src\config_avs.json -Encoding utf8
+#Out-File -FilePath $env:TEMP\ARCForAVS\config_avs.json -Encoding:utf8
+$myjsonfile = $env:TEMP+"\ARCForAVS\ArcOnAVS-2.0.14\src\config_avs.json"
 
 #$jason = $filelinearray | ConvertTo-Json
 
@@ -75,7 +75,8 @@ Add-Content -Value ('"networkCIDRForApplianceVM"'+":"+" "+'"'+$networkCIDRForApp
 Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8 
 Add-Content -Value ("}") -Path $myjsonfile -Encoding:utf8
 
-#Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
-#Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
-#.\run.ps1 -Operation onboard -FilePath $myjsonfile
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy ByPass
+Set-Location -Path $env:TEMP\ARCForAVS\ArcOnAVS-2.0.14\src
+.\run.ps1 -Operation onboard -FilePath .\config_avs.json
+
 

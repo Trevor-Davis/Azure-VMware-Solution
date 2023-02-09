@@ -16,7 +16,7 @@ Function Get-FileName($initialDirectory)
 Add-Type -AssemblyName PresentationCore,PresentationFramework
 $ButtonType = [System.Windows.MessageBoxButton]::YesNo
 $MessageboxTitle = "AVS Simplified Deployment"
-$Messageboxbody = "You will need to locate the COMPLETED 'AVSSimplifiedDeployment.xlsx file.
+$Messageboxbody = "You will need to locate the COMPLETED 'AVSSimplifiedDeployment Excel file.
 
 Would You Like To Continue?
 "
@@ -141,7 +141,6 @@ Write-Host -ForegroundColor Magenta "Deploying Private Cloud $pcname
 
 $filename = "01_RegisterAVSResourceProvider.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -152,7 +151,6 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 $filename = "02_CreateResourceGroup.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -163,7 +161,6 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 $filename = "03_deployavsprivatecloud.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -174,7 +171,6 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 $filename = "04_createexpressroutegateway.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -185,7 +181,6 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 $filename = "05_connectavstoexrgw.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -196,7 +191,6 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 $filename = "06_ConnectAVStoOnPremExR.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -207,7 +201,6 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 $filename = "07_deployarcforavs.ps1"
 Out-File -FilePath $env:TEMP\$folderforstaging\$filename -Encoding utf8
-Write-Host "Downloading $filename"
 $download = 0
 While ($download.StatusCode -ne 200) {
   # Do Something
@@ -218,39 +211,52 @@ Add-Content -Value $download.Content -Path $env:TEMP\$folderforstaging\$filename
 
 
 ##Register Resource Provider
-Write-Host -ForegroundColor Yellow "Registering Resource Provider"
+Write-Host -ForegroundColor Yellow "
+
+Registering Microsoft.AVS Resource Provider"
 $filename = "01_RegisterAVSResourceProvider.ps1"
 . $env:TEMP\$folderforstaging\$filename
 
 #Create Resource Group
-Write-Host -ForegroundColor Yellow "Creating Resource Group"
+Write-Host -ForegroundColor Yellow "
+
+Creating Resource Group"
 $filename = "02_CreateResourceGroup.ps1"
 . $env:TEMP\$folderforstaging\$filename
 
 #Deploy Private Cloud
-Write-Host -ForegroundColor Yellow "Deploying Private Cloud"
+Write-Host -ForegroundColor Yellow "
+
+Deploying Private Cloud"
 $filename = "03_deployavsprivatecloud.ps1"
 . $env:TEMP\$folderforstaging\$filename 
 
 #Create ExpressRoute Gateway
-Write-Host -ForegroundColor Yellow "Creating ExpressRoute Gateway"
+Write-Host -ForegroundColor Yellow "
+
+Creating ExpressRoute Gateway"
 $filename = "04_createexpressroutegateway.ps1"
 . $env:TEMP\$folderforstaging\$filename 
 
 #Connect AVS to ExR GW
-Write-Host -ForegroundColor Yellow "Connect AVS to ExpressRoute Gateway"
+Write-Host -ForegroundColor Yellow "
+
+Connect AVS to ExpressRoute Gateway"
 $filename = "05_connectavstoexrgw.ps1"
 . $env:TEMP\$folderforstaging\$filename 
 
 #Connect AVS to On-Prem ExR
 if ($OnPremConnectivity -eq "ExpressRoute") {
-  Write-Host -ForegroundColor Yellow "Connecting AVS to On-Prem ExpressRoute"
+  Write-Host -ForegroundColor Yellow "
+  
+  Connecting AVS to On-Prem ExpressRoute"
   $filename = "06_ConnecrtAVStoOnPremExR.ps1"
   . $env:TEMP\$folderforstaging\$filename 
 }
-<#
+
 #Deploy ARC for AVS
-Write-Host -ForegroundColor Yellow "Deploy ARC for AVS"
+Write-Host -ForegroundColor Yellow "
+
+Deployiong ARC for AVS"
 $filename = "07_deployarcforavs.ps1"
 . $env:TEMP\$folderforstaging\$filename
-#>
