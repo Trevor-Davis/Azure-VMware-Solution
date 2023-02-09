@@ -43,7 +43,7 @@ Deployment Status Will Begin To Show Shortly"
 
 New-AzVMWarePrivateCloud -Name $pcname -ResourceGroupName $avsrgname -SubscriptionId $avssub -NetworkBlock $avsaddressblock -Sku $avssku -Location $avsregion -managementclustersize $numberofhosts -Internet $internet -NoWait -AcceptEULA -ErrorAction Stop
 
-Write-Host -foregroundcolor Blue "
+Write-Host -foregroundcolor Yellow "
 The Azure VMware Solution Private Cloud $pcname deployment is underway and will take approximately 4 hours."
 Write-Host -foregroundcolor Yellow "
 The status of the deployment will begin to update in 5 minutes."

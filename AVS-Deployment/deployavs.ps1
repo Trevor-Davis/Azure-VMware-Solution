@@ -255,8 +255,13 @@ if ($OnPremConnectivity -eq "ExpressRoute") {
 }
 
 #Deploy ARC for AVS
+
+If($global:deployarc -eq "Yes")
+{
 Write-Host -ForegroundColor Yellow "
 
 Deployiong ARC for AVS"
 $filename = "07_deployarcforavs.ps1"
 . $env:TEMP\$folderforstaging\$filename
+}
+
