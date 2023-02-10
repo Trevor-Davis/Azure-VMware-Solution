@@ -1,9 +1,20 @@
+#Author - Trevor Davis
+#@vTrevorDavis on Twitter
+#For Guidance on this script visit
+# https://virtualworkloads.com/2023/02/deploy-arc-for-azure-vmware-solution-simply-using-powershell/
+
 #variables
+
 $avssub = "" #Subscription where AVS private cloud is deployed.
 $avsrg = "" #Resource group where AVS private cloud is deployed.
 $pcname = "" #Name of the AVS Private Cloud
 $networkCIDRForApplianceVM = "" #/28 network for the ARC Appliance 
 $tenant = "" #Optional
+
+
+
+
+
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 
