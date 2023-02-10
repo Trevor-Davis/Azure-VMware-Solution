@@ -84,15 +84,22 @@ Set-ItemProperty -Path "HKCU:\Console" -Name Quickedit $quickeditsettingatstarto
 }
 
 #Enable Internet
-$command = Update-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $avsrgname -Internet $internet -NoWait
 
+
+$command = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $avsrgname 
+
+if ("Enabled" -ne $command.Internet)
+{
+
+$command  = Update-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $avsrgname -Internet $internet -NoWait
 while ("Enabled" -ne $command.Internet)
 {
 $timeStamp = Get-Date -Format "hh:mm"
 write-host -foregroundcolor yellow "Updating Internet Access ... Please Wait"
 Start-Sleep -Seconds 120
-$provisioningstate = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $avsrgname 
-$currentprovisioningstate = $provisioningstate.ProvisioningState
+$command = get-azvmwareprivatecloud -Name $pcname -ResourceGroupName $avsrgname 
 }
 
+Write-Host -ForegroundColor Green "
+Azure VMware Solution Private Cloud Internet Access is Enabled"
 }
