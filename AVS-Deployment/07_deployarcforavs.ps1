@@ -1,12 +1,9 @@
 #variables
 $avssub = $global:avssub
 $avsrg = $global:avsrgname
-$folder = $global:folder
 $pcname = $global:pcname
 $networkCIDRForApplianceVM = $global:networkCIDRForApplianceVM #input the network gateway in this format, this is the network which will be created 10.1.1.1/24
 $tenant = ""
-
-
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 
