@@ -1,19 +1,112 @@
-# This function will allow for the input excel file to be defined
+#Check the Pre-Reqs
 
-Function Get-FileName($initialDirectory)
+$powershellversion = $psversiontable.PSVersion.Major
+
+if ( $powershellversion -lt 7)
 {
-    Add-Type -AssemblyName System.Windows.Forms
-    $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-    $OpenFileDialog.Title = "Please Select File"
-    $OpenFileDialog.InitialDirectory = $initialDirectory
-    $OpenFileDialog.filter = "All files (*.*)| *.*"
-    # Out-Null supresses the "OK" after selecting the file.
-    $OpenFileDialog.ShowDialog() | Out-Null
-    $Global:SelectedFile = $OpenFileDialog.FileName
+Write-Host -ForegroundColor Red "PowerShell version 7 or above is required, you are running version $powershellversion"
+Write-Host  "https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
+"
+
+Exit
 }
+else {
+    Write-Host "Powershell:" -NoNewline
+    Write-Host -ForegroundColor Green " OK" 
+    }
+
+$azvmwaremodule = Get-Module -ListAvailable -Name Az.VMware
+if ($azvmwaremodule.Count -eq 0)
+{
+    Write-Host -ForegroundColor Red "The Az.VMware Powershell module needs to be installed."
+    Write-Host  "https://www.powershellgallery.com/packages/Az.VMWare
+    "
+    Exit
+}
+else {
+    Write-Host "Az.VMware Module:" -NoNewline
+    Write-Host -ForegroundColor Green " OK" 
+    }
+
+$azcli = az --version
+if ($azcli.Count -eq 0)
+{
+    Write-Host -ForegroundColor Red "The Az CLI needs to be installed."
+    Write-Host  "https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
+    "
+    Exit
+}
+else {
+Write-Host "Azure CLI:" -NoNewline
+Write-Host -ForegroundColor Green " OK" 
+}
+
+$excelcheck = New-Object -ComObject Excel.application 
+if ($excelcheck.Value -ne "Microsoft Excel")
+{
+    Write-Host -ForegroundColor Red "
+    
+    
+Excel needs to be installed on this machine"
+    
+    Exit
+}
+else {
+Write-Host "Excel:" -NoNewline
+Write-Host -ForegroundColor Green " OK" 
+}
+
+# start Excel
+<#
+$filename = "\avssimplifieddeployment.xlsm"
+#$fullpath = $PSScriptRoot+$filename
+
+$process = Start-Process -FilePath "$fullpath" -PassThru
+
+# Get the process ud
+$process.ID
+
+# Wait 1 second
+Start-Sleep 5
+
+# Kill the process
+Stop-Process -id $process.Id
+
+#>
+$filename = "\avssimplifieddeployment.xlsm"
+#$fullpath = $PSScriptRoot+$filename
+$fullpath = "C:\Users\tredavis\OneDrive - Microsoft\GitHub\Azure VMware Solution\AVS-Deployment\avssimplifieddeployment.xlsm"
+
+$excel = New-Object -comobject Excel.Application
+$workbook = $excel.Workbooks.Open($fullpath) 
+
+$excel.Visible = $true
+$excel.DisplayFullScreen = $true
+
+
+Write-Host -ForegroundColor Blue "An Excel file has just opened, navigate to that excel file and complete the AVS Simplified Deployment input form, after saving and closing that Excel file return to this Powershell screen."
+
+Start-Sleep -seconds 10
+
+Write-Host -ForegroundColor Yellow "After completing the AVS Simplifed Deployment input form, saving and closing the file, press any key to continue ...."
+Read-Host
+
+<#
+
+do {
+    Start-Sleep -Seconds 5
+    $workbooknamecount = $workbook.name.Count
+} until ($workbooknamecount -ne 1)
+Write-Host = "trevor"
+Exit
+
+Write-Host -ForegroundColor Yellow "The file $filename has been closed, please wait just a few seconds ... "
+Start-Sleep -Seconds 10
+#>
+
 #Read in the excel variables
 
-$file = $Global:SelectedFile
+#$filename = $PSScriptRoot+$filename
 
 $sheetName = "Variables"
 
@@ -21,7 +114,7 @@ $sheetName = "Variables"
 $excel = New-Object -com Excel.Application
 
 #open excel file
-$wb = $excel.workbooks.open($file)
+$wb = $excel.workbooks.open($fullpath)
 
 #select excel sheet to read data
 $sheet = $wb.Worksheets.Item($sheetname)
@@ -66,26 +159,15 @@ If($global:deployarc -eq "Yes")
 $global:networkCIDRForApplianceVM = $sheet.Cells.Item(19,2).Text
 }
 
+$global:numberofhosts = $sheet.Cells.Item(21,2).Text
+$global:internet = $sheet.Cells.Item(20,2).Text
 
-  $global:numberofhosts = "3" #This should be left at 3
-  $global:internet = "Enabled" 
-  
 $excel.Quit()
-
-Stop-Process -Name EXCEL -Force
 
 #DO NOT MODIFY BELOW THIS LINE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 $ProgressPreference = 'SilentlyContinue'
-#$ErrorActionPreference = 'SilentlyContinue'
-
-#ID Path where this script is running
-$global:myjsonpath = $MyInvocation.MyCommand.Path 
-$global:myjsonpath = split-path $myjsonpath -Parent
-$global:myjsonpath = $myjsonpath+"\config_avs.json"
-
 
 #Variables Do Not Modify
-$testing = 0
 $global:nameofavsglobalreachconnection = "to-$nameofonpremexrcircuit"
 $global:avsexrauthkeyname = "to-ExpressRouteGateway-$exrgwname"
 $global:avsexrgwconnectionname = "from-AVSPrivateCloud-$pcname"
@@ -107,6 +189,47 @@ mkdir $env:TEMP\$folderforstaging
 
 #Start Logging
 Start-Transcript -Path $env:TEMP\$folderforstaging\$logfilename".log" -Append
+
+#Confirm Values
+
+$a = @{"AVS Private Cloud Name" = $pcname}
+$b = @{"Sub ID for the AVS Private Cloud" = $avssub}
+$c = @{"Region to deploy the AVS Private Cloud" = $regionfordeployment}
+$d = @{"Resource Group to deploy the AVS Private Cloud" = $avsrgname}
+$e = @{"AVS SKU" = $avssku}
+$f = @{"Network Block to Use for AVS Deployment"=$avsaddressblock}
+$g = @{""=""}
+$h = @{"Connect AVS Private Cloud to New or Existing ExpressRoute Gateway"=$exrgwneworexisting}
+$i = @{"AVS ExpressRoute Gateway Sub ID"=$exrgwsub}
+$j = @{"AVS ExpressRoute Gateway Name"=$exrgwname}
+$k = @{"Region Where the ExpressRoute Gateway $($exrgwname) is (or will be) Located"=$exrgwregion}
+$l = @{"Resource Group Where the ExpressRoute Gateway $($exrgwname) is (or will be) Located"=$exrgwrg}
+if ($exrgwneworexisting -eq "New") {$m = @{"vNet Where the ExpressRoute Gateway $($exrgwname) will be) Located"=$exrvnetname}}
+$n = @{""=""}
+$o = @{"Azure to On-Prem Connectivity Method"= if($OnPremConnectivity -eq "It dosen't"){"Does Not Exist"}else{$OnPremConnectivity}}
+$p = @{"Sub ID of the On-Premisis ExpressRoute"=$OnPremExpressRouteCircuitSub}
+$q = @{"Name of the On-Premises ExpressRoute Circuit"=$nameofonpremexrcircuit}
+$r = @{"Resource Group where $($nameofonpremexrcircuit) is Deployed"=$rgofonpremexrcircuit}
+$s = @{""=""}
+$t = @{"Deploy Azure ARC for AVS"=$deployarc}
+if ($deployarc -eq "Yes") {$u = @{"Network to create in the AVS Private Cloud for ARC"=$networkCIDRForApplianceVM} }
+
+If ($OnPremConnectivity -eq "It dosen't")
+{
+  $table1 = $a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$s,$t,$u
+}  
+else {
+$table1 = $a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$t,$u}
+
+$table1 | Format-Table -AutoSize -Wrap:$true 
+
+Write-Host -ForegroundColor Yellow "Please Review These Values For Accuracy"
+Write-Host -ForegroundColor Yellow -NoNewline "
+Continue (Y/N)  "
+$continue = Read-Host
+If ($continue -ne "y")
+{exit}
+
 
 #Execution #######################################
 
@@ -160,11 +283,14 @@ $filename = "03_deployavsprivatecloud.ps1"
 . $env:TEMP\$folderforstaging\$filename 
 
 #Create ExpressRoute Gateway
+
+if ($exrgwneworexisting -eq "New") {
 Write-Host -ForegroundColor Yellow "
 
 Creating ExpressRoute Gateway"
 $filename = "04_createexpressroutegateway.ps1"
 . $env:TEMP\$folderforstaging\$filename 
+}
 
 #Connect AVS to ExR GW
 Write-Host -ForegroundColor Yellow "
@@ -192,4 +318,5 @@ Deployiong ARC for AVS"
 $filename = "07_deployarcforavs.ps1"
 . $env:TEMP\$folderforstaging\$filename
 }
+
 

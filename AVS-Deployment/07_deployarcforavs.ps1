@@ -30,6 +30,20 @@ else {
 
 azurelogin -subtoconnect $sub
 
+#Test
+$getvcenter = Get-AzResource -ResourceType Microsoft.ConnectedVMwarevSphere/VCenters -ResourceGroupName $avsrg
+$getvcenter.Count
+
+if ($getvcenter.count -ne 0) {
+Write-Host -ForegroundColor Yellow "It appears ARC for AVS is Already Installed"
+Write-Host -ForegroundColor Yellow -NoNewline "
+Do you want to re-install ARC for AVS? (Y/N) "
+$continueyesorno = Read-Host 
+if ($continueyesorno -eq "N") {
+exit}
+}
+
+#Register Resource Providers
 Write-Host -ForegroundColor Yellow "Registering ARC for AVS Resource Providers"
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.ConnectedVMwarevSphere 
@@ -39,7 +53,6 @@ Register-AzResourceProvider -ProviderNamespace Microsoft.ResourceConnector
 Register-AzResourceProvider -ProviderNamespace Microsoft.AVS
 Register-AzProviderPreviewFeature -Name AzureArcForAVS -ProviderNamespace Microsoft.AVS
 Register-AzProviderPreviewFeature -Name earlyAccess -ProviderNamespace Microsoft.AVS
-
 
 #Download Zip
 $filename = "v2.0.14.zip"
