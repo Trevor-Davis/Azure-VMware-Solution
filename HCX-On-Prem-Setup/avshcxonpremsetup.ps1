@@ -22,12 +22,6 @@ $ssodomain = "vsphere.local" #This would be the SSO domain of the on-prem vCente
 $ssogroup = "Administrators" #This would be the SSO domain group which holds the HCX Admins, for initial setup recommendation is to keep this setting.
 $HCXOnPremLocation = "Buffalo" #The closest major city where the HCX Manager is deployed on-prem.
 
-<#
-$vmotionportgroup = "NestedLab" #Either the vMotion network portgroup name, or the management network port group name.
-$vmotionprofilegateway = "192.168.89.1" #The gateway of the network for the $vmotionportgroup
-$vmotionippool = "192.168.89.200-192.168.89.202" #two continguous IP addresses from the $vmotionportgroup network
-$vmotionnetworkmask = "24" #The netmask of the $vmotionportgroup network.
-#>
 $managementportgroup = "NestedLab" #The management network portgroup name.
 $mgmtprofilegateway = "192.168.89.1" #The gateway of the network for the $managementportgroup
 $mgmtippool = "192.168.89.200-192.168.89.204" #two continguous IP addresses from the $managementportgroup network
@@ -41,14 +35,12 @@ Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 $hcxovafilename = "VMware-HCX-Connector-4.5.0.0-20616025.ova"
 
 $HCXManagerVMName = "HCX-Manager-for-$pcname"
-$HCXOnPremUserID = "administrator@vsphere.local"
 $HCXOnPremAdminUserID = "admin"
 $HCXCloudUserID = "cloudadmin@vsphere.local"
-# $vmotionnetworkprofilename = "vMotionNetworkProfile"
 $mgmtnetworkprofilename = "HCXNetworkProfile"
 $hcxComputeProfileName = "HCXComputeProfile"
 $hcxServiceMeshName = "HCXServiceMesh"
-
+$logfilename = "hcxonpreminstall.log"
 
 #Azure Login
 $filename = "Function-azurelogin.ps1"
@@ -58,7 +50,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScri
 azurelogin -subtoconnect $sub
 
 #Start Logging
-Start-Transcript -Path $env:TEMP\"hcxonpreminstall.log" -Append
+Start-Transcript -Path $env:TEMP\$logfilename -Append
 
 #Execution
 
@@ -66,10 +58,11 @@ Write-Host "
 Deploying HCX Manager to vCenter $OnPremVIServerIP and Connecting to $pcname"
 
 
-
 #######################################################################################
 # Connect to On-Prem vCenter
 #######################################################################################  
+Write-Host -ForegroundColor Yellow "
+Connecting to On-Premises vCenter"
 
 $test = Get-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
 
@@ -95,16 +88,6 @@ write-Host -ForegroundColor Blue "
 vCenter $OnPremVIServerIP Connected"
 }
 
-<#
-write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
-write-host -ForegroundColor White -nonewline "Username: "
-$OnPremVIServerUsername = Read-Host 
-write-host -ForegroundColor White -nonewline "Password: "
-$OnPremVIServerPassword = Read-Host -MaskInput
-#>
-
-
- 
 
 #######################################################################################
 # Install HCX To Private Cloud
@@ -133,12 +116,9 @@ write-Host -ForegroundColor Blue "
 HCX Deployed to $pcname"
 }
 
- 
-
 #######################################################################################
 #Get HCX Cloud IP Address and Password
 #######################################################################################
-
 
 #IP Address
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $pcrg -Subscription $sub
@@ -159,8 +139,8 @@ write-host -foregroundcolor Yellow -nonewline "
 
 You can create a HCX Activation Key in the Azure Portal by navigating to the following location.  
 Select your PRIVATE CLOUD > MANAGE > ADD-ONs > MIGRATION USING HCX
-
-Or you can skip this step and enter an activation key at a later time.  You will have HCX running in trial mode for 30 days until an activation key is required.
+Or 
+You can skip this step and enter an activation key at a later time.  HCX will run in trial mode for the next 30 days.
 
 Would you like to enter an activation key now? (Y/N): "
 
@@ -188,7 +168,6 @@ $mypath = split-path $mypath -Parent
 Set-Location -Path $mypath
 
 # $HCXApplianceOVA = $mypath+"\"+$hcxovafilename
-
  
   # Load OVF/OVA configuration into a variable
   $ovfconfig = Get-OvfConfiguration $hcxovafilename
@@ -244,7 +223,6 @@ Success: HCX Connector Deployed to On-Premises Cluster"
 }
 }
  
-  
   #########################
   # PowerOn HCX Manager
   #########################
