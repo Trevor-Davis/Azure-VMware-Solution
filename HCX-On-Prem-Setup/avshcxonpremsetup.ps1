@@ -34,7 +34,7 @@ $ProgressPreference = 'SilentlyContinue'
 Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 $hcxovafilename = "VMware-HCX-Connector-4.5.0.0-20616025.ova"
 
-$HCXManagerVMName = "HCX-Manager-for-$pcname"
+$HCXManagerVMName = "HCX-Manager"
 $HCXOnPremAdminUserID = "admin"
 $HCXCloudUserID = "cloudadmin@vsphere.local"
 $mgmtnetworkprofilename = "HCXNetworkProfile"
