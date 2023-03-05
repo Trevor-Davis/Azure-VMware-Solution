@@ -319,4 +319,5 @@ $filename = "07_deployarcforavs.ps1"
 . $env:TEMP\$folderforstaging\$filename
 }
 
-
+Write-Host "Press Any Key to Quit"
+Read-Host

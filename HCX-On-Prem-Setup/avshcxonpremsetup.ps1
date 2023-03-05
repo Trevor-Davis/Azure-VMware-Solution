@@ -7,13 +7,12 @@ $OnPremVIServerIP ="192.168.89.10" #This is the IP of the vCenter Server on-prem
 $OnPremVIServerUsername = "administrator@vsphere.local" #This is the username of the vCenter Server on-premises where HCX needs to be deployed.
 $OnPremVIServerPassword = "Microsoft1!" #password for username above.
 $HCXOnPremAdminPassword = "Microsoft1!" #When HCX is installed on-prem there will be a local user created called admin, provide the password you would like assigned to that user.
-#$HCXApplianceOVA = "VMware-HCX-Connector-4.5.0.0-20616025.ova"
 $OnPremCluster = "Cluster-VirtualWorkloads" #The name of teh cluster where HCX Appliance will be deployed.
 $datastore = "iscsi" #the name of the datastore to deploy HCX Manager
-$VMNetwork = "NestedLab" #What network should HCX Manager be deployed ... must be the name of the portgroup in vCenter.
-$HCXVMIP = "192.168.89.9" #The IP to assign to HCX Manager.
+$VMNetwork = "PortGroup-VLAN14" #What network should HCX Manager be deployed ... must be the name of the portgroup in vCenter.
+$HCXVMIP = "192.168.14.9" #The IP to assign to HCX Manager.
 $HCXVMNetmask ="24" #netmask for the $vmnetwork
-$HCXVMGateway = "192.168.89.1" #gateway for the for the $vmnetwork
+$HCXVMGateway = "192.168.14.1" #gateway for the for the $vmnetwork
 $HCXVMDNS ="10.20.0.4" #DNS Server to use
 $HCXVMDomain = "virtualworkloads.local" #domain to assign to HCX Manager
 #$AVSVMNTP = "10.20.0.4" #NTP Server for HCX Manager
@@ -28,9 +27,9 @@ $vmotionprofilegateway = "192.168.89.1" #The gateway of the network for the $vmo
 $vmotionippool = "192.168.89.200-192.168.89.202" #two continguous IP addresses from the $vmotionportgroup network
 $vmotionnetworkmask = "24" #The netmask of the $vmotionportgroup network.
 #>
-$managementportgroup = "NestedLab" #The management network portgroup name.
-$mgmtprofilegateway = "192.168.89.1" #The gateway of the network for the $managementportgroup
-$mgmtippool = "192.168.89.200-192.168.89.204" #two continguous IP addresses from the $managementportgroup network
+$managementportgroup = "PortGroup-VLAN14" #The management network portgroup name.
+$mgmtprofilegateway = "192.168.14.1" #The gateway of the network for the $managementportgroup
+$mgmtippool = "192.168.14.200-192.168.14.204" #two continguous IP addresses from the $managementportgroup network
 $mgmtnetworkmask = "24" #The netmask of the $managementportgroup network.
 
 $l2extendedVDS = "DSwitch"
@@ -40,15 +39,14 @@ $ProgressPreference = 'SilentlyContinue'
 Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 $hcxovafilename = "VMware-HCX-Connector-4.5.0.0-20616025.ova"
 
-$HCXManagerVMName = "HCX-Manager-for-$pcname"
+$HCXManagerVMName = "HCX-Manager"
 $HCXOnPremUserID = "administrator@vsphere.local"
 $HCXOnPremAdminUserID = "admin"
 $HCXCloudUserID = "cloudadmin@vsphere.local"
-# $vmotionnetworkprofilename = "vMotionNetworkProfile"
 $mgmtnetworkprofilename = "HCXNetworkProfile"
 $hcxComputeProfileName = "HCXComputeProfile"
 $hcxServiceMeshName = "HCXServiceMesh"
-
+$logfilename = "hcxonpreminstall.log"
 
 #Azure Login
 $filename = "Function-azurelogin.ps1"
@@ -58,18 +56,19 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScri
 azurelogin -subtoconnect $sub
 
 #Start Logging
-Start-Transcript -Path $env:TEMP\"hcxonpreminstall.log" -Append
+Start-Transcript -Path $env:TEMP\$logfilename -Append
 
 #Execution
 
-Write-Host "
+Write-Host -foregroundcolor Magenta "
 Deploying HCX Manager to vCenter $OnPremVIServerIP and Connecting to $pcname"
-
 
 
 #######################################################################################
 # Connect to On-Prem vCenter
 #######################################################################################  
+Write-Host -ForegroundColor Yellow "
+Connecting to On-Premises vCenter"
 
 $test = Get-VIServer -Server $OnPremVIServerIP -username $OnPremVIServerUsername -password $OnPremVIServerPassword
 
@@ -95,16 +94,6 @@ write-Host -ForegroundColor Blue "
 vCenter $OnPremVIServerIP Connected"
 }
 
-<#
-write-host -ForegroundColor Yellow "What is the USERNAME and PASSWORD for the ON-PREMISES vCenter Server ($OnPremVIServerIP) where the VMware HCX Connector will be deployed?"
-write-host -ForegroundColor White -nonewline "Username: "
-$OnPremVIServerUsername = Read-Host 
-write-host -ForegroundColor White -nonewline "Password: "
-$OnPremVIServerPassword = Read-Host -MaskInput
-#>
-
-
- 
 
 #######################################################################################
 # Install HCX To Private Cloud
@@ -133,12 +122,9 @@ write-Host -ForegroundColor Blue "
 HCX Deployed to $pcname"
 }
 
- 
-
 #######################################################################################
 #Get HCX Cloud IP Address and Password
 #######################################################################################
-
 
 #IP Address
   $myprivatecloud = Get-AzVMwarePrivateCloud -Name $pcname -ResourceGroupName $pcrg -Subscription $sub
@@ -159,8 +145,8 @@ write-host -foregroundcolor Yellow -nonewline "
 
 You can create a HCX Activation Key in the Azure Portal by navigating to the following location.  
 Select your PRIVATE CLOUD > MANAGE > ADD-ONs > MIGRATION USING HCX
-
-Or you can skip this step and enter an activation key at a later time.  You will have HCX running in trial mode for 30 days until an activation key is required.
+Or 
+You can skip this step and enter an activation key at a later time.  HCX will run in trial mode for the next 30 days.
 
 Would you like to enter an activation key now? (Y/N): "
 
@@ -188,7 +174,6 @@ $mypath = split-path $mypath -Parent
 Set-Location -Path $mypath
 
 # $HCXApplianceOVA = $mypath+"\"+$hcxovafilename
-
  
   # Load OVF/OVA configuration into a variable
   $ovfconfig = Get-OvfConfiguration $hcxovafilename
@@ -205,11 +190,11 @@ Set-Location -Path $mypath
   $ovfconfig.Common.hostname.Value = $HCXManagerVMName
   $ovfconfig.Common.mgr_ntp_list.Value = $AVSVMNTP
   $ovfconfig.Common.mgr_isSSHEnabled.Value = $true
-  $ovfconfig.Common.mgr_cli_passwd.Value = $HCXOnPremPassword
-  $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremPassword
+  $ovfconfig.Common.mgr_cli_passwd.Value = $HCXOnPremAdminPassword
+  $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremAdminPassword
   $ovfconfig.Common.mgr_isSSHEnabled.Value = $true
-  $ovfconfig.Common.mgr_cli_passwd.Value = $HCXOnPremPassword
-  $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremPassword 
+  $ovfconfig.Common.mgr_cli_passwd.Value = $HCXOnPremAdminPassword
+  $ovfconfig.Common.mgr_root_passwd.Value = $HCXOnPremAdminPassword 
   
   
   # Deploy the OVF/OVA with the config parameters
@@ -240,11 +225,10 @@ Exit
 }
 else {
   Write-Host -ForegroundColor Green "
-Success: HCX Connector Deployed to On-Premises Cluster"
+Success: HCX Manager OVA Imported"
 }
 }
  
-  
   #########################
   # PowerOn HCX Manager
   #########################
@@ -265,7 +249,7 @@ Powering on HCX Manager ..."
   while($status.PowerState -ne "PoweredOn")
   {
 
-Start-Sleep -Seconds 60
+Start-Sleep -Seconds 30
 $status = Get-VM -Name $HCXManagerVMName
 }
 
@@ -389,42 +373,6 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   ######################################
   # Define the Role Mapping
   ####################################
-<#
-If ($HCXOnPremRoleMapping -eq "vsphere.local") {
-  Write-Host -ForegroundColor Green "HCX Role Mapping Set To vsphere.local\Administrators"
-    }
-    else{  
-    $refcharacter = $HCXOnPremRoleMapping.IndexOf("\")
-    $ssodomain = $HCXOnPremRoleMapping.Substring(0,$refcharacter)
-    $ssogroup = $HCXOnPremRoleMapping.Substring($refcharacter+1)
-    
-    
-      $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-      $headers.Add("Content-Type", "application/json;charset=UTF-8")
-      $headers.Add("Accept", "application/json")
-      $headers.Add("Authorization", "Basic $HCXOnPremCredentialsEncoded")
-      
-      $body = "[
-      `n    {
-      `n        `"role`": `"System Administrator`",
-      `n        `"userGroups`": [
-      `n            `"$ssodomain`\`\$ssogroup`"
-      `n        ]
-      `n    },
-      `n    {
-      `n        `"role`": `"Enterprise Administrator`",
-      `n        `"userGroups`": []
-      `n    }
-      `n]"
-      
-      $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/roleMappings -Method 'PUT' -Headers $headers -Body $body -SkipCertificateCheck
-      $response | ConvertTo-Json
-  
-      Write-Host -ForegroundColor Green "HCX Role Mapping Set To $ssodomain\$ssogroup"
-  
-    }
-#>
-
 
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
   $headers.Add("Content-Type", "application/json;charset=UTF-8")
@@ -498,7 +446,7 @@ If ($HCXOnPremRoleMapping -eq "vsphere.local") {
   ##########################
   #Activate HCX
   ###########################
-  if ($hcxactivationkey -eq $null) {
+  if ($null -eq $hcxactivationkey) {
     Write-Host -ForegroundColor Red "You did not enter an HCX Activation Key, HCX will be deployed in evaluation mode."
     
    }
@@ -536,6 +484,8 @@ If ($HCXOnPremRoleMapping -eq "vsphere.local") {
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
   $headers.Add("Content-Type", "application/json")
   $headers.Add("Accept", "application/json")
+  $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
+
   
   $body = "{
          `"username`": `"$OnPremVIServerUsername`",
@@ -568,16 +518,6 @@ If ($HCXOnPremRoleMapping -eq "vsphere.local") {
     $command | ConvertTo-Json
     $command
  
- <# ######################
-  # Create vMotion Network Profile
-  ######################
-  
-  $vmotionnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name "$vmotionportgroup"
-  
-  $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $vmotionnetworkprofilename -GatewayAddress $vmotionprofilegateway -IPPool $vmotionippool -Network $vmotionnetworkbacking -PrefixLength $vmotionnetworkmask
-  $command | ConvertTo-Json
-  #>
-   
   ######################
   # Create Management Network Profile
   ######################
@@ -620,7 +560,7 @@ If ($HCXOnPremRoleMapping -eq "vsphere.local") {
 
   $command | ConvertTo-Json
   
-   
+  
   
   ###############
   #Service Mesh
@@ -664,3 +604,39 @@ If ($HCXOnPremRoleMapping -eq "vsphere.local") {
     $command | ConvertTo-Json
   
   }
+
+
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+while ($status.ServiceStatus.Count -eq 0){
+Write-host -nonewline "Service Mesh Status: "
+Write-Host -ForegroundColor Yellow "Preparing"
+Start-Sleep -Seconds 60
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+}
+
+
+$count = 0
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+while ($status.ServiceStatus.status.Contains("unknown") -eq "True"){
+Write-host -nonewline "Service Mesh Status: "
+Write-Host -ForegroundColor Yellow "Building"
+Start-Sleep -Seconds 60
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$count = $count +1
+if ($count -eq 20) {
+write-host -ForegroundColor Red "Service Mesh Build Has Timed Out"
+exit
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status.ServiceStatus
+}
+}
+
+
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+if ($status.ServiceStatus.status.Contains("up") -eq "True"){
+Write-host -nonewline "Service Mesh Status: "
+Write-Host -ForegroundColor Green "Complete"
+}
+
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status.ServiceStatus

@@ -482,7 +482,6 @@ $command = Get-AzVMwarePrivateCloudAdminCredential -PrivateCloudName $pcname -Re
 $HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassword -AsPlainText
 
 
-
 #######################################################################################
 #Get HCX Activation Key
 #######################################################################################
