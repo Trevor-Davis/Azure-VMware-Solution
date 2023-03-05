@@ -289,7 +289,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
     }
 }
 
- 
+
 
   #########################################
   # Encode the HCX On Prem Admin credentials
@@ -616,37 +616,37 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   }
 
 
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 while ($status.ServiceStatus.Count -eq 0){
 Write-host -nonewline "Service Mesh Status: "
 Write-Host -ForegroundColor Yellow "Preparing"
 Start-Sleep -Seconds 60
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 }
 
 
 $count = 0
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 while ($status.ServiceStatus.status.Contains("unknown") -eq "True"){
 Write-host -nonewline "Service Mesh Status: "
 Write-Host -ForegroundColor Yellow "Building"
 Start-Sleep -Seconds 60
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 $count = $count +1
 if ($count -eq 20) {
 write-host -ForegroundColor Red "Service Mesh Build Has Timed Out"
 exit
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 $status.ServiceStatus
 }
 }
 
 
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 if ($status.ServiceStatus.status.Contains("up") -eq "True"){
 Write-host -nonewline "Service Mesh Status: "
 Write-Host -ForegroundColor Green "Complete"
 }
 
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $server
+$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 $status.ServiceStatus
