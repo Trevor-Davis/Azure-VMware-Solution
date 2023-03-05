@@ -3,12 +3,12 @@
 # Twitter: vTrevorDavis
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
-
+ 
 
 #variables
 
 #AVS Private Cloud Information
-$sub = "1178f22f-xxxx-45e3-xxxx-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
+$sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
 $pcname = "VirtualWorkloads-AVS-PC01" #Name of the AVS private cloud
 $pcrg = "VirtualWorkloads-AVS-PC01" #The resource group where AVS private cloud is deployed.
 
@@ -40,7 +40,7 @@ $mgmtippool = "192.168.14.200-192.168.14.204" #two continguous IP addresses from
 $mgmtnetworkmask = "24" #The netmask of the $managementportgroup network.
 
 #L2 Extension Info
-$l2extendedVDS = "" #What is the name of the VDS which has portgroups that need to be L2 extended to Azure VMware Solution. 
+$l2extendedVDS = "DSwitch" #What is the name of the VDS which has portgroups that need to be L2 extended to Azure VMware Solution. 
 
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
@@ -154,9 +154,9 @@ write-host -foregroundcolor Yellow -nonewline "
 
 You can create a HCX Activation Key in the Azure Portal by navigating to the following location.  
 Select your PRIVATE CLOUD > MANAGE > ADD-ONs > MIGRATION USING HCX
+
 Or 
-You can skip this step and enter an activation key at a later time.  HCX will run in trial mode for the next 30 days.
-Or 
+
 You can skip this step and enter an activation key at a later time.  HCX will run in trial mode for the next 30 days.
 
 Would you like to enter an activation key now? (Y/N): "
@@ -533,7 +533,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   ######################
   
   
-  $mgmtnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name "$managementportgroup" 
+  $mgmtnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name $managementportgroup 
   
   $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $mgmtnetworkprofilename -GatewayAddress $mgmtprofilegateway -IPPool $mgmtippool -Network $mgmtnetworkbacking -PrefixLength $mgmtnetworkmask
   $command | ConvertTo-Json
