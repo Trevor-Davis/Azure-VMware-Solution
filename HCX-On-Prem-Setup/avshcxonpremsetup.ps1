@@ -30,6 +30,9 @@ $vmotionnetworkmask = "24" #The netmask of the $vmotionportgroup network.
 $managementportgroup = "PortGroup-VLAN14" #The management network portgroup name.
 $mgmtprofilegateway = "192.168.14.1" #The gateway of the network for the $managementportgroup
 $mgmtippool = "192.168.14.200-192.168.14.204" #two continguous IP addresses from the $managementportgroup network
+$managementportgroup = "NestedLab" #The management network portgroup name.
+$mgmtprofilegateway = "192.168.89.1" #The gateway of the network for the $managementportgroup
+$mgmtippool = "192.168.89.200-192.168.89.204" #two continguous IP addresses from the $managementportgroup network
 $mgmtnetworkmask = "24" #The netmask of the $managementportgroup network.
 
 $l2extendedVDS = "DSwitch"
@@ -41,11 +44,13 @@ $hcxovafilename = "VMware-HCX-Connector-4.5.0.0-20616025.ova"
 
 $HCXManagerVMName = "HCX-Manager"
 $HCXOnPremUserID = "administrator@vsphere.local"
+$HCXManagerVMName = "HCX-Manager"
 $HCXOnPremAdminUserID = "admin"
 $HCXCloudUserID = "cloudadmin@vsphere.local"
 $mgmtnetworkprofilename = "HCXNetworkProfile"
 $hcxComputeProfileName = "HCXComputeProfile"
 $hcxServiceMeshName = "HCXServiceMesh"
+$logfilename = "hcxonpreminstall.log"
 $logfilename = "hcxonpreminstall.log"
 
 #Azure Login
@@ -57,6 +62,7 @@ azurelogin -subtoconnect $sub
 
 #Start Logging
 Start-Transcript -Path $env:TEMP\$logfilename -Append
+Start-Transcript -Path $env:TEMP\$logfilename -Append
 
 #Execution
 
@@ -67,6 +73,8 @@ Deploying HCX Manager to vCenter $OnPremVIServerIP and Connecting to $pcname"
 #######################################################################################
 # Connect to On-Prem vCenter
 #######################################################################################  
+Write-Host -ForegroundColor Yellow "
+Connecting to On-Premises vCenter"
 Write-Host -ForegroundColor Yellow "
 Connecting to On-Premises vCenter"
 
@@ -93,6 +101,7 @@ $command
 write-Host -ForegroundColor Blue "
 vCenter $OnPremVIServerIP Connected"
 }
+
 
 
 #######################################################################################
@@ -145,6 +154,8 @@ write-host -foregroundcolor Yellow -nonewline "
 
 You can create a HCX Activation Key in the Azure Portal by navigating to the following location.  
 Select your PRIVATE CLOUD > MANAGE > ADD-ONs > MIGRATION USING HCX
+Or 
+You can skip this step and enter an activation key at a later time.  HCX will run in trial mode for the next 30 days.
 Or 
 You can skip this step and enter an activation key at a later time.  HCX will run in trial mode for the next 30 days.
 
@@ -228,6 +239,7 @@ else {
 Success: HCX Manager OVA Imported"
 }
 }
+ 
  
   #########################
   # PowerOn HCX Manager
