@@ -1,18 +1,30 @@
+# Author: Trevor Davis
+# Website: www.virtualworkloads.com
+# Twitter: vTrevorDavis
+# This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
+# For guidance on this script please refer to https://www.virtualworkloads.com 
+
+
 #variables
 
-$sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
+#AVS Private Cloud Information
+$sub = "1178f22f-xxxx-45e3-xxxx-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
 $pcname = "VirtualWorkloads-AVS-PC01" #Name of the AVS private cloud
 $pcrg = "VirtualWorkloads-AVS-PC01" #The resource group where AVS private cloud is deployed.
+
+#On Premises Info
 $OnPremVIServerIP ="192.168.89.10" #This is the IP of the vCenter Server on-premises where HCX needs to be deployed.
-$OnPremVIServerUsername = "administrator@vsphere.local" #This is the username of the vCenter Server on-premises where HCX needs to be deployed.
-$OnPremVIServerPassword = "Microsoft1!" #password for username above.
-$HCXOnPremAdminPassword = "Microsoft1!" #When HCX is installed on-prem there will be a local user created called admin, provide the password you would like assigned to that user.
+$OnPremVIServerUsername = "administrator@vsphere.local" #It's recommended to use administrator@vsphere.local
+$OnPremVIServerPassword = "Microsoft1!"
 $OnPremCluster = "Cluster-VirtualWorkloads" #The name of teh cluster where HCX Appliance will be deployed.
-$datastore = "iscsi" #the name of the datastore to deploy HCX Manager
+$datastore = "iscsi" #the name of the datastore on-prem to deploy HCX Manager
 $VMNetwork = "PortGroup-VLAN14" #What network should HCX Manager be deployed ... must be the name of the portgroup in vCenter.
+
+#Inputs for the deployment of HCX Manager on-premises
+$HCXOnPremAdminPassword = "Microsoft1!" #When HCX is installed on-prem there will be a local user created called admin, provide the password you would like assigned to that user.
 $HCXVMIP = "192.168.14.9" #The IP to assign to HCX Manager.
 $HCXVMNetmask ="24" #netmask for the $vmnetwork
-$HCXVMGateway = "192.168.14.1" #gateway for the for the $vmnetwork
+$HCXVMGateway = "192.168.14.1" #gateway for the $vmnetwork
 $HCXVMDNS ="10.20.0.4" #DNS Server to use
 $HCXVMDomain = "virtualworkloads.local" #domain to assign to HCX Manager
 #$AVSVMNTP = "10.20.0.4" #NTP Server for HCX Manager
@@ -21,21 +33,15 @@ $ssodomain = "vsphere.local" #This would be the SSO domain of the on-prem vCente
 $ssogroup = "Administrators" #This would be the SSO domain group which holds the HCX Admins, for initial setup recommendation is to keep this setting.
 $HCXOnPremLocation = "Buffalo" #The closest major city where the HCX Manager is deployed on-prem.
 
-<#
-$vmotionportgroup = "NestedLab" #Either the vMotion network portgroup name, or the management network port group name.
-$vmotionprofilegateway = "192.168.89.1" #The gateway of the network for the $vmotionportgroup
-$vmotionippool = "192.168.89.200-192.168.89.202" #two continguous IP addresses from the $vmotionportgroup network
-$vmotionnetworkmask = "24" #The netmask of the $vmotionportgroup network.
-#>
-$managementportgroup = "PortGroup-VLAN14" #The management network portgroup name.
+#HCX Network Profile Inputs
+$managementportgroup = "PortGroup-VLAN14" #The on-premises management network portgroup name.
 $mgmtprofilegateway = "192.168.14.1" #The gateway of the network for the $managementportgroup
 $mgmtippool = "192.168.14.200-192.168.14.204" #two continguous IP addresses from the $managementportgroup network
-$managementportgroup = "NestedLab" #The management network portgroup name.
-$mgmtprofilegateway = "192.168.89.1" #The gateway of the network for the $managementportgroup
-$mgmtippool = "192.168.89.200-192.168.89.204" #two continguous IP addresses from the $managementportgroup network
 $mgmtnetworkmask = "24" #The netmask of the $managementportgroup network.
 
-$l2extendedVDS = "DSwitch"
+#L2 Extension Info
+$l2extendedVDS = "" #What is the name of the VDS which has portgroups that need to be L2 extended to Azure VMware Solution. 
+
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 $ProgressPreference = 'SilentlyContinue'
@@ -43,14 +49,11 @@ Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 $hcxovafilename = "VMware-HCX-Connector-4.5.0.0-20616025.ova"
 
 $HCXManagerVMName = "HCX-Manager"
-$HCXOnPremUserID = "administrator@vsphere.local"
-$HCXManagerVMName = "HCX-Manager"
 $HCXOnPremAdminUserID = "admin"
 $HCXCloudUserID = "cloudadmin@vsphere.local"
 $mgmtnetworkprofilename = "HCXNetworkProfile"
 $hcxComputeProfileName = "HCXComputeProfile"
 $hcxServiceMeshName = "HCXServiceMesh"
-$logfilename = "hcxonpreminstall.log"
 $logfilename = "hcxonpreminstall.log"
 
 #Azure Login
@@ -62,7 +65,6 @@ azurelogin -subtoconnect $sub
 
 #Start Logging
 Start-Transcript -Path $env:TEMP\$logfilename -Append
-Start-Transcript -Path $env:TEMP\$logfilename -Append
 
 #Execution
 
@@ -73,8 +75,6 @@ Deploying HCX Manager to vCenter $OnPremVIServerIP and Connecting to $pcname"
 #######################################################################################
 # Connect to On-Prem vCenter
 #######################################################################################  
-Write-Host -ForegroundColor Yellow "
-Connecting to On-Premises vCenter"
 Write-Host -ForegroundColor Yellow "
 Connecting to On-Premises vCenter"
 
@@ -299,9 +299,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($HCXOnPremCredentials)
   $HCXOnPremAdminCredentialsEncoded =[Convert]::ToBase64String($HCXBytes)
      
-  
- 
-  
+    
   ######################################
   # Get The Certificate From HCX Cloud
   ####################################
