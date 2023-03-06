@@ -171,6 +171,23 @@ else {
   Write-Host "Most likely the network does not have access to the Internet"
 }
 
+$udpobject = new-Object system.Net.Sockets.Udpclient(11001)
+$udpobject.client.receivetimeout = 1000
+$a = new-object system.text.asciiencoding
+$byte = $a.GetBytes("$(Get-Date)")
+$udpobject.Connect("127.0.0.1",11001)
+[void]$udpobject.Send($byte,$byte.length)
+$remoteendpoint = New-Object system.net.ipendpoint([system.net.ipaddress]::Any,0)
+$receivebytes = $udpobject.Receive([ref]$remoteendpoint)
+ 
+#Convert returned data into string format
+[string]$returndata = $a.GetString($receivebytes)
+ 
+#Uses the IPEndPoint object to show that the host responded.
+Write-Host "This is the message you received: $($returndata.ToString())"
+Write-Host "This message was sent from: $($remoteendpoint.address.ToString()) on their port number: $($remoteendpoint.Port.ToString())"
+
+
 #######################################################################################
 # Connect to On-Prem vCenter
 #######################################################################################  
