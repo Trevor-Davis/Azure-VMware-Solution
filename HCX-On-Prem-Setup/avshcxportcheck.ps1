@@ -105,6 +105,8 @@ $HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassw
   }
 
 
+
+
 $appliances =  Get-HCXInterconnectStatus -Server $HCXCloudIP 
  
 $hash=@{}
@@ -120,18 +122,54 @@ $hash
 
 Write-Host -ForegroundColor Yellow "
 Please Provide the Values From The Table Above
-----------------------------------------------"
+----------------------------------------------
+"
 
 Write-Host "HCXServiceMesh-NE-R1" -NoNewline
-write-host -foregroundcolor yellow " - Management IP Address: "
+write-host -foregroundcolor yellow " - Management IP Address: " -NoNewline
 $nemgmtip = Read-Host 
-$nemgmtip
+Write-Host "HCXServiceMesh-NE-R1" -NoNewline
+write-host -foregroundcolor yellow " - Uplink IP Address: " -NoNewline
+$neuplinkip = Read-Host 
+Write-Host "
+HCXServiceMesh-IX-R1" -NoNewline
+write-host -foregroundcolor yellow " - Management IP Address: " -NoNewline
+$ixmgmtip = Read-Host 
+Write-Host "HCXServiceMesh-IX-R1" -NoNewline
+write-host -foregroundcolor yellow " - Uplink IP Address: " -NoNewline
+$ixuplinkip = Read-Host 
+Write-Host "HCXServiceMesh-IX-R1" -NoNewline
+write-host -foregroundcolor yellow " - vMotion IP Address: " -NoNewline
+$ixvmotionip = Read-Host 
+write-host ""
+
+Invoke-WebRequest -uri "https://connect.hcx.vmware.com" -ErrorVariable connecthcxerror
+cls
+Invoke-WebRequest -uri "https://hybridity-depot.vmware.com/" -ErrorVariable hybridityerror
+cls
+
+if ($connecthcxerror.ErrorRecord.ErrorDetails.Message.Contains("403") -eq "True")
+{
+Write-Host -foregroundcolor Yellow "Connection to connect.hcx.vmware.com: " -NoNewline
+Write-HOst -ForegroundColor Green "OK"
+}
+else {
+  Write-Host -foregroundcolor Yellow "Connection to connect.hcx.vmware.com: " -NoNewline
+  Write-HOst -ForegroundColor Red "Failed"
+  Write-Host "Most likely the network does not have access to the Internet"
+}
 
 
-$test  
-
-<#
-
+if ($hybridityerror.ErrorRecord.ErrorDetails.Message.Contains("An error occurred while processing your request") -eq "True")
+{
+Write-Host -foregroundcolor Yellow "Connection to hybridity-depot.vmware.com: " -NoNewline
+Write-HOst -ForegroundColor Green "OK"
+}
+else {
+  Write-Host -foregroundcolor Yellow "Connection to connect.hcx.vmware.com: " -NoNewline
+  Write-HOst -ForegroundColor Red "Failed"
+  Write-Host "Most likely the network does not have access to the Internet"
+}
 
 #######################################################################################
 # Connect to On-Prem vCenter
