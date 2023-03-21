@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Environment
+     xmlns="http://schemas.dmtf.org/ovf/environment/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xmlns:oe="http://schemas.dmtf.org/ovf/environment/1"
+     xmlns:ve="http://www.vmware.com/schema/ovfenv"
+     oe:id=""
+     ve:vCenterId="vm-378847">
+   <PlatformSection>
+      <Kind>VMware ESXi</Kind>
+      <Version>5.1.0</Version>
+      <Vendor>VMware, Inc.</Vendor>
+      <Locale>en</Locale>
+   </PlatformSection>
+   <EthernetAdapterSection>
+      <Adapter ve:mac="00:50:56:01:09:9b" ve:network="vxw-dvs-82-virtualwire-40-sid-5017-dvs.VCDVSDefault-3773f133-3c4a-45a7-b39c-72ff" ve:unitNumber="7"/>
+   </EthernetAdapterSection>
+</Environment>
+
+
+

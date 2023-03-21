@@ -1,17 +1,36 @@
+# Author: Trevor Davis
+# Website: www.virtualworkloads.com
+# Twitter: vTrevorDavis
+# This script can be used to check HCX port communication to the AVS Private Cloud from an on-premises environment.
+# INSTRUCTIONS: Modify the variables, then run the script. 
+
+#variables
 
 $global:sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
 $global:pcname = "VirtualWorkloads-AVS-PC01" #Name of the AVS private cloud
 $global:pcrg = "VirtualWorkloads-AVS-PC01" #The resource group where AVS private cloud is deployed.
 
 
+
+
+
+
+
+
+
+
+
+
 #DO NOT MODIFY BELOW THIS LINE #################################################
-. test-port-function.ps1
-
-
 $ProgressPreference = 'SilentlyContinue'
 Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
 $HCXCloudUserID = "cloudadmin@vsphere.local"
 $logfilename = "hcxportcheck.log"
+
+#test-port function
+$filename = "Function-test-port.ps1"
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+. $env:TEMP\$filename
 
 #Azure Login
 $filename = "Function-azurelogin.ps1"
@@ -49,14 +68,22 @@ $HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassw
 ######################################
 # Connect To Cloud HCX Manager
 ######################################
-  $connecthcx = Connect-HCXServer -Server $HCXCloudIP -User $HCXCloudUserID -Password $HCXCloudPassword 
+######################################
+# Connect To Cloud HCX Manager
+######################################
+$connecthcx = Connect-HCXServer -Server $HCXCloudIP -User $HCXCloudUserID -Password $HCXCloudPassword 
+If ($connecthcx.IsConnected -ne "True" ) {
+  Write-Host -ForegroundColor yellow "Unable to Connect to HCX Manager in AVS ($($hcxcloudip)) on port 443"
+  Exit
+}
+<#  $connecthcx = Connect-HCXServer -Server $HCXCloudIP -User $HCXCloudUserID -Password $HCXCloudPassword 
   while ($connecthcx.IsConnected -ne "True" ) {
     Write-Host -ForegroundColor yellow 'Waiting for On-Premises HCX Connector Services To Re-Start ... Checking Again In 1 Minute ....'
     Start-Sleep -Seconds 60
     $connecthcx = Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword 
   
   }
-
+#>
 
 
 
