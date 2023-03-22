@@ -7,6 +7,10 @@
 
 
 ####################################################################
+# Function - IfSelection
+####################################################################
+
+####################################################################
 # Function - Write All Variables to File
 ####################################################################
 $variablestorage = "c:\windows\temp\hcxappliancevariables.ps1"
@@ -40,8 +44,6 @@ function updatevariablefile {
 
 }
 
-updatevariablefile
-
 ####################################################################
 # Function - Main Menu
 ####################################################################
@@ -52,14 +54,14 @@ function mainmenu
         [string]$Title = 'Azure VMware Solution On-Prem HCX Deployment Appliance'
     )
     Clear-Host
-    Write-Host "================ $Title ================"
+    Write-Host "
+    
+================ $Title ================"
 Write-Host -ForegroundColor Yellow "
-
 1. Verify HCX Network Connectivity
 2. Input HCX Deployment and Configuration Parameters
 3. Kickoff HCX Deployment and Configuration
-4. Save All Configuration Parameters and Exit
-6. Reset to Defaults
+
 0. Exit
 "
 
@@ -67,16 +69,16 @@ Write-Host "
 Selection: " -NoNewline
 $Selection = Read-Host
 
-if ($Selection -eq 1){menu-verifyhcxconnectivity}
-if ($Selection -eq 2){menu-inputhcxparameters}
-if ($Selection -eq 3){mainmenu-selection3}
+if ($Selection -eq 1){menuverifyhcxconnectivity}
+if ($Selection -eq 2){menuhcxparameters}
+if ($Selection -eq 3){. c:\windows\temp\avshcxonpremsetup-forappliance.ps1}
 }
 
 ####################################################################
-# Function - Menu-VerifyHCXConnectivity
+# Function - menuverifyhcxconnectivity
 ####################################################################
 
-function menu-verifyhcxconnectivity
+function menuverifyhcxconnectivity
 {
 param ()
 Clear-Host
@@ -102,7 +104,7 @@ Write-Host "
 AVS Private Cloud Subscription ID: " -NoNewline
 $global:sub = Read-Host
 updatevariablefile
-menu-verifyhcxconnectivity
+menuverifyhcxconnectivity
 }
 
 If ($Selection -eq 2){
@@ -110,7 +112,7 @@ Write-Host "
 AVS Private Cloud Name: " -NoNewline
 $global:pcname = Read-Host
 Add-Content -path $variablestorage -value ('$global:pcname = "'+($global:pcname)+'"')
-menu-verifyhcxconnectivity
+menuverifyhcxconnectivity
 }
 
 If ($Selection -eq 3){
@@ -118,7 +120,7 @@ Write-Host "
 AVS Private Cloud Resource Group:  " -NoNewline
 $global:pcrg = Read-Host
 Add-Content -path $variablestorage -value ('$global:pcrg = "'+($global:pcrg)+'"')
-menu-verifyhcxconnectivity
+menuverifyhcxconnectivity
 }
 
 If ($Selection -eq "r"){
@@ -131,20 +133,20 @@ mainmenu
 
 If ($Selection -ne 1 -or $Selection -ne 2 -or $Selection -ne 3 -or $Selection -ne "r" -or $Selection -ne 0)
 {
-    menu-verifyhcxconnectivity    
+    menuverifyhcxconnectivity    
 }
       
 }
 
 ####################################################################
-#   Function - Menu-InputHCXParameters
+#   Function - hcxparameterlist
 ####################################################################
 
-function menuinputhcxparameterslist {
+function hcxparameterlist {
     param ()
     
 
-$menuinputhcxparameterslist = @(
+$global:hcxparameterslist = @(
 @{Question=("AVS Private Cloud Information"); Variable=("")}
 @{Question=("============================="); Variable=("")}
 @{Question=("1. AVS Private Cloud Subscription ID: ");  Variable=($global:sub)}
@@ -187,12 +189,16 @@ $menuinputhcxparameterslist = @(
 )
 }
 
-function menu-inputhcxparameters
+####################################################################
+#   Function - MenuHCXParameters
+####################################################################
+
+function menuhcxparameters
 {
 param ()
 Clear-Host
-menuinputhcxparameterslist
-foreach ($item in $menuinputhcxparameterslist) {
+hcxparameterlist
+foreach ($item in $hcxparameterslist) {
     write-host $item.Question -NoNewline
     write-host -ForegroundColor yellow $item.Variable
 }
@@ -207,17 +213,227 @@ Write-Host "
 Input Value for " -NoNewline
 Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
 $global:sub = Read-Host
-Add-Content -path $variablestorage -value ('$global:sub = "'+($global:sub)+'"')
-menu-inputhcxparameters
+updatevariablefile
+menuhcxparameters
 }
-      
+
+If ($Selection -eq 2){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:pcname = Read-Host
+updatevariablefile
+menuhcxparameters}
+
+If ($Selection -eq 3){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:pcrg = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 4){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:OnPremVIServerIP = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 5){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:OnPremVIServerUsername = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 6){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:OnPremVIServerPassword = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 7){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:OnPremCluster = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 8){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:datastore = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 9){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:VMNetwork = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 10){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXOnPremAdminPassword = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 11){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXVMIP = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 12){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXVMNetmask = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 13){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXVMGateway = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 14){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXVMDNS = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 15){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXVMDomain = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 16){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:PSCIP = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 17){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:ssodomain = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 18){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:ssogroup = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 19){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:HCXOnPremLocation = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 20){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:managementportgroup = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 21){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:mgmtprofilegateway = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 22){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:mgmtnetworkmask = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 23){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:mgmtippool = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
+If ($Selection -eq 24){
+Write-Host "
+Input Value for " -NoNewline
+Write-Host -foregroundcolor Yellow "Item $($Selection): " -NoNewline
+$global:l2extendedVDS = Read-Host
+updatevariablefile
+menuhcxparameters
+}
+
 If ($Selection -eq 0){
 mainmenu
 }
 
-If ($Selection -ne 1 -or $Selection -ne 2 -or $Selection -ne 3 -or $Selection -ne "r" -or $Selection -ne 0)
+If ($Selection -ne 1 -or $Selection -ne 2 -or $Selection -ne 3 -or $Selection -ne 4 -or $Selection -ne 5 -or $Selection -ne 6 `
+-or $Selection -ne 7 -or $Selection -ne 8 -or $Selection -ne 9 -or $Selection -ne 10 -or $Selection -ne 11 -or $Selection -ne 12 `
+-or $Selection -ne 13 -or $Selection -ne 14 -or $Selection -ne 15 -or $Selection -ne 16 -or $Selection -ne 17 -or $Selection -ne 18 `
+-or $Selection -ne 19 -or $Selection -ne 20 -or $Selection -ne 21 -or $Selection -ne 22 -or $Selection -ne 23 -or $Selection -ne 24 `
+-or $Selection -ne 0)
 {
-    menu-inputhcxparameters
+    menuhcxparameters
 }
       
 }
