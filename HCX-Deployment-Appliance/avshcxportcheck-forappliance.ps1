@@ -2,11 +2,11 @@
 # Website: www.virtualworkloads.com
 # Twitter: vTrevorDavis
 # This script can be used to check HCX port communication to the AVS Private Cloud from an on-premises environment.
-# INSTRUCTIONS: Modify the variables, then run the script. 
 
 #variables
+$appliancefiledirectory = "c:\windows\temp\hcxappliance"
 
-. c:\windows\temp\hcxappliancevariables.ps1
+. $appliancefiledirectory\hcxappliancevariables.ps1
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 $ProgressPreference = 'SilentlyContinue'

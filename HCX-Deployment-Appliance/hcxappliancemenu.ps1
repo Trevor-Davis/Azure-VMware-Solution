@@ -4,7 +4,7 @@
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
 
-
+$appliancefiledirectory = "c:\windows\temp\hcxappliance"
 
 ####################################################################
 # Function - IfSelection
@@ -13,7 +13,7 @@
 ####################################################################
 # Function - Write All Variables to File
 ####################################################################
-$variablestorage = "c:\windows\temp\hcxappliancevariables.ps1"
+$variablestorage = $appliancefiledirectory+"\hcxappliancevariables.ps1"
 
 function updatevariablefile {
     param ()
@@ -58,9 +58,9 @@ function mainmenu
     
 ================ $Title ================"
 Write-Host -ForegroundColor Yellow "
-1. Verify HCX Network Connectivity
-2. Input HCX Deployment and Configuration Parameters
-3. Kickoff HCX Deployment and Configuration
+1. Verify HCX Network Connectivity From On-Premises to Azure/AVS
+2. Input HCX Deployment and Configuration Parameters for On-Premises Deployment
+3. Kickoff On-Premises HCX Deployment and Configuration
 
 0. Exit
 "
@@ -71,7 +71,8 @@ $Selection = Read-Host
 
 if ($Selection -eq 1){menuverifyhcxconnectivity}
 if ($Selection -eq 2){menuhcxparameters}
-if ($Selection -eq 3){. c:\windows\temp\avshcxonpremsetup-forappliance.ps1}
+if ($Selection -eq 3){. $appliancefiledirectory\avshcxonpremsetup-forappliance.ps1}
+if ($Selection -eq 0){exit}
 }
 
 ####################################################################
@@ -124,7 +125,7 @@ menuverifyhcxconnectivity
 }
 
 If ($Selection -eq "r"){
-. c:\windows\temp\avshcxportcheck-forappliance.ps1
+. $appliancefiledirectory\avshcxportcheck-forappliance.ps1
 }
       
 If ($Selection -eq 0){
@@ -441,5 +442,5 @@ If ($Selection -ne 1 -or $Selection -ne 2 -or $Selection -ne 3 -or $Selection -n
 
 ###################################################################
 
-. C:\windows\temp\hcxappliancevariables.ps1
+. $appliancefiledirectory+"\hcxappliancevariables.ps1"
 mainmenu

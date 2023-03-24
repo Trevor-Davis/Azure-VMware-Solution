@@ -7,7 +7,10 @@
 
 #variables
 
-. C:\windows\temp\hcxappliancevariables.ps1
+$appliancefiledirectory = "c:\windows\temp\hcxappliance"
+
+. $appliancefiledirectory\hcxappliancevariables.ps1
+
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 $ProgressPreference = 'SilentlyContinue'
