@@ -4,6 +4,7 @@
 # This script can be used to check HCX port communication to the AVS Private Cloud from an on-premises environment.
 
 #variables
+Set-PowerCLIConfiguration -ParticipateInCEIP $false -Confirm:$false
 $appliancefiledirectory = "c:\windows\temp\hcxappliance"
 
 . $appliancefiledirectory\hcxappliancevariables.ps1
@@ -16,12 +17,13 @@ $logfilename = "hcxportcheck.log"
 
 #test-port function
 $filename = "Function-test-port.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$filename" -OutFile $env:TEMP\$filename
 . $env:TEMP\$filename
+
 
 #Azure Login
 $filename = "Function-azurelogin.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$filename
 . $env:TEMP\$filename
 
 azurelogin -subtoconnect $sub
@@ -31,7 +33,7 @@ Start-Transcript -Path $env:TEMP\$logfilename -Append
 
 #Execution
 
-Write-Host -foregroundcolor Magenta "
+Write-Host -foregroundcolor Yellow "
 Checking HCX Port Communication to $pcname"
 
 #######################################################################################
@@ -47,7 +49,8 @@ $HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
 #Password
 
 $command = Get-AzVMwarePrivateCloudAdminCredential -PrivateCloudName $pcname -ResourceGroupName $pcrg
-$HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassword -AsPlainText
+$vcenterpassword = $command.VcenterPassword
+$HCXCloudPassword = ConvertFrom-SecureString -SecureString $vcenterpassword -AsPlainText
 
 ######################################
 # Connect To Cloud HCX Manager
@@ -60,15 +63,27 @@ $HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassw
 
 #this will list all HCX Appliances
 $appliances =  Get-HCXInterconnectStatus -Server $HCXCloudIP 
+$appliancecount = 0
 $hash=@{}
 foreach ($appliance in $appliances)
 {
  $hash.add($appliance.ServiceComponent,$appliance.IpAddress -split ";")
+ $appliancecount = $appliancecount+1
 }
 $hash
 
-$Selection = 2
+Write-Host "
+HCX Manager (Cloud): " $HCXCloudIP 
+Write-Host "Number of Appliances Deployed: " $appliancecount
 
+if ($appliancecount -eq 0){
+Write-Host -ForegroundColor Red "
+It appears HCX is not deployed ... Press Any Key To Continue"
+Read-Host
+Exit
+}
+
+$Selection = 2
 while ($selection -eq 2) {
   
 Write-Host -ForegroundColor Yellow "
@@ -102,8 +117,6 @@ Enter Your Selection: " -NoNewline
 $Selection = Read-Host
 
 }
-
-
 
 #Run all the tests
 Invoke-WebRequest -uri "https://connect.hcx.vmware.com" -ErrorVariable connecthcxerror

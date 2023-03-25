@@ -92,7 +92,8 @@ Write-Host "2. AVS Private Cloud Name: " -NoNewline
 write-host -foregroundcolor yellow "$($global:pcname)"
 Write-Host "3. AVS Private Cloud Resource Group: "  -NoNewline 
 write-host -foregroundcolor yellow "$($global:pcrg)"
-Write-Host "R. Run The HCX Network Connectivity Check"
+Write-Host "
+R. Run The HCX Network Connectivity Check"
 Write-Host "
 0. Return to Main Menu"
 
@@ -442,5 +443,5 @@ If ($Selection -ne 1 -or $Selection -ne 2 -or $Selection -ne 3 -or $Selection -n
 
 ###################################################################
 
-. $appliancefiledirectory+"\hcxappliancevariables.ps1"
+. $variablestorage
 mainmenu

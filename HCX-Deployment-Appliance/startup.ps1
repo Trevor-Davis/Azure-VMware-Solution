@@ -1,0 +1,1 @@
+start-process -Filepath c:\windows\temp\hcxappliance\hcxappliancemenu.lnk
