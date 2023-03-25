@@ -2,24 +2,12 @@
 # Website: www.virtualworkloads.com
 # Twitter: vTrevorDavis
 # This script can be used to check HCX port communication to the AVS Private Cloud from an on-premises environment.
-# INSTRUCTIONS: Modify the variables, then run the script. 
 
 #variables
+Set-PowerCLIConfiguration -ParticipateInCEIP $false -Confirm:$false
+$appliancefiledirectory = "c:\windows\temp\hcxappliance"
 
-$global:sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
-$global:pcname = "VirtualWorkloads-AVS-PC01" #Name of the AVS private cloud
-$global:pcrg = "VirtualWorkloads-AVS-PC01" #The resource group where AVS private cloud is deployed.
-
-
-
-
-
-
-
-
-
-
-
+. $appliancefiledirectory\hcxappliancevariables.ps1
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 $ProgressPreference = 'SilentlyContinue'
@@ -29,12 +17,13 @@ $logfilename = "hcxportcheck.log"
 
 #test-port function
 $filename = "Function-test-port.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/scripts/main/Functions/$filename" -OutFile $env:TEMP\$filename
 . $env:TEMP\$filename
+
 
 #Azure Login
 $filename = "Function-azurelogin.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$folder\$filename
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/AzureScripts/main/Functions/$filename" -OutFile $env:TEMP\$filename
 . $env:TEMP\$filename
 
 azurelogin -subtoconnect $sub
@@ -44,9 +33,8 @@ Start-Transcript -Path $env:TEMP\$logfilename -Append
 
 #Execution
 
-Write-Host -foregroundcolor Magenta "
+Write-Host -foregroundcolor Yellow "
 Checking HCX Port Communication to $pcname"
-
 
 #######################################################################################
 #Get HCX Cloud IP Address and Password
@@ -61,43 +49,41 @@ $HCXCloudIP = $HCXCloudURL.Substring(8,$length-9)
 #Password
 
 $command = Get-AzVMwarePrivateCloudAdminCredential -PrivateCloudName $pcname -ResourceGroupName $pcrg
-$HCXCloudPassword = ConvertFrom-SecureString -SecureString $command.VcenterPassword -AsPlainText
-
-
+$vcenterpassword = $command.VcenterPassword
+$HCXCloudPassword = ConvertFrom-SecureString -SecureString $vcenterpassword -AsPlainText
 
 ######################################
 # Connect To Cloud HCX Manager
 ######################################
-######################################
-# Connect To Cloud HCX Manager
-######################################
-$connecthcx = Connect-HCXServer -Server $HCXCloudIP -User $HCXCloudUserID -Password $HCXCloudPassword 
-If ($connecthcx.IsConnected -ne "True" ) {
-  Write-Host -ForegroundColor yellow "Unable to Connect to HCX Manager in AVS ($($hcxcloudip)) on port 443"
-  Exit
+  $connecthcx = Connect-HCXServer -Server $HCXCloudIP -User $HCXCloudUserID -Password $HCXCloudPassword 
+  If ($connecthcx.IsConnected -ne "True" ) {
+    Write-Host -ForegroundColor yellow "Unable to Connect to HCX Manager in AVS ($($hcxcloudip)) on port 443"
+    Exit
 }
-<#  $connecthcx = Connect-HCXServer -Server $HCXCloudIP -User $HCXCloudUserID -Password $HCXCloudPassword 
-  while ($connecthcx.IsConnected -ne "True" ) {
-    Write-Host -ForegroundColor yellow 'Waiting for On-Premises HCX Connector Services To Re-Start ... Checking Again In 1 Minute ....'
-    Start-Sleep -Seconds 60
-    $connecthcx = Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword 
-  
-  }
-#>
-
-
 
 #this will list all HCX Appliances
 $appliances =  Get-HCXInterconnectStatus -Server $HCXCloudIP 
+$appliancecount = 0
 $hash=@{}
 foreach ($appliance in $appliances)
 {
  $hash.add($appliance.ServiceComponent,$appliance.IpAddress -split ";")
+ $appliancecount = $appliancecount+1
 }
 $hash
 
-$Selection = 2
+Write-Host "
+HCX Manager (Cloud): " $HCXCloudIP 
+Write-Host "Number of Appliances Deployed: " $appliancecount
 
+if ($appliancecount -eq 0){
+Write-Host -ForegroundColor Red "
+It appears HCX is not deployed ... Press Any Key To Continue"
+Read-Host
+Exit
+}
+
+$Selection = 2
 while ($selection -eq 2) {
   
 Write-Host -ForegroundColor Yellow "
@@ -132,13 +118,11 @@ $Selection = Read-Host
 
 }
 
-
-
 #Run all the tests
 Invoke-WebRequest -uri "https://connect.hcx.vmware.com" -ErrorVariable connecthcxerror
-cls
+Clear-Host
 Invoke-WebRequest -uri "https://hybridity-depot.vmware.com/" -ErrorVariable hybridityerror
-cls
+Clear-Host
 write-host -foregroundcolor yellow "Testing HCX Communication, Please Wait"
 $nemgmtiptest = test-port -computer $nemgmtip -port 4500 -UDPtimeout 5000 -UDP
 $neuplinkiptest = test-port -computer $neuplinkip -port 4500 -UDPtimeout 5000 -UDP
