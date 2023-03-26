@@ -258,7 +258,8 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
     }
 }
 
-
+write-host "press key"
+Read-Host
 
   #########################################
   # Encode the HCX On Prem Admin credentials
@@ -267,7 +268,10 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $HCXOnPremCredentials = "$HCXOnPremAdminUserID"+":"+"$HCXOnPremAdminPassword" 
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($HCXOnPremCredentials)
   $HCXOnPremAdminCredentialsEncoded =[Convert]::ToBase64String($HCXBytes)
-     
+
+  write-host "press key"
+  Read-Host
+       
     
   ######################################
   # Get The Certificate From HCX Cloud
@@ -285,14 +289,18 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/certificates -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-       
+  write-host "press key"
+  Read-Host
+         
 
   ##########################
   # Encode The On-Prem vCenter Password
   ##########################
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($OnPremVIServerPassword)
   $OnPremVIServerPasswordEncoded =[Convert]::ToBase64String($HCXBytes)
-   
+  write-host "press key"
+  Read-Host
+     
   ##########################
   # Connect HCX Connector to OnPrem Vcenter
   ##########################
@@ -319,7 +327,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/vcenter -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-   
+  write-host "press key"
+  Read-Host
+     
    
    
   ##########################
@@ -349,7 +359,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   
   $response | ConvertTo-Json
    
-  
+  write-host "press key"
+  Read-Host
+    
   ######################################
   # Define the Role Mapping
   ####################################
@@ -377,7 +389,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
 
   Write-Host -ForegroundColor Green "HCX Role Mapping Set To $ssodomain\$ssogroup"
 
- 
+  write-host "press key"
+  Read-Host
+   
   
   #########################
   # Retrieve Location 
@@ -422,7 +436,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/location -Method 'PUT' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-   
+  write-host "press key"
+  Read-Host
+     
   ##########################
   #Activate HCX
   ###########################
@@ -456,6 +472,8 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $response | ConvertTo-Json
   
 } 
+write-host "press key"
+Read-Host
   
   ################################
   ## login to HCX Connector and get the session info / Certificate for future API Call
@@ -478,7 +496,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $response | ConvertTo-Json
   $session
   
-   
+  write-host "press key"
+  Read-Host
+     
 
   ######################################
   # Connect To On Prem HCX Server
@@ -491,7 +511,11 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   
   }
  
-######################
+  write-host "press key"
+  Read-Host
+  
+  
+  ######################
 # Site Pairing
 ######################
     $command = New-HCXSitePairing -Url https://$($HCXCloudIP) -Username $HCXCloudUserID -Password $HCXCloudPassword -Server $HCXVMIP
@@ -508,7 +532,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $mgmtnetworkprofilename -GatewayAddress $mgmtprofilegateway -IPPool $mgmtippool -Network $mgmtnetworkbacking -PrefixLength $mgmtnetworkmask
   $command | ConvertTo-Json
   
-   
+  write-host "press key"
+Read-Host
+ 
   
   ######################
   # Create ComputeProfile
@@ -540,7 +566,9 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
 
   $command | ConvertTo-Json
   
-  
+  write-host "press key"
+  Read-Host
+    
   
   ###############
   #Service Mesh
