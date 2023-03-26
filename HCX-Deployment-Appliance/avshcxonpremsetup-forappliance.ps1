@@ -337,7 +337,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
               {
                   `"config`": {
                       `"providerType`": `"PSC`",
-                      `"lookupServiceUrl`": `"$PSCIP`"
+                      `"lookupServiceUrl`": `"https://$PSCIP`"
                   }
               }
           ]
