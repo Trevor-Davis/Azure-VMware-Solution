@@ -336,7 +336,6 @@ Read-Host
   # Define PSC
   ##########################
   
-  $PSCURL = "https://$pscip"
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
   $headers.Add("Accept", "application/json")
   $headers.Add("Content-Type", "application/json")
@@ -348,7 +347,7 @@ Read-Host
               {
                   `"config`": {
                       `"providerType`": `"PSC`",
-                      `"lookupServiceUrl`": `"$PSCURL`"
+                      `"lookupServiceUrl`": `"$PSCIP`"
                   }
               }
           ]
