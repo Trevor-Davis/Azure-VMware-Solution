@@ -326,6 +326,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
   # Define PSC
   ##########################
   
+  $PSCURL = "https://$pscip"
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
   $headers.Add("Accept", "application/json")
   $headers.Add("Content-Type", "application/json")
@@ -337,7 +338,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
               {
                   `"config`": {
                       `"providerType`": `"PSC`",
-                      `"lookupServiceUrl`": `"https://$PSCIP`"
+                      `"lookupServiceUrl`": `"$PSCURL`"
                   }
               }
           ]
