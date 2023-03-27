@@ -509,8 +509,8 @@ exit}
   $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $mgmtnetworkprofilename -GatewayAddress $mgmtprofilegateway -IPPool $mgmtippool -Network $mgmtnetworkbacking -PrefixLength $mgmtnetworkmask
   $command | ConvertTo-Json
   
-  
-
+Write-Host "management network profile created on prem"  
+Read-Host
   
   ######################
   # Create ComputeProfile
@@ -542,7 +542,10 @@ exit}
 
   $command | ConvertTo-Json
   
-   
+  
+  Write-Host "created on prem compute profile"  
+  Read-Host
+     
   
   ###############
   #Service Mesh
@@ -550,6 +553,9 @@ exit}
     
   $hcxDestinationSite = Get-HCXSite -Destination -ErrorAction Stop
   $hcxDestinationSite
+  Write-Host "hcxdestinationsite"  
+  Read-Host
+     
   $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName -Server $HCXVMIP
   $hcxLocalComputeProfile
   $hcxRemoteComputeProfileName = Get-HCXComputeProfile -Site $hcxDestinationSite
