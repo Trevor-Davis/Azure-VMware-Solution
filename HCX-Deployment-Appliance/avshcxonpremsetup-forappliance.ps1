@@ -250,12 +250,12 @@ Success: HCX Manager is now ready to be configured!"
     }
     catch {
         Write-Host -ForegroundColor Yellow "
-HCX Manager Still Getting Ready ... Will Check Again In 1 Minute ..."
-        Start-Sleep 60
+HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
+        Start-Sleep 30
     }
 }
 
-write-host "press key"
+write-host "press key ... hcx manager is ready, take snapshot"
 Read-Host
 
   #########################################
@@ -326,8 +326,7 @@ Read-Host
   
   write-host "press key"
   Read-Host
-     
-   
+       
    
   ##########################
   # Define PSC
@@ -388,6 +387,32 @@ Read-Host
   write-host "press key"
   Read-Host
    
+
+  ###############################
+  ## login to HCX Connector and get the session info / Certificate for future API Call
+  ###################################
+  
+  $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+  $headers.Add("Content-Type", "application/json")
+  $headers.Add("Accept", "application/json")
+  $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
+
+  
+  $body = "{
+         `"username`": `"$OnPremVIServerUsername`",
+         `"password`": `"$OnPremVIServerPassword`"
+     }"
+  ##This username and password combination is used because it's the same as the on-prem vcenter
+  
+  
+  $response = Invoke-RestMethod https://$($HCXVMIP)/hybridity/api/sessions -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck -SessionVariable 'Session'
+  $response | ConvertTo-Json
+  $session
+  
+  write-host "press key"
+  Read-Host
+
+
   
   #########################
   # Retrieve Location 
@@ -471,29 +496,6 @@ Read-Host
 write-host "press key"
 Read-Host
   
-  ################################
-  ## login to HCX Connector and get the session info / Certificate for future API Call
-  ###################################
-  
-  $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-  $headers.Add("Content-Type", "application/json")
-  $headers.Add("Accept", "application/json")
-  $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
-
-  
-  $body = "{
-         `"username`": `"$OnPremVIServerUsername`",
-         `"password`": `"$OnPremVIServerPassword`"
-     }"
-  ##This username and password combination is used because it's the same as the on-prem vcenter
-  
-  
-  $response = Invoke-RestMethod https://$($HCXVMIP)/hybridity/api/sessions -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck -SessionVariable 'Session'
-  $response | ConvertTo-Json
-  $session
-  
-  write-host "press key"
-  Read-Host
      
 
   ######################################
