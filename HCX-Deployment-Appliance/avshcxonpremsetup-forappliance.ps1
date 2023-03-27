@@ -8,9 +8,7 @@
 #variables
 
 $appliancefiledirectory = "c:\windows\temp\hcxappliance"
-
 . $appliancefiledirectory\hcxappliancevariables.ps1
-
 
 #DO NOT MODIFY BELOW THIS LINE #################################################
 $ProgressPreference = 'SilentlyContinue'
@@ -35,11 +33,10 @@ azurelogin -subtoconnect $sub
 #Start Logging
 Start-Transcript -Path $env:TEMP\$logfilename -Append
 
-#Execution
+#Execution ###########################################################################
 
-Write-Host -foregroundcolor Magenta "
+Write-Host -foregroundcolor Yellow "
 Deploying HCX Manager to vCenter $OnPremVIServerIP and Connecting to $pcname"
-
 
 #######################################################################################
 # Connect to On-Prem vCenter
@@ -517,10 +514,21 @@ Read-Host
   ######################
 # Site Pairing
 ######################
+
+$request = Invoke-WebRequest -Uri "https://$($HCXCloudIP)" -Method GET -SkipCertificateCheck -TimeoutSec 5
+         
+if($request.StatusCode -ne 200) {
+Write-Host -foregroundcolor Red "
+It appears there is no network connectivity to $HCXCloudIP, cannot continue"
+exit}
+
     $command = New-HCXSitePairing -Url https://$($HCXCloudIP) -Username $HCXCloudUserID -Password $HCXCloudPassword -Server $HCXVMIP
     $command | ConvertTo-Json
     $command
- 
+
+    write-host "press key"
+    Read-Host
+     
   ######################
   # Create Management Network Profile
   ######################
