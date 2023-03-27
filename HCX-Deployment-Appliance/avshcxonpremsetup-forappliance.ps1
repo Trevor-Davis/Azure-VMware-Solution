@@ -651,9 +651,9 @@ $status.ServiceStatus
 
 $status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 if ($status.ServiceStatus.status.Contains("up") -eq "True"){
+$status.ServiceStatus
 Write-host -nonewline "Service Mesh Status: "
 Write-Host -ForegroundColor Green "Complete"
+Write-Host -ForegroundColor Yellow "Press Any Key to Exit ... Installation Complete"
+Read-Host
 }
-
-$status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
-$status.ServiceStatus
