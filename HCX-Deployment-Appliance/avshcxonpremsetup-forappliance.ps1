@@ -3,7 +3,7 @@
 # Twitter: vTrevorDavis
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
-# 0.9
+# 0.91
  
 
 #variables
@@ -256,8 +256,6 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
     }
 }
 
-write-host "press key ... hcx manager is ready, take snapshot"
-Read-Host
 
   #########################################
   # Encode the HCX On Prem Admin credentials
@@ -439,8 +437,6 @@ Read-Host
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/location -Method 'PUT' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-  write-host "press key"
-  Read-Host
      
   ##########################
   #Activate HCX
@@ -475,11 +471,6 @@ Read-Host
   $response | ConvertTo-Json
   
 } 
-write-host "press key"
-Read-Host
-  
-     
-
   ######################################
   # Connect To On Prem HCX Server
   ######################################
@@ -491,9 +482,6 @@ Read-Host
   
   }
  
-  write-host "press key"
-  Read-Host
-  
   
   ######################
 # Site Pairing
@@ -510,9 +498,7 @@ exit}
     $command | ConvertTo-Json
     $command
 
-    write-host "press key"
-    Read-Host
-     
+    
   ######################
   # Create Management Network Profile
   ######################
@@ -523,9 +509,8 @@ exit}
   $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $mgmtnetworkprofilename -GatewayAddress $mgmtprofilegateway -IPPool $mgmtippool -Network $mgmtnetworkbacking -PrefixLength $mgmtnetworkmask
   $command | ConvertTo-Json
   
-  write-host "press key"
-Read-Host
- 
+  
+
   
   ######################
   # Create ComputeProfile
