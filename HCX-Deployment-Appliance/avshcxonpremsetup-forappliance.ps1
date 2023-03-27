@@ -266,8 +266,7 @@ Read-Host
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($HCXOnPremCredentials)
   $HCXOnPremAdminCredentialsEncoded =[Convert]::ToBase64String($HCXBytes)
 
-  write-host "press key"
-  Read-Host
+
        
     
   ######################################
@@ -286,17 +285,11 @@ Read-Host
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/certificates -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-  write-host "press key"
-  Read-Host
-         
-
   ##########################
   # Encode The On-Prem vCenter Password
   ##########################
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($OnPremVIServerPassword)
   $OnPremVIServerPasswordEncoded =[Convert]::ToBase64String($HCXBytes)
-  write-host "press key"
-  Read-Host
      
   ##########################
   # Connect HCX Connector to OnPrem Vcenter
@@ -324,9 +317,6 @@ Read-Host
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/vcenter -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-  write-host "press key"
-  Read-Host
-       
    
   ##########################
   # Define PSC
@@ -354,9 +344,7 @@ Read-Host
   
   $response | ConvertTo-Json
    
-  write-host "press key"
-  Read-Host
-    
+
   ######################################
   # Define the Role Mapping
   ####################################
@@ -384,9 +372,7 @@ Read-Host
 
   Write-Host -ForegroundColor Green "HCX Role Mapping Set To $ssodomain\$ssogroup"
 
-  write-host "press key"
-  Read-Host
-   
+
 
   ###############################
   ## login to HCX Connector and get the session info / Certificate for future API Call
@@ -408,11 +394,6 @@ Read-Host
   $response = Invoke-RestMethod https://$($HCXVMIP)/hybridity/api/sessions -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck -SessionVariable 'Session'
   $response | ConvertTo-Json
   $session
-  
-  write-host "press key"
-  Read-Host
-
-
   
   #########################
   # Retrieve Location 
@@ -575,9 +556,7 @@ Read-Host
 
   $command | ConvertTo-Json
   
-  write-host "press key"
-  Read-Host
-    
+   
   
   ###############
   #Service Mesh
@@ -651,9 +630,16 @@ $status.ServiceStatus
 
 $status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 if ($status.ServiceStatus.status.Contains("up") -eq "True"){
-$status.ServiceStatus
+
 Write-host -nonewline "Service Mesh Status: "
-Write-Host -ForegroundColor Green "Complete"
-Write-Host -ForegroundColor Yellow "Press Any Key to Exit ... Installation Complete"
-Read-Host
+Write-Host -ForegroundColor Green "Complete
+"
 }
+
+Write-Host -ForegroundColor Yellow "
+Press Any Key to Exit"
+$status.ServiceStatus
+
+Read-Host
+Write-Host -ForegroundColor Yellow "Script Will Exit in 30 Seconds"
+Start-Sleep -Seconds 30
