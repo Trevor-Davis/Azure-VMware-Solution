@@ -678,7 +678,8 @@ Write-Host -ForegroundColor Yellow "
 Press Any Key to Begin Checking Communication Ports to HCX Components in $pcname"
 Read-Host
 .\avshcxportcheck-forappliance.ps1
-Write-Host -ForegroundColor Yellow "Press Any Key To Return To The Main Menu"
+Write-Host -ForegroundColor Yellow "
+Press Any Key To Return To The Main Menu"
 Read-Host
 mainmenu
 }
@@ -689,7 +690,8 @@ else {
 Press Any Key to Begin Checking Communication Ports to HCX Components in $pcname"
   Read-Host
   .\avshcxportcheck-forappliance.ps1
-  Write-Host -ForegroundColor Yellow "Press Any Key To Return To The Main Menu"
+  Write-Host -ForegroundColor Yellow "
+Press Any Key To Return To The Main Menu"
   Read-Host
   mainmenu
     }
