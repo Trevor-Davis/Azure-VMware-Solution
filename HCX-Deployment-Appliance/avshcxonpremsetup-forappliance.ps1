@@ -3,7 +3,7 @@
 # Twitter: vTrevorDavis
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
-# 0.96
+# 0.97
  
 
 #variables
@@ -678,8 +678,7 @@ Write-Host -ForegroundColor Yellow "
 Press Any Key to Exit"
 
 Read-Host
-Write-Host -ForegroundColor Yellow "Script Will Exit in 30 Seconds"
-Start-Sleep -Seconds 30
+mainmenu
 }
 else {
   Write-host -nonewline "Service Mesh Status: "
