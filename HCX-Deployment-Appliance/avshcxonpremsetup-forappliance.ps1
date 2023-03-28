@@ -3,7 +3,7 @@
 # Twitter: vTrevorDavis
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
-# 0.95
+# 0.96
  
 
 #variables
@@ -687,4 +687,5 @@ else {
   write-host -Foregroundcolor yellow "
   Press Any Key To Return to the Main Menu"
   Read-Host
+  mainmenu
   }
