@@ -3,7 +3,7 @@
 # Twitter: vTrevorDavis
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
-# 0.97
+# 0.99
  
 
 #variables
@@ -275,7 +275,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
   
   $test = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/certificates -Method 'GET' -Headers $headers -SkipCertificateCheck
-  if ($test.data.items -eq 0) {
+  if ($test.data.items.count -eq 1) {
   $body = "{
       `"url`": `"$HCXCloudIP`"
     }
@@ -482,8 +482,8 @@ if ($test.data.items.config.name.count -eq 0){
   ######################################
   $connecthcx = Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword 
   while ($connecthcx.IsConnected -ne "True" ) {
-    Write-Host -ForegroundColor yellow 'Waiting for On-Premises HCX Connector Services To Re-Start ... Checking Again In 1 Minute ....'
-    Start-Sleep -Seconds 60
+    Write-Host -ForegroundColor Yellow "Connecting to HCX Server $HCXVMIP"
+    Start-Sleep -Seconds 10
     $connecthcx = Connect-HCXServer -Server $HCXVMIP -User $OnPremVIServerUsername -Password $OnPremVIServerPassword 
   
   }
@@ -493,7 +493,7 @@ if ($test.data.items.config.name.count -eq 0){
 # Site Pairing
 ######################
 
-$request = Invoke-WebRequest -Uri "https://$($HCXCloudIP)" -Method GET -SkipCertificateCheck -TimeoutSec 5
+$request = Invoke-WebRequest -Uri "https://$($HCXCloudIP)" -Method 'GET' -SkipCertificateCheck -TimeoutSec 5
          
 if($request.StatusCode -ne 200) {
 Write-Host -foregroundcolor Red "
@@ -539,7 +539,7 @@ else {
   $command | ConvertTo-Json
     
   if ($command.PercentComplete -ne "100") {
-    Start-Sleep -Seconds 20
+    Start-Sleep -Seconds 30
     Write-Host -ForegroundColor Green "Network Profile Created"
   }
   else {
@@ -585,7 +585,7 @@ else {
   $command | ConvertTo-Json
 
   if ($command.PercentComplete -ne "100") {
-    Start-Sleep -Seconds 20
+    Start-Sleep -Seconds 30
     Write-Host -ForegroundColor Green "Compute Profile Created"
   }
 
@@ -675,16 +675,20 @@ Write-Host -ForegroundColor Green "Complete
 }
 
 Write-Host -ForegroundColor Yellow "
-Press Any Key to Exit"
-
+Press Any Key to Begin Checking Communication Ports to HCX Components in $pcname"
 Read-Host
+.\avshcxportcheck-forappliance.ps1
+Write-Host -ForegroundColor Yellow "Press Any Key To Return To The Main Menu"
+
 mainmenu
 }
 else {
   Write-host -nonewline "Service Mesh Status: "
   Write-Host -ForegroundColor Green "Complete"
-  write-host -Foregroundcolor yellow "
-  Press Any Key To Return to the Main Menu"
+  Write-Host -ForegroundColor Yellow "
+Press Any Key to Begin Checking Communication Ports to HCX Components in $pcname"
   Read-Host
+  .\avshcxportcheck-forappliance.ps1
+  Write-Host -ForegroundColor Yellow "Press Any Key To Return To The Main Menu"
   mainmenu
-  }
+    }
