@@ -483,7 +483,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   }
  
   
-  ######################
+######################
 # Site Pairing
 ######################
 
@@ -494,28 +494,65 @@ Write-Host -foregroundcolor Red "
 It appears there is no network connectivity to $HCXCloudIP, cannot continue"
 exit}
 
-    $command = New-HCXSitePairing -Url https://$($HCXCloudIP) -Username $HCXCloudUserID -Password $HCXCloudPassword -Server $HCXVMIP
-    $command | ConvertTo-Json
-    $command
 
+$command = Get-HCXSitePairing -ErrorAction:SilentlyContinue
+
+if ($command.Url -eq "https://$($HCXCloudIP)" -and $command.status -eq "ok"){
+Write-Host -ForegroundColor Green "Site Pairing Completed"
+}
+else {
+
+  $command = New-HCXSitePairing -Url https://$($HCXCloudIP) -Username $HCXCloudUserID -Password $HCXCloudPassword -Server $HCXVMIP
+  $command | ConvertTo-Json
+  
+  $command = Get-HCXSitePairing
+  while ($command.Status -ne "ok") {
+  Start-Sleep -Seconds 10
+  $command = Get-HCXSitePairing
+  }
+  
+  if ($command.Status -eq "ok") {
+  Write-Host -ForegroundColor Green "Site Pairing Completed"
+  }
+}  
+  
     
   ######################
   # Create Management Network Profile
   ######################
   
-  
+$command = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename -ErrorAction:SilentlyContinue
+
+if ($command.Name -eq $mgmtnetworkprofilename){
+Write-Host -ForegroundColor Green "Network Profile Created"
+}
+else {
+
   $mgmtnetworkbacking = Get-HCXNetworkBacking -Server $HCXVMIP -Name $managementportgroup 
-  
   $command = New-HCXNetworkProfile -PrimaryDNS $HCXVMDNS -DNSSuffix $HCXVMDomain -Name $mgmtnetworkprofilename -GatewayAddress $mgmtprofilegateway -IPPool $mgmtippool -Network $mgmtnetworkbacking -PrefixLength $mgmtnetworkmask
   $command | ConvertTo-Json
-  
-Write-Host "management network profile created on prem"  
-Read-Host
+    
+  if ($command.PercentComplete -ne "100") {
+    Start-Sleep -Seconds 20
+    Write-Host -ForegroundColor Green "Network Profile Created"
+  }
+  else {
+    Write-Host -ForegroundColor Green "Network Profile Created"
+  }
+
+}  
   
   ######################
   # Create ComputeProfile
   ######################
-  
+$command = Get-HCXComputeProfile -Name $hcxComputeProfileName -ErrorAction:SilentlyContinue
+
+if ($command.Name -eq $hcxComputeProfileName){
+Write-Host -ForegroundColor Green "Compute Profile Created"
+}
+else {
+  <# Action when all if and elseif conditions are false #>
+
   $managementNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename
   # $vmotionNetworkProfile = Get-HCXNetworkProfile -Name $vmotionnetworkprofilename
   $hcxComputeCluster = Get-HCXApplianceCompute -ClusterComputeResource -Name $OnPremCluster
@@ -541,21 +578,20 @@ Read-Host
   }
 
   $command | ConvertTo-Json
-  
-  
-  Write-Host "created on prem compute profile"  
-  Read-Host
-     
-  
+
+  if ($command.PercentComplete -ne "100") {
+    Start-Sleep -Seconds 20
+    Write-Host -ForegroundColor Green "Compute Profile Created"
+  }
+
+}
+
   ###############
   #Service Mesh
   ###############
     
   $hcxDestinationSite = Get-HCXSite -Destination -ErrorAction Stop
   $hcxDestinationSite
-  Write-Host "hcxdestinationsite"  
-  Read-Host
-     
   $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName -Server $HCXVMIP
   $hcxLocalComputeProfile
   $hcxRemoteComputeProfileName = Get-HCXComputeProfile -Site $hcxDestinationSite
@@ -623,6 +659,8 @@ $status.ServiceStatus
 $status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 if ($status.ServiceStatus.status.Contains("up") -eq "True"){
 
+  $status.ServiceStatus
+  
 Write-host -nonewline "Service Mesh Status: "
 Write-Host -ForegroundColor Green "Complete
 "
@@ -630,7 +668,6 @@ Write-Host -ForegroundColor Green "Complete
 
 Write-Host -ForegroundColor Yellow "
 Press Any Key to Exit"
-$status.ServiceStatus
 
 Read-Host
 Write-Host -ForegroundColor Yellow "Script Will Exit in 30 Seconds"
