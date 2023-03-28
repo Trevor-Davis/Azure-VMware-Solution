@@ -3,7 +3,7 @@
 # Twitter: vTrevorDavis
 # This script can be used to deploy HCX to an on-prem location and fully connect and configure for use w/ an AVS Private Cloud
 # For guidance on this script please refer to https://www.virtualworkloads.com 
-# 0.93
+# 0.94
  
 
 #variables
@@ -264,9 +264,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $HCXOnPremCredentials = "$HCXOnPremAdminUserID"+":"+"$HCXOnPremAdminPassword" 
   $HCXBytes = [System.Text.Encoding]::UTF8.GetBytes($HCXOnPremCredentials)
   $HCXOnPremAdminCredentialsEncoded =[Convert]::ToBase64String($HCXBytes)
-
-
-       
+      
     
   ######################################
   # Get The Certificate From HCX Cloud
@@ -276,6 +274,8 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $headers.Add("Accept", "application/json")
   $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
   
+  $test = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/certificates -Method 'GET' -Headers $headers -SkipCertificateCheck
+  if ($test.data.items -eq 0) {
   $body = "{
       `"url`": `"$HCXCloudIP`"
     }
@@ -283,6 +283,8 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
 
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/certificates -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
+  }
+  
   
   ##########################
   # Encode The On-Prem vCenter Password
@@ -299,6 +301,8 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $headers.Add("Content-Type", "application/json")
   $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
   
+  $test = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/vcenter -Method 'GET' -Headers $headers -SkipCertificateCheck
+if ($test.data.items.config.name.count -eq 0){
   $body = "{
     `"data`": {
       `"items`": [
@@ -316,7 +320,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/vcenter -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   $response | ConvertTo-Json
   
-   
+}
   ##########################
   # Define PSC
   ##########################
@@ -326,6 +330,8 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $headers.Add("Content-Type", "application/json")
   $headers.Add("Authorization", "Basic $HCXOnPremAdminCredentialsEncoded")
   
+  $test = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/lookupservice/ -Method 'get' -Headers $headers -SkipCertificateCheck
+  if ($test.data.items.Config.lookupServiceUrl.count -eq 0){
   $body = "{
       `"data`": {
           `"items`": [
@@ -342,7 +348,7 @@ HCX Manager Still Getting Ready ... Will Check Again In 30 Seconds ..."
   $response = Invoke-RestMethod https://$($HCXVMIP):9443/api/admin/global/config/lookupservice/ -Method 'POST' -Headers $headers -Body $body -SkipCertificateCheck
   
   $response | ConvertTo-Json
-   
+}
 
   ######################################
   # Define the Role Mapping
@@ -545,13 +551,12 @@ else {
   ######################
   # Create ComputeProfile
   ######################
-$command = Get-HCXComputeProfile -Name $hcxComputeProfileName -ErrorAction:SilentlyContinue
+$test = Get-HCXComputeProfile -Name $hcxComputeProfileName -ErrorAction:SilentlyContinue
 
-if ($command.Name -eq $hcxComputeProfileName){
+if ($test.Name -eq $hcxComputeProfileName){
 Write-Host -ForegroundColor Green "Compute Profile Created"
 }
 else {
-  <# Action when all if and elseif conditions are false #>
 
   $managementNetworkProfile = Get-HCXNetworkProfile -Name $mgmtnetworkprofilename
   # $vmotionNetworkProfile = Get-HCXNetworkProfile -Name $vmotionnetworkprofilename
@@ -590,6 +595,11 @@ else {
   #Service Mesh
   ###############
     
+  $test = Get-HCXServiceMesh -Name $hcxServiceMeshName -ErrorAction:Ignore
+  if($test.name -ne $hcxServiceMeshName)
+  
+  {
+
   $hcxDestinationSite = Get-HCXSite -Destination -ErrorAction Stop
   $hcxDestinationSite
   $hcxLocalComputeProfile = Get-HCXComputeProfile -Name $hcxComputeProfileName -Server $HCXVMIP
@@ -659,8 +669,6 @@ $status.ServiceStatus
 $status = Get-HCXServiceMesh -Name $hcxServiceMeshName -Server $hcxvmip
 if ($status.ServiceStatus.status.Contains("up") -eq "True"){
 
-  $status.ServiceStatus
-  
 Write-host -nonewline "Service Mesh Status: "
 Write-Host -ForegroundColor Green "Complete
 "
@@ -672,3 +680,8 @@ Press Any Key to Exit"
 Read-Host
 Write-Host -ForegroundColor Yellow "Script Will Exit in 30 Seconds"
 Start-Sleep -Seconds 30
+}
+else {
+  Write-host -nonewline "Service Mesh Status: "
+  Write-Host -ForegroundColor Green "Complete"
+  }
