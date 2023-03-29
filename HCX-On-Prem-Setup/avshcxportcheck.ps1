@@ -6,9 +6,9 @@
 
 #variables
 
-$global:sub = "1178f22f-6ce4-45e3-bd92-ba89930be5be" #the sub where the AVS private cloud is deployed, use the ID not the name.
-$global:pcname = "VirtualWorkloads-AVS-PC01" #Name of the AVS private cloud
-$global:pcrg = "VirtualWorkloads-AVS-PC01" #The resource group where AVS private cloud is deployed.
+$global:sub = "" #the sub where the AVS private cloud is deployed, use the ID not the name.
+$global:pcname = "" #Name of the AVS private cloud
+$global:pcrg = "" #The resource group where AVS private cloud is deployed.
 
 
 
