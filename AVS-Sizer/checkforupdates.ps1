@@ -16,13 +16,11 @@ Read-Host
 If ($cloudversion -gt $currentversion)
 {
     "There is a new version"
-    $filename = "globalvariables.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename 
 
+$filenames = "#StartAVSSizer.vbs", "1_StartMenu.ps1", "2a_avssizer-script.ps1", "2b_manual-input-menu.ps1"
+
+foreach($filename in $filenames){
+    Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename 
+ 
 }
-
-$global:apiurl = "https://vmc.vmware.com/api/vmc-sizer/v5/recommendation?vmPlacement=false"
-$global:apiurlstaging = "https://stg.skyscraper.vmware.com/api/vmc-sizer/v5/recommendation"
-$global:filename = "sizer.xlsm" # this is the filename of the sizer file
-$global:buttonclicked = ""
-
+}
