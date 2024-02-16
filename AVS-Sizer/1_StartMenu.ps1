@@ -1,21 +1,8 @@
-$global:testing = 0
-########################################################################################
 
-
-If ($testing -eq 1){
-    $global:locationofpowershell = "C:\Users\tredavis\OneDrive - Microsoft\GitHub\Azure VMware Solution\AVS-Sizer\dev\" #This sets the location of all the pwoershell files to the root directory of this script.
-    $global:sizerlocation = "C:\Users\tredavis\OneDrive - Microsoft\GitHub\Azure VMware Solution\AVS-Sizer\dev\sizer.xlsm"
-    .\globalvariables.ps1
-    .\variablesinventory.ps1
-    Read-Host "press any key"
-}
-    else {
     .\globalvariables.ps1  
     $global:manualsizing = 0     
     $global:locationofpowershell = $PSScriptRoot #This sets the location of all the pwoershell files to the root directory of this script.
     $global:sizerlocation = $locationofpowershell + "\" + $filename # this is the full path of the sizer file location
-
-}
 
 
 ########################################################################################
