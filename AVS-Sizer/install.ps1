@@ -1,26 +1,17 @@
+Clear-Host
 
-. $downloaddirectory\currentversion.ps1
+$global:downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
 
-$filename = "cloudversion.ps1"
-Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename 
-. $downloaddirectory\$filename 
+if (Test-Path $downloaddirectory) {
+        Remove-Item $downloaddirectory -verbose -Confirm:$false -Force:$true -Recurse:$true
+} 
 
-If ($cloudversion -gt $currentversion){
-
-$YesOrNo = Read-Host "
-Your Version: $currentversion
-New Version: $cloudversion
-There is a new version of the AVS-Sizer, would you like to Upgrade Now? (Y/N)"
-
-If ( $YesOrNo -eq "y")
-{
-.\install.ps1
-}
-}
-
-
-
-<#
+write-host "Installing The AVS Sizer ... 
+" 
+$downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
+Write-Host "Creating Directory:" $downloaddirectory
+Write-host ""
+mkdir $downloaddirectory
 
 ##############
 # Base Directory
@@ -50,16 +41,17 @@ If ( $YesOrNo -eq "y")
 
 foreach($filename in $filenames){
 
-$filename
+Write-Host "Downloading File:" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
 }
-Read-Host
 
 ##############
 # AllInSizing Directory
 ##############
-
 $directory = "allinsizing"
+mkdir $downloaddirectory\$directory
+
+
 
 $filenames = @(
 "allinvariables.ps1"
@@ -71,16 +63,18 @@ $filenames = @(
 
 foreach($filename in $filenames){
 
-    $filename
+Write-Host "Downloading File:" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
 
 }
+
 
 ##############
 # Linuxandothersizing Directory
 ##############
 
 $directory = "linuxandothersizing"
+mkdir $downloaddirectory\$directory
 
 $filenames = @(
 "linuxandotherVariables.ps1"
@@ -90,7 +84,7 @@ $filenames = @(
 )
 
 foreach($filename in $filenames){
-    $filename
+Write-Host "Downloading File:" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
 
 }
@@ -100,6 +94,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "sqlsizing"
+mkdir $downloaddirectory\$directory
 
 $filenames = @(
 "sqlVariables.ps1"
@@ -110,7 +105,7 @@ $filenames = @(
 
 foreach($filename in $filenames){
 
-    $filename
+Write-Host "Downloading File:" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
 
 }
@@ -120,6 +115,8 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "windowssizing"
+mkdir $downloaddirectory\$directory
+
 
 $filenames = @(
 "WindowsVariables.ps1"
@@ -131,7 +128,8 @@ $filenames = @(
 
 
 foreach($filename in $filenames){
-    $filename
+Write-Host "Downloading File:" $filename
+
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
 
 }
@@ -142,6 +140,7 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "dropdowns"
+mkdir $downloaddirectory\$directory
 
 $filenames = @(
 "cpuovercommit.csv"
@@ -153,12 +152,7 @@ $filenames = @(
 
 
 foreach($filename in $filenames){
-    $filename
+Write-Host "Downloading File:" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
 
 }
-
-
-}
-}
-#>

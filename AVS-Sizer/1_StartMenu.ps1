@@ -1,5 +1,7 @@
 
-    .\globalvariables.ps1  
+.\globalvariables.ps1  
+.\checkforupdates.ps1
+
     $global:manualsizing = 0     
     $global:locationofpowershell = $PSScriptRoot #This sets the location of all the pwoershell files to the root directory of this script.
     $global:sizerlocation = $locationofpowershell + "\" + $filename # this is the full path of the sizer file location
@@ -9,13 +11,9 @@
 # Check Pre-Reqs
 ########################################################################################
 
-If ($testing -eq 1){
-
-}
-else {
   .\check-importexcel.ps1
   .\check-powershell.ps1
-}
+
 
 
 ########################################################################################
