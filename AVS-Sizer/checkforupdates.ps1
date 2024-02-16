@@ -17,6 +17,10 @@ If ( $YesOrNo -eq "y")
 .\install.ps1
 }
 }
+else {
+Write-Host "You Are Running the Latest AVS-Sizer
+Thank You - Trevor Davis"    
+}
 
 
 
