@@ -2,16 +2,25 @@ Clear-Host
 
 $global:downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
 
-if (Test-Path $downloaddirectory) {
+if ($global:updateflag -eq 0)
+
+{
+    if (Test-Path $downloaddirectory) {
         Remove-Item $downloaddirectory -verbose -Confirm:$false -Force:$true -Recurse:$true
 } 
+
+}
 
 write-host "Installing The AVS Sizer ... 
 " 
 $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
+
+if ($global:updateflag -eq 0)
+{
 Write-Host "Creating Directory:" $downloaddirectory
 Write-host ""
 mkdir $downloaddirectory
+}
 
 ##############
 # Base Directory
@@ -33,7 +42,8 @@ mkdir $downloaddirectory
     "cloudversion.ps1"
     "currentversion.ps1"
     "globalvariables.ps1"
-    "install.ps1"
+    if ($global:updateflag -eq 0){
+    "install.ps1"}
     "Install-AVS-Sizer.bat"
     "opensizerfile.ps1"
     "sizer.xlsm"

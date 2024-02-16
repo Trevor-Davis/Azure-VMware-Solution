@@ -1,5 +1,6 @@
 
 . $downloaddirectory\currentversion.ps1
+$global:updateflag = 1
 
 $filename = "cloudversion.ps1"
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename 
@@ -19,10 +20,10 @@ If ( $YesOrNo -eq "y")
 }
 else {
 Write-Host "You Are Running the Latest AVS-Sizer
-Thank You - Trevor Davis"    
+"   
 }
 
-
+$global:updateflag = 0
 
 <#
 
