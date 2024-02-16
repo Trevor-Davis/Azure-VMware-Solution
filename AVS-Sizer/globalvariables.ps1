@@ -1,4 +1,4 @@
-$global:currentversion = 7
+$global:currentversion = 7.1
 
 $downloaddirectory = "$env:HOMEPATH\Documents\avssizer"
 
