@@ -60,7 +60,6 @@ $directory = "allinsizing"
 
 $filenames = @(
 "allinvariables.ps1"
-"av36AllInSizing.ps1"
 "av36pAllInSizing.ps1"
 "av52AllInSizing.ps1"
 "av64AllInSizing.ps1"
@@ -74,8 +73,90 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 
 }
 
+##############
+# Linuxandothersizing Directory
+##############
+
+$directory = "linuxandothersizing"
+
+$filenames = @(
+"linuxandothervariables.ps1"
+"av36plinuxandotherSizing.ps1"
+"av52linuxandotherSizing.ps1"
+"av64linuxandotherSizing.ps1"
+)
+
+$filenames
+
+foreach($filename in $filenames){
+
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
+
+}
+
+##############
+# sqlsizing Directory
+##############
+
+$directory = "sqlsizing"
+
+$filenames = @(
+"sqlvariables.ps1"
+"av36psqlSizing.ps1"
+"av52sqlSizing.ps1"
+"av64sqlSizing.ps1"
+)
+
+$filenames
+
+foreach($filename in $filenames){
+
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
+
+}
+
+##############
+# windowssizing Directory
+##############
+
+$directory = "windowssizing"
+
+$filenames = @(
+"windowsvariables.ps1"
+"av36pwindowsSizing.ps1"
+"av52windowsSizing.ps1"
+"av64windowsSizing.ps1"
+)
+
+$filenames
+
+foreach($filename in $filenames){
+
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
+
+}
 
 
+##############
+# dropdowns
+##############
+
+$directory = "dropdowns"
+
+$filenames = @(
+"cpuovercommit.csv"
+"dedupecompression.csv"
+"fttraid.csv"
+"regions.csv"
+)
+
+$filenames
+
+foreach($filename in $filenames){
+
+Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
+
+}
 
 
 
