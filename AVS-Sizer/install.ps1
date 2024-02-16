@@ -61,8 +61,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 # AllInSizing Directory
 ##############
 $directory = "allinsizing"
+if ($updateflag -ne 1){
 mkdir $downloaddirectory\$directory
-
+}
 
 
 $filenames = @(
@@ -86,8 +87,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "linuxandothersizing"
+if ($updateflag -ne 1){
 mkdir $downloaddirectory\$directory
-
+}
 $filenames = @(
 "linuxandotherVariables.ps1"
 "av36plinuxandotherSizing.ps1"
@@ -106,8 +108,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "sqlsizing"
-mkdir $downloaddirectory\$directory
-
+if ($updateflag -ne 1){
+    mkdir $downloaddirectory\$directory
+}
 $filenames = @(
 "sqlVariables.ps1"
 "av36pSQLSizing.ps1"
@@ -127,8 +130,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "windowssizing"
+if ($updateflag -ne 1){
 mkdir $downloaddirectory\$directory
-
+}
 
 $filenames = @(
 "WindowsVariables.ps1"
@@ -152,7 +156,9 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 ##############
 
 $directory = "dropdowns"
+if ($updateflag -ne 1){
 mkdir $downloaddirectory\$directory
+}
 
 $filenames = @(
 "cpuovercommit.csv"
