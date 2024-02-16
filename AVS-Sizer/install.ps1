@@ -33,6 +33,8 @@ mkdir $downloaddirectory
     "cloudversion.ps1"
     "currentversion.ps1"
     "globalvariables.ps1"
+    "install.ps1"
+    "Install-AVS-Sizer.bat"
     "opensizerfile.ps1"
     "sizer.xlsm"
     "StartAVSSizer.vbs"
