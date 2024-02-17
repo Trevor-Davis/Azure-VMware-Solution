@@ -35,6 +35,7 @@ mkdir $downloaddirectory
     "3_manual-avssizer-script.ps1"
     "apipost.ps1"
     "AVS.pptm"
+    "AVS-Sizer.zip"
     "checkforupdates.ps1"
     "check-importexcel.ps1"
     "check-powershell.ps1"
@@ -174,3 +175,10 @@ Write-Host "Downloading File:" $filename
 Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$directory/$filename" -OutFile $downloaddirectory\$directory\$filename
 
 }
+
+$global:downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
+$global:desktopdirectory = [Environment]::GetFolderPath("Desktop")
+
+Expand-Archive -LiteralPath $global:downloaddirectory\AVS-Sizer.zip -DestinationPath $global:downloaddirectory -Force
+
+Copy-Item $global:downloaddirectory\AVS-Sizer.lnk $global:desktopdirectory
