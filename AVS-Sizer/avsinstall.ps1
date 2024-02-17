@@ -176,9 +176,12 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 
 }
 
-$global:downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
 $global:desktopdirectory = [Environment]::GetFolderPath("Desktop")
 
 Expand-Archive -LiteralPath $global:downloaddirectory\AVS-Sizer.zip -DestinationPath $global:downloaddirectory -Force
 
 Copy-Item $global:downloaddirectory\AVS-Sizer.lnk $global:desktopdirectory
+
+REad-Host "AVS Sizer Is Installed ... Press Any Key To Continue"
+Write-Host "Cleaning Up Files ..."
+Start-Sleep -Seconds 4
