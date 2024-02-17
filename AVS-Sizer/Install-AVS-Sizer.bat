@@ -1,1 +1,2 @@
-powershell.exe -ExecutionPolicy Bypass -File .\install.ps1
+curl https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/install.ps1 --output %userprofile%\Downloads\install.ps1
+powershell.exe -ExecutionPolicy Bypass -File .\%userprofile%\Downloads\install.ps1
