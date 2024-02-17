@@ -44,7 +44,7 @@ mkdir $downloaddirectory
     "currentversion.ps1"
     "globalvariables.ps1"
     if ($global:updateflag -ne 1){
-    "install.ps1"}
+    "avsinstall.ps1"}
     "Install-AVS-Sizer.bat"
     "opensizerfile.ps1"
     "sizer.xlsm"
