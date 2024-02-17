@@ -15,7 +15,7 @@ There is a new version of the AVS-Sizer, would you like to Upgrade Now? (Y/N)"
 
 If ( $YesOrNo -eq "y")
 {
-.\install.ps1
+.\avsinstall.ps1
 }
 }
 else {
