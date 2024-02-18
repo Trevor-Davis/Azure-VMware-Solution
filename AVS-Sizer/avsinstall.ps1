@@ -183,7 +183,7 @@ Expand-Archive -LiteralPath $global:downloaddirectory\AVS-Sizer.zip -Destination
 Copy-Item $global:downloaddirectory\AVS-Sizer.lnk $global:desktopdirectory
 
 REad-Host "
-AVS Sizer Is Installed, There Is a Shortcut on the Desktop Called ""AVS-Sizer""... Press Any Key To Continue
-"
-Write-Host "Cleaning Up Files ..."
+AVS Sizer Is Installed, There Is a Shortcut on the Desktop Called ""AVS-Sizer""... Press Any Key To Continue"
+Write-Host "
+Cleaning Up Files ..."
 Start-Sleep -Seconds 4
