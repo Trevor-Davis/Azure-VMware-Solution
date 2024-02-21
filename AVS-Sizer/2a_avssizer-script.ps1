@@ -37,17 +37,30 @@ $ExcelSheet.activate()
 $ExcelSheet.Range("g2") = $global:rvtoolslocation
 $ExcelSheet.Range("g3") = $global:rvtoolsfilename
 
+
 $ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
 $ExcelSheet.Range("a1") = "RV Tools"
 $ExcelSheet.Range("B2:b33") = ""
 $ExcelSheet.Range("N2:N15") = ""
+$ExcelSheet.Range("b35") = $global:excludepoweredoff
 
 $global:app.Run("Import") # Run the Excel Macro in the Sizer file to import the RV Tools file.
+
+If ($global:excludepoweredoff -eq "Yes"){
+
+Write-Host "
+Removing Powered Off VMs ... "
+Write-Host -ForegroundColor Yellow "Depending on the amount of workloads in the RVTools file this could take a few minutes"
+$global:app.Run("deletepoweredoff") # If Powered Off VMs were chosen to be exlcuded, they are.
+    
+}
+
 
 Write-Host "
 Inventorying Workloads Into Windows, SQL, Linux or Other ..."
 Write-Host -ForegroundColor Yellow "Depending on the amount of workloads in the RVTools file this could take a few minutes"
 $global:app.Run("AssignvInfoLabels") # Run the Excel Macro in the Sizer file to label all the VMs into their categories.
+
 
 .\closesizerfile.ps1
 

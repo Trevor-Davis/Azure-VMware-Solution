@@ -104,6 +104,22 @@ $cpuovercommitdropdown.AutoSize=$true
 $cpuovercommitdropdown.SelectedText="5"
 Import-Csv "$global:locationofpowershell\dropdowns\cpuovercommit.csv" | ForEach-Object {$cpuovercommitdropdown.Items.Add($_.'cpuovercommit')}
 
+# Powered On / Off Selection
+$dropdownrowtopmargin = $dropdownrowtopmargin+70
+$textrowtopmargin = $textrowtopmargin+70
+
+$powerstateitem = New-Object $labelobject
+$powerstateitem.Text = "Exclude Powered Off VMs?: "
+$powerstateitem.AutoSize=$true
+$powerstateitem.Location=New-Object System.Drawing.Point($leftmargin,$dropdownrowtopmargin)   
+
+$powerstatedropdown = New-Object $comboboxobject
+$powerstatedropdown.Width = '350'
+$powerstatedropdown.Location=New-Object System.Drawing.Point($dropdownleftmargin,$dropdownrowtopmargin)
+$powerstatedropdown.AutoSize=$true
+$powerstatedropdown.SelectedText="No"
+Import-Csv "$global:locationofpowershell\dropdowns\powerstate.csv" | ForEach-Object {$powerstatedropdown.Items.Add($_.'powerstate')}
+
 
 
 
@@ -147,8 +163,8 @@ $cancelButton.add_Click({$global:buttonclicked = "Cancel"})
 
 
 ##Notice
-$dropdownrowtopmargin = $dropdownrowtopmargin+70
-$textrowtopmargin = $textrowtopmargin - 110
+$dropdownrowtopmargin = $dropdownrowtopmargin+170
+$textrowtopmargin = $textrowtopmargin - 210
 $leftmargin = 30
 $noticenote = New-Object $labelobject
 $noticenote.Text = "Depending on the number of VMs in the RV Tools file this could take 
@@ -157,7 +173,7 @@ $noticenote.AutoSize=$true
 $noticenote.ForeColor = "Red"
 $noticenote.Location=New-Object System.Drawing.Point($leftmargin,$textrowtopmargin)  
 
-$AppForm.Controls.AddRange(@($instructions,$cancelbutton,$rvToolsButton,$regionitem,$regiondropdown,$manualimportButton,$dedupecompressionitem,$dedupecompressionnote,$dedupecompressiondropdown,$fttraiditem,$fttraidnote,$fttraiddropdown,$cpuovercommititem,$cpuovercommitnote,$cpuovercommitdropdown,$noticenote,$noticenote2)) 
+$AppForm.Controls.AddRange(@($instructions,$cancelbutton,$rvToolsButton,$regionitem,$regiondropdown,$manualimportButton,$dedupecompressionitem,$dedupecompressionnote,$dedupecompressiondropdown,$fttraiditem,$fttraidnote,$fttraiddropdown,$cpuovercommititem,$cpuovercommitnote,$cpuovercommitdropdown, $powerstateitem, $powerstatedropdown)) 
 
 Clear-Host
 
@@ -174,6 +190,7 @@ $AppForm.ShowDialog()
 $global:compressionRatio = $dedupecompressiondropdown.SelectedText
 $global:vcpupercore = $cpuovercommitdropdown.SelectedText
 $global:computeOvercommitFactor = $cpuovercommitdropdown.SelectedText
+$global:excludepoweredoff = $powerstatedropdown.SelectedText
 
 if ($testing -eq 1){
 .\variablesinventory.ps1
