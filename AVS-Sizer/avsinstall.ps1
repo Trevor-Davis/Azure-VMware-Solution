@@ -166,6 +166,7 @@ $filenames = @(
 "dedupecompression.csv"
 "fttraid.csv"
 "regions.csv"
+"powerstate.csv"
 )
 
 
