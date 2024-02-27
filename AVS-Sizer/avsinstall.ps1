@@ -36,6 +36,7 @@ mkdir $downloaddirectory
     "apipost.ps1"
     "AVS.pptm"
     "AVS-Sizer.zip"
+    "AVSDemandGen.pptm"
     "checkforupdates.ps1"
     "check-importexcel.ps1"
     "check-powershell.ps1"
