@@ -1,1 +1,1 @@
-$global:cloudversion = .9
+$global:cloudversion = .92
