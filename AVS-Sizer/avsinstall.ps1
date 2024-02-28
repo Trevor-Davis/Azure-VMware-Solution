@@ -37,6 +37,7 @@ mkdir $downloaddirectory
     "AVS.pptm"
     "AVS-Sizer.zip"
     "AVSDemandGen.pptm"
+    "AVSDemandGen-Template.pptm"
     "checkforupdates.ps1"
     "check-importexcel.ps1"
     "check-powershell.ps1"
