@@ -39,6 +39,7 @@ mkdir $downloaddirectory
     "AVSDemandGen.pptm"
     "AVSDemandGen-Template.pptm"
     "checkforupdates.ps1"
+    "check-newinstallfile.ps1"
     "check-importexcel.ps1"
     "check-powershell.ps1"
     "closesizerfile.ps1"
