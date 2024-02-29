@@ -1,4 +1,4 @@
-
+.\check-newinstallfile.ps1
 .\globalvariables.ps1  
 .\checkforupdates.ps1
 
