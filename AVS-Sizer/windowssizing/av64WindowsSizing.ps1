@@ -1,30 +1,78 @@
 ## Sets the host type to AV64
 $global:sddcHostType = $importsizer[49].Value
 
-if($testing -eq 1){
-    .\windowssizing\windowsvariables.ps1
-    .\variablesinventory.ps1
-}
+$global:sizingfor = "Windows"
+$global:hosttype = "AV64"
 
-### Calculate for AVAV64 All In
-.\windowssizing\windowsvariables.ps1
+$global:thehostcountinexcel_total = "b13"
+$global:thefttraidinexcel_total = "n13"
 
+$global:thehostcountinexcel_cpu = "w13"
+$global:thefttraidinexcel_cpu = "x13"
+
+$global:thehostcountinexcel_memory = "u13"
+$global:thefttraidinexcel_memory = "v13"
+
+$global:thehostcountinexcel_storage = "s13"
+$global:thefttraidinexcel_storage = "t13"
+
+$global:hostcoutforstorageonlyinexcel = "y13"
+
+$global:excelsheetsizingresults = "sizingresults"
+
+$global:directory = "$sizingfor" + "sizing"
+$global:variablesfilename = "$sizingfor" + "variables.ps1"
+
+
+
+$ExcelSheet = $ExcelWorkBook.Worksheets.Item($global:excelsheetsizingresults)
+$ExcelSheet.activate()
+
+### Calculate for AV64 Windows
+. .\$global:directory\$global:variablesfilename
 
 .\apipost.ps1
-$global:responseAV64windows = Invoke-RestMethod $global:apiurlstaging -Method 'POST' -Headers $global:headers -Body $global:body 
+$global:api = Invoke-RestMethod $global:apiurlstaging -Method 'POST' -Headers $global:headers -Body $global:body 
+$ExcelSheet.Range($global:thehostcountinexcel_total) = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thefttraidinexcel_total) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
 
 
-if($global:testing -eq 1){
-    Read-Host "press any key ... done"
-}
 
-## Read the Host Count and RAID Levels into a Variable
-$global:hostcountAV64windows = $global:responseAV64windows.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraidAV64windows = $global:responseAV64windows.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+### Calculate for AV64 Windows Storage Only
+. .\$global:directory\$global:variablesfilename
+$global:vCpuPerVM = 0
+$global:vRamPerVM = 0
 
-## Write The Host Count and RAID Levels into the sizer.xlsm file
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurlstaging -Method 'POST' -Headers $global:headers -Body $global:body 
 
-$ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
-$ExcelSheet.activate()
-$ExcelSheet.Range("B13") = $global:hostcountAV64windows #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("N13") = $global:fttraidAV64windows #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
+$global:hostsfor_storage = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_storage) = $global:hostsfor_storage
+$ExcelSheet.Range($global:thefttraidinexcel_storage) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV64 Windows CPU Only
+. .\$global:directory\$global:variablesfilename
+$global:vRamPerVM = 0
+$global:storagePerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurlstaging -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_cpu = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_cpu) = $global:hostsfor_cpu
+$ExcelSheet.Range($global:thefttraidinexcel_cpu) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV64 Windows Memory Only
+. .\$global:directory\$global:variablesfilename
+$global:storagePerVM = 0
+$global:vCpuPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurlstaging -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_memory = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_memory) = $global:hostsfor_memory
+$ExcelSheet.Range($global:thefttraidinexcel_memory) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+

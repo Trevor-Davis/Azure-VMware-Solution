@@ -1,51 +1,76 @@
-## Sets the host type to AV36p
+## Sets the host type to AV36p and the variables for the formulas
 $global:sddcHostType = $importsizer[36].Value
+$global:sizingfor = "SQL"
+$global:hosttype = "AV36p"
 
-if($testing -eq 1){
-    .\sqlsizing\sqlvariables.ps1
-    .\variablesinventory.ps1
-}
+$global:thehostcountinexcel_total = "b4"
+$global:thefttraidinexcel_total = "n4"
 
-### Calculate for AV36p All In
-.\sqlsizing\sqlvariables.ps1
-.\apipost.ps1
-$global:response36psql = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$global:thehostcountinexcel_cpu = "w4"
+$global:thefttraidinexcel_cpu = "x4"
 
+$global:thehostcountinexcel_memory = "u4"
+$global:thefttraidinexcel_memory = "v4"
 
-### Calculate for AV36p All In Storage Only
-.\sqlsizing\sqlvariables.ps1
-$global:vCpuPerVM = 0
-$global:vRamPerVM = 0
-.\apipost.ps1
-$global:response36psqlStorageOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
+$global:thehostcountinexcel_storage = "s4"
+$global:thefttraidinexcel_storage = "t4"
 
+$global:hostcoutforstorageonlyinexcel = "y4"
 
-### Calculate for AV36p All In CPU Only
-.\sqlsizing\sqlvariables.ps1
-$global:vRamPerVM = 0
-$global:storagePerVM = 0
+$global:excelsheetsizingresults = "sizingresults"
 
-.\apipost.ps1
-$global:response36psqlCPUOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
+$global:directory = "$sizingfor" + "sizing"
+$global:variablesfilename = "$sizingfor" + "variables.ps1"
 
-### Calculate for AV36pp All In Memory Only
-.\sqlsizing\sqlvariables.ps1
-$global:storagePerVM = 0
-$global:vCpuPerVM = 0
-.\apipost.ps1
-$global:response36psqlMemoryOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-if($global:testing -eq 1){
-    Read-Host "press any key ... done"
-}
-
-## Read the Host Count and RAID Levels into a Variable
-$global:hostcount36psql = $global:response36psql.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraid36psql = $global:response36psql.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-## Write The Host Count and RAID Levels into the sizer.xlsm file
-
-$ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
+$ExcelSheet = $ExcelWorkBook.Worksheets.Item($global:excelsheetsizingresults)
 $ExcelSheet.activate()
-$ExcelSheet.Range("B4") = $global:hostcount36psql #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("N4") = $global:fttraid36psql #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
+
+### Calculate for AV36p SQL
+. .\$global:directory\$global:variablesfilename
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$ExcelSheet.Range($global:thehostcountinexcel_total) = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thefttraidinexcel_total) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+
+### Calculate for AV36p SQL Storage Only
+. .\$global:directory\$global:variablesfilename
+$global:vCpuPerVM = 0
+$global:vRamPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_storage = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_storage) = $global:hostsfor_storage
+$ExcelSheet.Range($global:thefttraidinexcel_storage) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV36p SQL CPU Only
+. .\$global:directory\$global:variablesfilename
+$global:vRamPerVM = 0
+$global:storagePerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_cpu = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_cpu) = $global:hostsfor_cpu
+$ExcelSheet.Range($global:thefttraidinexcel_cpu) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV36p SQL Memory Only
+. .\$global:directory\$global:variablesfilename
+$global:storagePerVM = 0
+$global:vCpuPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_memory = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_memory) = $global:hostsfor_memory
+$ExcelSheet.Range($global:thefttraidinexcel_memory) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+

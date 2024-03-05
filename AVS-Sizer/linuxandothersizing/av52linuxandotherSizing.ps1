@@ -1,63 +1,79 @@
 ## Sets the host type to AV52
 $global:sddcHostType = $importsizer[37].Value
 
-if($testing -eq 1){
-    .\linuxandothersizing\linuxandothervariables.ps1
-    .\variablesinventory.ps1
-}
+$global:sizingfor = "LinuxAndOther"
+$global:hosttype = "AV52"
 
-### Calculate for AVAV52 All In
-.\linuxandothersizing\linuxandothervariables.ps1
+$global:thehostcountinexcel_total = "b10"
+$global:thefttraidinexcel_total = "n10"
 
+$global:thehostcountinexcel_cpu = "w10"
+$global:thefttraidinexcel_cpu = "x10"
 
+$global:thehostcountinexcel_memory = "u10"
+$global:thefttraidinexcel_memory = "v10"
 
-.\apipost.ps1
-$global:responseAV52linuxandother = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$global:thehostcountinexcel_storage = "s10"
+$global:thefttraidinexcel_storage = "t10"
 
+$global:hostcoutforstorageonlyinexcel = "y10"
 
-### Calculate for AVAV52 All In Storage Only
-.\linuxandothersizing\linuxandothervariables.ps1
-$global:vCpuPerVM = 0
-$global:vRamPerVM = 0
+$global:excelsheetsizingresults = "sizingresults"
 
-
-
-.\apipost.ps1
-$global:responseAV52linuxandotherStorageOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-
-### Calculate for AVAV52 All In CPU Only
-.\linuxandothersizing\linuxandothervariables.ps1
-$global:vRamPerVM = 0
-$global:storagePerVM = 0
+$global:directory = "$sizingfor" + "sizing"
+$global:variablesfilename = "$sizingfor" + "variables.ps1"
 
 
 
-
-.\apipost.ps1
-$global:responseAV52linuxandotherCPUOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-### Calculate for AVAV52p All In Memory Only
-.\linuxandothersizing\linuxandothervariables.ps1
-$global:storagePerVM = 0
-$global:vCpuPerVM = 0
-
-
-
-.\apipost.ps1
-$global:responseAV52linuxandotherMemoryOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-if($global:testing -eq 1){
-    Read-Host "press any key ... done"
-}
-
-## Read the Host Count and RAID Levels into a Variable
-$global:hostcountAV52linuxandother = $global:responseAV52linuxandother.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraidAV52linuxandother = $global:responseAV52linuxandother.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-## Write The Host Count and RAID Levels into the sizer.xlsm file
-
-$ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
+$ExcelSheet = $ExcelWorkBook.Worksheets.Item($global:excelsheetsizingresults)
 $ExcelSheet.activate()
-$ExcelSheet.Range("B10") = $global:hostcountAV52linuxandother #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("N10") = $global:fttraidAV52linuxandother #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
+
+### Calculate for AV52 LinuxAndOther
+. .\$global:directory\$global:variablesfilename
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$ExcelSheet.Range($global:thehostcountinexcel_total) = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thefttraidinexcel_total) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+
+### Calculate for AV52 LinuxAndOther Storage Only
+. .\$global:directory\$global:variablesfilename
+$global:vCpuPerVM = 0
+$global:vRamPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_storage = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_storage) = $global:hostsfor_storage
+$ExcelSheet.Range($global:thefttraidinexcel_storage) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV52 LinuxAndOther CPU Only
+. .\$global:directory\$global:variablesfilename
+$global:vRamPerVM = 0
+$global:storagePerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_cpu = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_cpu) = $global:hostsfor_cpu
+$ExcelSheet.Range($global:thefttraidinexcel_cpu) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV52 LinuxAndOther Memory Only
+. .\$global:directory\$global:variablesfilename
+$global:storagePerVM = 0
+$global:vCpuPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_memory = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_memory) = $global:hostsfor_memory
+$ExcelSheet.Range($global:thefttraidinexcel_memory) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+

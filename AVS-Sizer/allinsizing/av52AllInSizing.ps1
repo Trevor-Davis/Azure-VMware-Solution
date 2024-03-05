@@ -1,61 +1,79 @@
 ## Sets the host type to AV52
 $global:sddcHostType = $importsizer[37].Value
 
-if($testing -eq 1){
-    .\allinsizing\allinvariables.ps1
-    .\variablesinventory.ps1
-}
+$global:sizingfor = "AllIn"
+$global:hosttype = "AV52"
 
-### Calculate for AV52 All In
-.\allinsizing\allinvariables.ps1
-.\apipost.ps1
-$global:responseAV52AllIn = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$global:thehostcountinexcel_total = "b7"
+$global:thefttraidinexcel_total = "n7"
 
-### Calculate for AV52 All In Storage Only
-.\allinsizing\allinvariables.ps1
-$global:vCpuPerVM = 0
-$global:vRamPerVM = 0
-.\apipost.ps1
-$global:responseAV52AllInStorageOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
+$global:thehostcountinexcel_cpu = "w7"
+$global:thefttraidinexcel_cpu = "x7"
+
+$global:thehostcountinexcel_memory = "u7"
+$global:thefttraidinexcel_memory = "v7"
+
+$global:thehostcountinexcel_storage = "s7"
+$global:thefttraidinexcel_storage = "t7"
+
+$global:hostcoutforstorageonlyinexcel = "y7"
+
+$global:excelsheetsizingresults = "sizingresults"
+
+$global:directory = "$sizingfor" + "sizing"
+$global:variablesfilename = "$sizingfor" + "variables.ps1"
 
 
-### Calculate for AV52 All In CPU Only
-.\allinsizing\allinvariables.ps1
-$global:vRamPerVM = 0
-$global:storagePerVM = 0
-.\apipost.ps1
-$global:responseAV52AllInCPUOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
 
-### Calculate for AV52p All In Memory Only
-.\allinsizing\allinvariables.ps1
-$global:storagePerVM = 0
-$global:vCpuPerVM = 0
-.\apipost.ps1
-$global:responseAV52AllInMemoryOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-if($global:testing -eq 1){
-    Read-Host "press any key ... done"
-}
-
-## Read the Host Count and RAID Levels into a Variable
-$global:hostcountAV52AllIn = $global:responseAV52AllIn.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraidAV52AllIn = $global:responseAV52AllIn.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-$global:hostcountAV52AllInStorageOnly = $global:responseAV52AllInStorageOnly.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraidAV52AllInStorageOnly = $global:responseAV52AllInStorageOnly.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-$global:hostcountAV52AllInCPUOnly = $global:responseAV52AllInCPUOnly.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraidAV52AllInCPUOnly = $global:responseAV52AllInCPUOnly.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-$global:hostcountAV52AllInMemoryOnly = $global:responseAV52AllInMemoryOnly.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraidAV52AllInMemoryOnly = $global:responseAV52AllInMemoryOnly.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-## Write The Host Count and RAID Levels into the sizer.xlsm file
-
-$ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
+$ExcelSheet = $ExcelWorkBook.Worksheets.Item($global:excelsheetsizingresults)
 $ExcelSheet.activate()
-$ExcelSheet.Range("B7") = $global:hostcountAV52AllIn #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("N7") = $global:fttraidAV52AllIn #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("B21") = $global:hostcountAV52AllInCPUOnly #writes the rvtools filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("B22") = $global:hostcountAV52AllInMemoryOnly #writes the rvtools filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("B23") = $global:hostcountAV52AllInStorageOnly #writes the rvtools filename to the sizer sheet so the excel macro knows where it's located.
+
+### Calculate for AV52 AllIn
+. .\$global:directory\$global:variablesfilename
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$ExcelSheet.Range($global:thehostcountinexcel_total) = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thefttraidinexcel_total) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+
+### Calculate for AV52 AllIn Storage Only
+. .\$global:directory\$global:variablesfilename
+$global:vCpuPerVM = 0
+$global:vRamPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_storage = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_storage) = $global:hostsfor_storage
+$ExcelSheet.Range($global:thefttraidinexcel_storage) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV52 AllIn CPU Only
+. .\$global:directory\$global:variablesfilename
+$global:vRamPerVM = 0
+$global:storagePerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_cpu = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_cpu) = $global:hostsfor_cpu
+$ExcelSheet.Range($global:thefttraidinexcel_cpu) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV52 AllIn Memory Only
+. .\$global:directory\$global:variablesfilename
+$global:storagePerVM = 0
+$global:vCpuPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_memory = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_memory) = $global:hostsfor_memory
+$ExcelSheet.Range($global:thefttraidinexcel_memory) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+

@@ -1,69 +1,78 @@
-## Sets the host type to AV36p
+## Sets the host type to AV36p and the variables for the formulas
 $global:sddcHostType = $importsizer[36].Value
+$global:sizingfor = "AllIn"
+$global:hosttype = "AV36p"
 
-if($testing -eq 1){
-    .\allinsizing\allinvariables.ps1
-    .\variablesinventory.ps1
-}
+$global:thehostcountinexcel_total = "b2"
+$global:thefttraidinexcel_total = "n2"
 
+$global:thehostcountinexcel_cpu = "w2"
+$global:thefttraidinexcel_cpu = "x2"
 
-### Calculate for AV36p All In
-.\allinsizing\allinvariables.ps1
+$global:thehostcountinexcel_memory = "u2"
+$global:thefttraidinexcel_memory = "v2"
 
-.\apipost.ps1
-$global:response36pAllIn = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$global:thehostcountinexcel_storage = "s2"
+$global:thefttraidinexcel_storage = "t2"
 
+$global:hostcoutforstorageonlyinexcel = "y2"
 
-### Calculate for AV36p All In Storage Only
-.\allinsizing\allinvariables.ps1
-$global:vCpuPerVM = 0
-$global:vRamPerVM = 0
+$global:excelsheetsizingresults = "sizingresults"
 
-.\apipost.ps1
-$global:response36pAllInStorageOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-
-### Calculate for AV36p All In CPU Only
-.\allinsizing\allinvariables.ps1
-$global:vRamPerVM = 0
-$global:storagePerVM = 0
-
-.\apipost.ps1
-$global:response36pAllInCPUOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-### Calculate for AV36pp All In Memory Only
-.\allinsizing\allinvariables.ps1
-$global:storagePerVM = 0
-$global:vCpuPerVM = 0
+$global:directory = "$sizingfor" + "sizing"
+$global:variablesfilename = "$sizingfor" + "variables.ps1"
 
 
 
-.\apipost.ps1
-$global:response36pAllInMemoryOnly = Invoke-RestMethod $apiurl -Method 'POST' -Headers $headers -Body $body
-
-if($global:testing -eq 1){
-    Read-Host "press any key ... done"
-}
-
-## Read the Host Count and RAID Levels into a Variable
-$global:hostcount36pAllIn = $global:response36pAllIn.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraid36pAllIn = $global:response36pAllIn.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-$global:hostcount36pAllInStorageOnly = $global:response36pAllInStorageOnly.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraid36pAllInStorageOnly = $global:response36pAllInStorageOnly.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-$global:hostcount36pAllInCPUOnly = $global:response36pAllInCPUOnly.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraid36pAllInCPUOnly = $global:response36pAllInCPUOnly.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-$global:hostcount36pAllInMemoryOnly = $global:response36pAllInMemoryOnly.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
-$global:fttraid36pAllInMemoryOnly = $global:response36pAllInMemoryOnly.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
-
-## Write The Host Count and RAID Levels into the sizer.xlsm file
-
-$ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
+$ExcelSheet = $ExcelWorkBook.Worksheets.Item($global:excelsheetsizingresults)
 $ExcelSheet.activate()
-$ExcelSheet.Range("B2") = $global:hostcount36pAllIn #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("N2") = $global:fttraid36pAllIn #writes the rvtools file path and filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("B17") = $global:hostcount36pAllInCPUOnly #writes the rvtools filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("B18") = $global:hostcount36pAllInMemoryOnly #writes the rvtools filename to the sizer sheet so the excel macro knows where it's located.
-$ExcelSheet.Range("B19") = $global:hostcount36pAllInStorageOnly #writes the rvtools filename to the sizer sheet so the excel macro knows where it's located.
+
+### Calculate for AV36p AllIn
+. .\$global:directory\$global:variablesfilename
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+$ExcelSheet.Range($global:thehostcountinexcel_total) = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thefttraidinexcel_total) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+
+### Calculate for AV36p AllIn Storage Only
+. .\$global:directory\$global:variablesfilename
+$global:vCpuPerVM = 0
+$global:vRamPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_storage = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_storage) = $global:hostsfor_storage
+$ExcelSheet.Range($global:thefttraidinexcel_storage) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV36p AllIn CPU Only
+. .\$global:directory\$global:variablesfilename
+$global:vRamPerVM = 0
+$global:storagePerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_cpu = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_cpu) = $global:hostsfor_cpu
+$ExcelSheet.Range($global:thefttraidinexcel_cpu) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
+### Calculate for AV36p AllIn Memory Only
+. .\$global:directory\$global:variablesfilename
+$global:storagePerVM = 0
+$global:vCpuPerVM = 0
+
+.\apipost.ps1
+$global:api = Invoke-RestMethod $global:apiurl -Method 'POST' -Headers $global:headers -Body $global:body 
+
+$global:hostsfor_memory = $global:api.sddclist.clusterList.sazClusters.hostbreakuplist.totalHostCount
+$ExcelSheet.Range($global:thehostcountinexcel_memory) = $global:hostsfor_memory
+$ExcelSheet.Range($global:thefttraidinexcel_memory) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
+
+
