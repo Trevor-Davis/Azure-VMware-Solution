@@ -42,7 +42,7 @@ $ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
 $ExcelSheet.Range("a1") = "RV Tools"
 $ExcelSheet.Range("B2:b33") = ""
 $ExcelSheet.Range("N2:N15") = ""
-$ExcelSheet.Range("s2:y15") = ""
+$ExcelSheet.Range("s2:x15") = ""
 $ExcelSheet.Range("b35") = $global:excludepoweredoff
 
 $global:app.Run("Import") # Run the Excel Macro in the Sizer file to import the RV Tools file.

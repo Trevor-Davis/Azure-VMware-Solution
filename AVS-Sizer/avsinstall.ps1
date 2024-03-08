@@ -2,7 +2,8 @@ Clear-Host
 
 $global:downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
 
-if ($updateflag -ne 1)
+
+if ($global:updateflag -ne 1)
 
 {
     if (Test-Path $downloaddirectory) {
@@ -36,10 +37,10 @@ mkdir $downloaddirectory
     "apipost.ps1"
     "AVS.pptm"
     "AVS-Sizer.zip"
-    "AVSDemandGen.pptm"
+    "AVSDemandGen.pptm" 
     "AVSDemandGen-Template.pptm"
     "checkforupdates.ps1"
-    "check-newinstallfile.ps1"
+    #"check-newinstallfile.ps1"
     "check-importexcel.ps1"
     "check-powershell.ps1"
     "closesizerfile.ps1"

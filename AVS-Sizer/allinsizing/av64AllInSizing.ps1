@@ -16,7 +16,6 @@ $global:thefttraidinexcel_memory = "v12"
 $global:thehostcountinexcel_storage = "s12"
 $global:thefttraidinexcel_storage = "t12"
 
-$global:hostcoutforstorageonlyinexcel = "y12"
 
 $global:excelsheetsizingresults = "sizingresults"
 
