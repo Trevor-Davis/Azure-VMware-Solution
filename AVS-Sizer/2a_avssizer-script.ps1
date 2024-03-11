@@ -44,6 +44,10 @@ $ExcelSheet.Range("B2:b33") = ""
 $ExcelSheet.Range("N2:N15") = ""
 $ExcelSheet.Range("s2:x15") = ""
 $ExcelSheet.Range("b35") = $global:excludepoweredoff
+$ExcelSheet.Range("b36") = $global:fttraiddropdown.SelectedText
+$ExcelSheet.Range("d35") = $global:cpuovercommitdropdown.SelectedText
+$ExcelSheet.Range("f35") = $global:dedupecompressiondropdown.SelectedText
+
 
 $global:app.Run("Import") # Run the Excel Macro in the Sizer file to import the RV Tools file.
 

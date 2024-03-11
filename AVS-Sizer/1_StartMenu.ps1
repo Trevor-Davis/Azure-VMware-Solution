@@ -80,7 +80,7 @@ $dedupecompressiondropdown = New-Object $comboboxobject
 $dedupecompressiondropdown.Width = '350'
 $dedupecompressiondropdown.Location=New-Object System.Drawing.Point($dropdownleftmargin,$dropdownrowtopmargin)
 $dedupecompressiondropdown.AutoSize=$true
-$dedupecompressiondropdown.SelectedText="1.25"
+$global:dedupecompressiondropdown.SelectedText="1.25"
 Import-Csv "$global:locationofpowershell\dropdowns\dedupecompression.csv" | ForEach-Object {$dedupecompressiondropdown.Items.Add($_.'Dedupe/Compression')}
  
 ##FTT Raid Selection
@@ -97,7 +97,7 @@ $fttraiddropdown = New-Object $comboboxobject
 $fttraiddropdown.Width = '350'
 $fttraiddropdown.Location=New-Object System.Drawing.Point($dropdownleftmargin,$dropdownrowtopmargin)
 $fttraiddropdown.AutoSize=$true
-$fttraiddropdown.SelectedText="AUTO"
+$global:fttraiddropdown.SelectedText="AUTO"
 Import-Csv "$global:locationofpowershell\dropdowns\fttraid.csv" | ForEach-Object {$fttraiddropdown.Items.Add($_.'fttraid')}
 
 
@@ -114,7 +114,7 @@ $cpuovercommitdropdown = New-Object $comboboxobject
 $cpuovercommitdropdown.Width = '350'
 $cpuovercommitdropdown.Location=New-Object System.Drawing.Point($dropdownleftmargin,$dropdownrowtopmargin)
 $cpuovercommitdropdown.AutoSize=$true
-$cpuovercommitdropdown.SelectedText="5"
+$global:cpuovercommitdropdown.SelectedText="5"
 Import-Csv "$global:locationofpowershell\dropdowns\cpuovercommit.csv" | ForEach-Object {$cpuovercommitdropdown.Items.Add($_.'cpuovercommit')}
 
 # Powered On / Off Selection
@@ -213,31 +213,31 @@ if ($testing -eq 1){
 
 
 if (
-$fttraiddropdown.SelectedText -eq "FTT=1"
+$global:fttraiddropdown.SelectedText -eq "FTT=1"
 ){
     $global:fttFtmType = "FTT1_RAID1"
 }
 
 elseif (
-$fttraiddropdown.SelectedText -eq "FTT=1, Erasure Coding"
+$global:fttraiddropdown.SelectedText -eq "FTT=1, Erasure Coding"
 ){
     $global:fttFtmType = "FTT1_RAID5"
 }
 
 elseif (
-$fttraiddropdown.SelectedText -eq "FTT=2"
+$global:fttraiddropdown.SelectedText -eq "FTT=2"
 ){
     $global:fttFtmType = "FTT2_RAID1"
 }
 
 elseif (
-$fttraiddropdown.SelectedText -eq "FTT=2, Erasure Coding"
+$global:fttraiddropdown.SelectedText -eq "FTT=2, Erasure Coding"
 ){
     $global:fttFtmType = "FTT2_RAID6"
 }
 
 elseif (
-$fttraiddropdown.SelectedText -eq "AUTO"
+$global:fttraiddropdown.SelectedText -eq "AUTO"
 ){
     $global:fttFtmType = "AUTO_AUTO"
 }
