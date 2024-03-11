@@ -20,6 +20,22 @@ if ($filecheck) {
  
 
 
+        $testfile = $locationofpowershell + "\" + "AVS-Template.pptm"
+        $filecheck = Test-Path -path $testfile
+        
+        if ($filecheck) {
+            } else 
+            {
+                $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
+                $filenames = @("AVS-Template.pptm")
+                foreach($filename in $filenames){
+                    Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
+                }}
+         
+        
+
+
+        
 ########################################################################################
 # Check Pre-Reqs
 ########################################################################################

@@ -36,6 +36,7 @@ mkdir $downloaddirectory
     "3_manual-avssizer-script.ps1"
     "apipost.ps1"
     "AVS.pptm"
+    "AVS-template.pptm"
     "AVS-Sizer.zip"
     "AVSDemandGen.pptm" 
     "AVSDemandGen-Template.pptm"
