@@ -51,6 +51,7 @@ mkdir $downloaddirectory
     if ($global:updateflag -ne 1){
     "avsinstall.ps1"}
     "Install-AVS-Sizer.bat"
+    "loguse.ps1"
     "opensizerfile.ps1"
     "sizer.xlsm"
     "StartAVSSizer.vbs"

@@ -1,5 +1,7 @@
 .\globalvariables.ps1  
 .\checkforupdates.ps1
+.\loguse.ps1
+
 
     $global:manualsizing = 0     
     $global:locationofpowershell = $PSScriptRoot #This sets the location of all the pwoershell files to the root directory of this script.
@@ -32,7 +34,19 @@ if ($filecheck) {
                     Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
                 }}
          
-        
+
+                $testfile = $locationofpowershell + "\" + "loguse.ps1"
+                $filecheck = Test-Path -path $testfile
+                
+                if ($filecheck) {
+                    } else 
+                    {
+                        $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
+                        $filenames = @("loguse.ps1")
+                        foreach($filename in $filenames){
+                            Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
+                        }}
+                 
 
 
         
