@@ -8,46 +8,15 @@
     $global:sizerlocation = $locationofpowershell + "\" + $filename # this is the full path of the sizer file location
 
 #################
-$testfile = $locationofpowershell + "\" + "AVSDemanddGen-Template.pptm"
-$filecheck = Test-Path -path $testfile
 
-if ($filecheck) {
-    } else 
-    {
+
         $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
-        $filenames = @("AVSDemandGen-Template.pptm")
+        $filenames = @("AVSDemandGen-Template.pptm","AVS-Template.pptm","loguse.ps1")
         foreach($filename in $filenames){
             Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
-        }}
- 
-
-
-        $testfile = $locationofpowershell + "\" + "AVS-Template.pptm"
-        $filecheck = Test-Path -path $testfile
-        
-        if ($filecheck) {
-            } else 
-            {
-                $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
-                $filenames = @("AVS-Template.pptm")
-                foreach($filename in $filenames){
-                    Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
-                }}
-         
-
-                $testfile = $locationofpowershell + "\" + "loguse.ps1"
-                $filecheck = Test-Path -path $testfile
-                
-                if ($filecheck) {
-                    } else 
-                    {
-                        $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
-                        $filenames = @("loguse.ps1")
-                        foreach($filename in $filenames){
-                            Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
-                        }}
-                 
-
+        }
+    
+    
 
         
 ########################################################################################
