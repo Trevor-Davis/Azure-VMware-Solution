@@ -2,7 +2,7 @@
     
 $theuser = $env:USERNAME
 $thetime = Get-Date -Format "yyyy-MM-dd-HHmm"
-
+ 
 $file = Set-Content $env:LOCALAPPDATA\$theuser-$thetime.txt $theuser-$thetime
 $file = "$env:LOCALAPPDATA\$theuser-$thetime.txt"
 
