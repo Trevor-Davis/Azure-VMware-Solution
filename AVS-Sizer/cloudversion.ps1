@@ -1,1 +1,1 @@
-$global:cloudversion = 1.51
+$global:cloudversion = 1.52
