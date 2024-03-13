@@ -1,4 +1,5 @@
-
+# https://rzander.azurewebsites.net/upload-file-to-azure-blob-storage-with-powershell/
+    
 $theuser = $env:USERNAME
 $thetime = Get-Date -Format "yyyy-MM-dd-HHmm"
 
@@ -9,7 +10,8 @@ $file = "$env:LOCALAPPDATA\$theuser-$thetime.txt"
 $name = (Get-Item $file).Name
 
 #The target URL wit SAS Token
-$uri = "https://avssizer.blob.core.windows.net/avsexecutionlogs/$($name)?sp=rcw&st=2024-03-12T01:11:14Z&se=2024-03-12T09:11:14Z&spr=https&sv=2022-11-02&sr=c&sig=IiGnzRoh7qzMvmnvLlM5K3ikUvG0mP%2FGYVejEfNWZCc%3D"
+$uri = "https://avssizer.blob.core.windows.net/avsexecutionlogs/$($name)?sp=ac&st=2024-03-13T16:11:03Z&se=2024-08-14T00:11:03Z&spr=https&sv=2022-11-02&sr=c&sig=EZGFbbXM2AsJTLx0GuThCoZt5Dm%2BICPayLcfg6bkN7M%3D"
+
 
 #Define required Headers
 $headers = @{
