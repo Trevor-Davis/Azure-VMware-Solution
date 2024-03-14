@@ -1,1 +1,1 @@
-$global:currentversion = 1.55
+$global:currentversion = 1.56
