@@ -11,9 +11,9 @@
 
 
         $downloaddirectory = "$env:HOMEPATH\AppData\Local\avssizer"
-        $filenames = @("AVSDemandGen-Template.pptm","AVS-Template.pptm","loguse.ps1")
+        $filenames = @("AVSDemandGen-Template.pptm","AVS-template.pptm","loguse.ps1")
         foreach($filename in $filenames){
-            Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
+        Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMware-Solution/master/AVS-Sizer/$filename" -OutFile $downloaddirectory\$filename
         }
     
     
