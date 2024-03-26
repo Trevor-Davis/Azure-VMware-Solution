@@ -134,6 +134,7 @@ $global:storagePerVMTotal = $totalstorageinput.Text
 $global:vRamPerVM = $totalmemoryinput.Text/$global:totalVMCount
 $global:vRamPerVMTotal = $totalmemoryinput.Text
 
+
 .\3_manual-avssizer-script.ps1
 
 }
