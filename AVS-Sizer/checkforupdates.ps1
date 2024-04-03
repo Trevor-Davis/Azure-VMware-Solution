@@ -8,10 +8,13 @@ Invoke-WebRequest -uri "https://raw.githubusercontent.com/Trevor-Davis/Azure-VMw
 
 If ($cloudversion -gt $currentversion){
 
-$YesOrNo = Read-Host "
-Your Version: $currentversion
-New Version: $cloudversion
-There is a new version of the AVS-Sizer, would you like to Upgrade Now? (Y/N)"
+
+Write-Host "Your Version: $currentversion"
+Write-Host "New Version: $cloudversion"
+Write-Host "Release Notes: Converted memory calculation to MiB from MB to align with API sizing, default overcommit changed to 6:1 and cleaned up the powerpoint files formatting a bit" -ForegroundColor Yellow
+$YesOrNo = Read-Host "There is a new version of the AVS-Sizer, would you like to Upgrade Now? (Y/N)"
+write-host $YesOrNo
+Read-Host
 
 If ( $YesOrNo -eq "y")
 {

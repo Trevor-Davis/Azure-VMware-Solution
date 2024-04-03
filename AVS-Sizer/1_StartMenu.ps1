@@ -113,7 +113,7 @@ $cpuovercommitdropdown = New-Object $comboboxobject
 $cpuovercommitdropdown.Width = '350'
 $cpuovercommitdropdown.Location=New-Object System.Drawing.Point($dropdownleftmargin,$dropdownrowtopmargin)
 $cpuovercommitdropdown.AutoSize=$true
-$global:cpuovercommitdropdown.SelectedText="5"
+$global:cpuovercommitdropdown.SelectedText="6"
 Import-Csv "$global:locationofpowershell\dropdowns\cpuovercommit.csv" | ForEach-Object {$cpuovercommitdropdown.Items.Add($_.'cpuovercommit')}
 
 # Powered On / Off Selection
