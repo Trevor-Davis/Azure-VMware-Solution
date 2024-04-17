@@ -92,10 +92,7 @@ $global:memoryOvercommitFactor = $global:importsizer[41].Value
 
 
 $global:ExcelSheet = $ExcelWorkBook.Worksheets.Item('sizingresults')
-$global:ExcelSheet.Range("d35") = $global:computeOvercommitFactor 
-$global:ExcelSheet.Range("f35") = $global:compressionRatio
-$global:ExcelSheet.Range("f35") = $global:compressionRatio
-$global:ExcelSheet.Range("b36") = $global:fttraiddropdown.SelectedText
+
 
 ############################################################################################################
 #All In Models

@@ -11,7 +11,7 @@ If ($cloudversion -gt $currentversion){
 
 Write-Host "Your Version: $currentversion"
 Write-Host "New Version: $cloudversion"
-Write-Host "Release Notes: Converted memory calculation to MiB from MB to align with API sizing, default overcommit changed to 6:1 and cleaned up the powerpoint files formatting a bit" -ForegroundColor Yellow
+Write-Host "Release Notes: Able to handle column names and structures which aren't always the same across versions" -ForegroundColor Yellow
 $YesOrNo = Read-Host "There is a new version of the AVS-Sizer, would you like to Upgrade Now? (Y/N)"
 write-host $YesOrNo
 Read-Host

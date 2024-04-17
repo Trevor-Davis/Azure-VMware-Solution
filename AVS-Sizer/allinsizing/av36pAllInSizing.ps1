@@ -1,6 +1,6 @@
 ## Sets the host type to AV36p and the variables for the formulas
 $global:sddcHostType = $importsizer[36].Value
-$global:sizingfor = "AllIn"
+$global:sizingfor = "allin"
 $global:hosttype = "AV36p"
 
 $global:thehostcountinexcel_total = "b2"
@@ -27,6 +27,7 @@ $global:variablesfilename = "$sizingfor" + "variables.ps1"
 $ExcelSheet = $ExcelWorkBook.Worksheets.Item($global:excelsheetsizingresults)
 $ExcelSheet.activate()
 
+
 ### Calculate for AV36p AllIn
 . .\$global:directory\$global:variablesfilename
 
@@ -36,8 +37,9 @@ $ExcelSheet.Range($global:thehostcountinexcel_total) = $global:api.sddclist.clus
 $ExcelSheet.Range($global:thefttraidinexcel_total) = $global:api.sddclist.clusterList.sazClusters.clusterInfoList.fttFTMtype
 
 
-
 ### Calculate for AV36p AllIn Storage Only
+
+
 . .\$global:directory\$global:variablesfilename
 $global:vCpuPerVM = 0
 $global:vRamPerVM = 0

@@ -1,3 +1,19 @@
+<#
+
+write-host "sddcHostType" $sddcHostType
+write-host "totalVMCount" $totalVMCount
+write-host "vCpuPerVM" $vCpuPerVM
+write-host "memoryOvercommitFactor" $memoryOvercommitFactor
+write-host "computeOvercommitFactor" $computeOvercommitFactor
+write-host "storagePerVM" $storagePerVM
+write-host "fttFtmType" $fttFtmType
+write-host "vCpuPerCore" $vCpuPerCore
+write-host "compressionRatio" $compressionRatio
+write-host "vRamPerVM" $vRamPerVM
+
+
+#>
+
 $global:headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $global:headers.Add("Content-Type", "application/json; charset=utf-8")
 #$headers.Add("Authorization", "Basic dHJldm9yLnAuZGF2aXNATWljcm9zb2Z0LmNvbTpNaWNyb3NvZnQuMTIz")
@@ -41,8 +57,8 @@ $global:body = @"
         `"totalIOPs`": 5000,
         `"iopsPerVM`": 50,
         `"separateCluster`": false,
-        `"hyperThreadingFactor`": 1.25,
-        `"cpuUtilization`": 0.3,
+        `"hyperThreadingFactor`": 1.00,
+        `"cpuUtilization`": 0.5,
         `"computeOvercommitFactor`": $computeOvercommitFactor,
         `"clusterType`": `"SAZ`",
         `"ioRatio`": `"70/30`",
@@ -194,8 +210,8 @@ $global:body = @"
                 `"totalIOPs`": 5000,
                 `"iopsPerVM`": 50,
                 `"separateCluster`": false,
-                `"hyperThreadingFactor`": 1.25,
-                `"cpuUtilization`": 0.3,
+                `"hyperThreadingFactor`": 1.00,
+                `"cpuUtilization`": 0.5,
                 `"computeOvercommitFactor`": $computeOvercommitFactor,
                 `"clusterType`": `"SAZ`",
                 `"ioRatio`": `"70/30`",
