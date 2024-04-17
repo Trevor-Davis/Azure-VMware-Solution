@@ -11,7 +11,10 @@ If ($cloudversion -gt $currentversion){
 
 Write-Host "Your Version: $currentversion"
 Write-Host "New Version: $cloudversion"
-Write-Host "Release Notes: Able to handle column names and structures which aren't always the same across versions" -ForegroundColor Yellow
+Write-Host "
+Release Notes: 
+Able to handle column names and structures which aren't always the same across versions
+CPU Utilization assumnption changed from 30% to 50%" -ForegroundColor Yellow
 $YesOrNo = Read-Host "There is a new version of the AVS-Sizer, would you like to Upgrade Now? (Y/N)"
 write-host $YesOrNo
 Read-Host
