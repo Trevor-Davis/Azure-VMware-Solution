@@ -10,7 +10,7 @@ $file = "$env:LOCALAPPDATA\$theuser-$thetime.txt"
 $name = (Get-Item $file).Name
 
 #The target URL wit SAS Token
-$uri = "https://avssizer.blob.core.windows.net/avsexecutionlogs/$($name)?sp=ac&st=2024-03-13T16:11:03Z&se=2024-08-14T00:11:03Z&spr=https&sv=2022-11-02&sr=c&sig=EZGFbbXM2AsJTLx0GuThCoZt5Dm%2BICPayLcfg6bkN7M%3D"
+$uri = "https://tredavisavsgcs.blob.core.windows.net/avssizer/$($name)?sp=racw&st=2024-04-22T20:40:04Z&se=2025-04-23T04:40:04Z&spr=https&sv=2022-11-02&sr=c&sig=QnZoCCkVWO61Zs2al5iOSUQaDy2enOKFe1OmaBoAXVc%3D"
 
 
 #Define required Headers

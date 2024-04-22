@@ -76,7 +76,7 @@ $inputleftmargin = 350
 $topmargin = $topmargin+50
 
 $totalstorageinputtext = New-Object $labelobject
-$totalstorageinputtext.Text = "Total Storage (GB): "
+$totalstorageinputtext.Text = "Total Storage (TB): "
 $totalstorageinputtext.AutoSize=$true
 $totalstorageinputtext.Location=New-Object System.Drawing.Point($leftmargin,$topmargin)   
 
@@ -129,7 +129,7 @@ If($global:buttonclicked -eq "submit"){
 $global:totalVMCount = $totalvminput.Text
 $global:vCpuPerVM = ($totalvcpuinput.Text)/$global:totalVMCount
 $global:vCpuTotal = $totalvcpuinput.Text
-$global:storagePerVM = $totalstorageinput.Text/$global:totalVMCount
+$global:storagePerVM = ([int]$totalstorageinput.Text*1024)/$global:totalVMCount
 $global:storagePerVMTotal = $totalstorageinput.Text
 $global:vRamPerVM = $totalmemoryinput.Text/$global:totalVMCount
 $global:vRamPerVMTotal = $totalmemoryinput.Text
